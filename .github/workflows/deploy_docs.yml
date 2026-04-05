@@ -2,7 +2,8 @@ name: Deploy BobDocs
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -17,13 +18,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
-      - name: Install deps
-        run: make install
-
-      - name: Build site
-        run: make build
-
-      - name: Deploy site
-        run: make deploy
+      - name: Full deploy
+        run: make full-deploy
