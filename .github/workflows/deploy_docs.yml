@@ -20,6 +20,24 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Full deploy
-        run: make full-deploy
-        shell: bash
+      - name: Install deps
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Copy dist
+        run: |
+          Remove-Item -Recurse -Force dist -ErrorAction Ignore
+          Copy-Item -Recurse docs/.vitepress/dist dist
+
+      - name: Restart container
+        run: |
+          docker rm -f bobdocs 2>$null
+          docker run -d `
+            --name bobdocs `
+            -p 3000:80 `
+            -v ${PWD}/dist:/usr/share/nginx/html:ro `
+            -v ${PWD}/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro `
+            --restart unless-stopped `
+            nginx:latest
