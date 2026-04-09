@@ -104,7 +104,7 @@ export default defineConfig({
 
     outline: { level: [2, 3], label: 'On this page' },
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/longhornRacingElectric/' },
+      { icon: 'github', link: 'https://github.com/BobDyn/' },
       { icon: 'instagram', link: 'https://www.instagram.com/longhornracing/' },
     ],
 
