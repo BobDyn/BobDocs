@@ -3,7 +3,7 @@ layout: doc
 title: Vehicle Performance Metrics
 ---
 
-# Vehicle Performance Metrics
+## Vehicle Performance Metrics
 
 This page provides conceptual definitions of commonly used vehicle performance metrics. Each metric
 is described in terms of the physical behavior it represents and why it is relevant to vehicle
