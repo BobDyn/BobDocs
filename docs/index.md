@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: BobDyn
+  name: BobDyn!!!
   text: A framework for physics-based vehicle simulation
   image:
     src: /bob.png
