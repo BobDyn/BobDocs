@@ -3,7 +3,7 @@ layout: doc
 title: Control Theory
 ---
 
-## Control Theory
+# Control Theory
 
 In vehicle modeling, we don't just care about how a vehicle moves. We care about how to make it move
 the way we want. Control theory is the mathematical framework used to regulate the behavior of

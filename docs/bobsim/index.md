@@ -3,7 +3,7 @@ layout: doc
 title: BobSim
 ---
 
-## BobSim
+# BobSim
 
 BobSim executes and analyzes vehicle models built in BobLib. It provides the tools needed to explore system behavior, quantify sensitivities, and evaluate design decisions across the full parameter space.
 

@@ -3,7 +3,7 @@ layout: doc
 title: Reference
 ---
 
-## Reference
+# Reference
 
 Definitions, theory, and methodology behind BobSim and its outputs.
 

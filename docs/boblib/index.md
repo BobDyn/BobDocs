@@ -3,7 +3,7 @@ layout: doc
 title: Overview
 ---
 
-## BobLib
+# BobLib
 
 BobLib defines vehicle systems using acausal multibody physics. It serves as the foundation of the BobDyn framework, translating vehicle definitions into structured, high-fidelity physical models.
 
