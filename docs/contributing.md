@@ -4,7 +4,7 @@ BobDocs uses **VitePress**, which turns simple text files (Markdown) into the we
 
 ---
 
-## 🛠️ The Rules of the Road
+## The Rules of the Road
 
 To keep the documentation stable and high-quality, we follow a simple workflow.
 
@@ -15,7 +15,7 @@ To keep the documentation stable and high-quality, we follow a simple workflow.
 
 ---
 
-## 🚀 Step-by-Step Setup
+## Step-by-Step Setup
 
 If you don't have the code on your computer yet, follow these steps:
 
@@ -41,7 +41,7 @@ If you don't have the code on your computer yet, follow these steps:
 
 ---
 
-## 📝 How to Contribute (The Workflow)
+## How to Contribute (The Workflow)
 
 ### 1. Create a Branch
 Before you start typing, create a new branch:
@@ -59,7 +59,7 @@ Most of the work happens in the `docs/` folder. Files end in `.md` (Markdown).
     title: Your Page Title
     ---
     ```
-*   **Math**: We support LaTeX! 
+*   **Math**: We support LaTeX!
     - Inline: `$a = F/m$`
     - Blocks: 
       ```markdown
@@ -91,7 +91,7 @@ Then, go to the [GitHub repository](https://github.com/BobDyn/BobDocs) and click
 
 ---
 
-## 🧩 Advanced Features
+## Advanced Features
 
 ### Sidebars & "On this page"
 The right-hand "On this page" menu is automatic! It pulls from your `##` and `###` headings. The left-hand sidebar order determines the "Next" and "Previous" buttons at the bottom of the page.
