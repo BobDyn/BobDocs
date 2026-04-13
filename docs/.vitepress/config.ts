@@ -42,6 +42,7 @@ export default defineConfig({
       { text: 'BobLib', link: '/boblib/' },
       { text: 'BobSim', link: '/bobsim/' },
       { text: 'Reference', link: '/reference/' },
+      { text: 'Contribute', link: '/contributing' },
       // Add new top-nav entries here
     ],
 
@@ -99,6 +100,28 @@ export default defineConfig({
             { text: 'Feedforward Control', link: '/reference/control-theory#feedforward-control' },
           ]
         },
+      ],
+      '/contributing': [
+        {
+          text: 'Contribute',
+          collapsed: false,
+          items: [
+            { text: 'The Rules of the Road', link: '/contributing#the-rules-of-the-road' },
+            { text: 'Step-by-Step Setup', link: '/contributing#step-by-step-setup' },
+            {
+              text: 'How to Contribute',
+              collapsed: false,
+              items: [
+                { text: 'Create a Branch', link: '/contributing#create-a-branch' },
+                { text: 'Write Your Content', link: '/contributing#write-your-content' },
+                { text: 'Add to the Navigation', link: '/contributing#add-to-the-navigation-if-needed' },
+                { text: 'Check for Errors', link: '/contributing#check-for-errors' },
+                { text: 'Submit Your Work', link: '/contributing#submit-your-work' },
+              ],
+            },
+            { text: 'Advanced Features', link: '/contributing#advanced-features' },
+          ]
+        }
       ],
     },
 

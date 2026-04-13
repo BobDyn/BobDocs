@@ -31,6 +31,10 @@ npm run build
 npm run preview
 ```
 
+## Contributing
+
+Interested in contributing to BobDocs? See [CONTRIBUTING.md](./CONTRIBUTING.md) for a guide on how to add pages, edit content, and work with the sidebar.
+
 ## Content Editing
 
 All content is written in Markdown:
