@@ -5,9 +5,15 @@ title: Reference
 
 # Reference
 
-Definitions, theory, and methodology behind BobSim and its outputs.
+Reference pages explain the theory, terminology, and metrics used by BobDyn.
 
-- [Performance Metrics](/reference/metrics) - definitions and equations for all solver output
-  metrics across steady-state, transient, stability, and frequency domains
-- [Control Theory](/reference/control-theory) - feedback control fundamentals: bang-bang, PID,
-  feedforward
+## Pages
+
+- [Vehicle performance metrics](/reference/metrics)
+- [Control theory](/reference/control-theory)
+- [Output signals](/reference/output-signals)
+- [Glossary](/reference/glossary)
+
+## How to use this section
+
+Use the reference when reading reports or adding new metrics. The goal is to keep metric definitions close to the documentation so public users can understand the meaning of each output without reading the entire codebase.

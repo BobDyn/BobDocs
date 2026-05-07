@@ -114,3 +114,22 @@ h4:hover .header-anchor {
         max-height: 280px;
     }
 }
+
+.mobile-visuals-message {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-visuals {
+    display: none;
+  }
+
+  .mobile-visuals-message {
+    display: block;
+    padding: 1rem;
+    border: 1px solid var(--vp-c-divider);
+    border-radius: 12px;
+    background: var(--vp-c-bg-soft);
+    color: var(--vp-c-text-2);
+  }
+}

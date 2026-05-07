@@ -1,52 +1,62 @@
 ---
 layout: doc
-title: Overview
+title: BobLib
 ---
 
 # BobLib
 
-BobLib defines vehicle systems using acausal multibody physics. It serves as the foundation of the BobDyn framework, translating vehicle definitions into structured, high-fidelity physical models.
+BobLib is the Modelica modeling layer of BobDyn. It defines vehicle systems using acausal multibody physics and provides the compiled model that BobSim executes.
 
----
+## What BobLib contains
 
-## What It Does
+```text
+BobLib/
+├─ Vehicle/      physical vehicle subsystems and assemblies
+├─ Resources/    parameter records, vehicle definitions, visual records
+├─ Standards/    standard maneuver models and build scripts
+├─ Utilities/    reusable math, FMI, and multibody components
+└─ Tests/        development and validation test models
+```
 
-- Builds full vehicle systems from modular components
-- Represents geometry, constraints, and force generation directly
-- Captures load paths and interactions through physical relationships
-- Produces models that remain consistent across all operating conditions
+## Modeling philosophy
 
----
+BobLib is built around a few rules:
 
-## Modeling Approach
+| Principle | Meaning |
+|:--|:--|
+| Physics first | Geometry, constraints, forces, and motion should come from physical relationships. |
+| Acausal modeling | Components connect through Modelica equations rather than prescribed signal flow. |
+| Reusable structure | Vehicle components live in `Vehicle/`; data lives in `Resources/`. |
+| Inspectable assumptions | Records, parameters, and standard models are plain text and version controlled. |
+| Standards reuse the model | Standard maneuvers should exercise the same underlying vehicle model, not a separate reduced model. |
 
-Traditional vehicle models often rely on simplified formulas or signal-based representations. BobLib instead constructs the system from first principles:
+## Current maturity
 
-- **Acausal multibody modeling** - components interact through physical laws, not prescribed signal flow
-- **Explicit geometry** - suspension linkages, pickup points, etc. are directly defined
-- **Constraint-based systems** - motion is governed by joints and connections rather than approximations (DAEs)
+The chassis side is the most mature part of BobLib. The current public-release model includes:
 
-This allows simulations to reproduce behavior naturally and efficiently, without relying on empirical shortcuts.
+- double-wishbone suspension architecture,
+- bellcrank, rod, spring, damper, and anti-roll-bar linkages,
+- rack-and-pinion steering templates,
+- MF5.2-style tire evaluation structure,
+- full-vehicle double-wishbone RWD assembly,
+- standard-output records for ISO4138, ISO7401, KnC, and FMI-facing outputs.
 
----
+Powertrain, aero, electronics, and additional vehicle architectures exist but should be treated as earlier-stage than the core chassis workflow.
 
-## Structure
+## Main public entry points
 
-BobLib is organized around reusable system definitions:
+| Model/package | Purpose |
+|:--|:--|
+| `BobLib.Standards.VehicleModel` | Active unified executable target for BobSim standard workflows. |
+| `BobLib.Vehicle.VehicleDW_RWD_Lock` | Full vehicle assembly used by the active standard model. |
+| `BobLib.Resources.VehicleDefn.OrionRecord` | Vehicle parameter record used by the current standard model. |
+| `BobLib.Standards.StandardSim.ISO4138` | Standard-specific Modelica maneuver model. |
+| `BobLib.Standards.StandardSim.ISO7401` | Standard-specific transient maneuver model. |
+| `BobLib.Standards.VehicleFMI` | FMI-oriented vehicle model target. |
 
-- **Vehicle** - full system assembly
-- **Suspension** - architecture-specific templates (e.g., double wishbone)
-- **Linkages & Joints** - physical connections and constraints
-- **Tires** - force and moment generation
-- **Powertrain** - energy and drivetrain systems
+## Learn more
 
-Each layer is modular, allowing components to be reused and extended across different vehicle designs.
-
----
-
-## Why It Matters
-
-- Models are interpretable and physically grounded
-- Behavior can be traced directly to system structure
-- Components can be reused across projects and configurations
-- The same model supports multiple types of analysis
+- [BobLib structure](/boblib/structure)
+- [Vehicle model](/boblib/vehicle-model)
+- [Parameter records](/boblib/records)
+- [Modelica conventions](/boblib/modelica-conventions)
