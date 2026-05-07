@@ -57,12 +57,48 @@ The result is a transparent workflow for generating simulation ground truth: cha
 
 <div class="desktop-visuals">
 
-| ISO4138 — Steady-State Cornering | ISO7401 — Transient Handling |
-|:--|:--|
-| <video autoplay loop muted playsinline width="100%"><source src="/iso4138.mp4" type="video/mp4"></video> | <video autoplay loop muted playsinline width="100%"><source src="/iso7401.mp4" type="video/mp4"></video> |
-| Steady-state cornering at constant velocity with prescribed curvature using closed-loop control. | Transient steering inputs used to evaluate vehicle response, stability, and handling behavior. |
-| **ISO4138 Report** | **ISO7401 Report** |
-| <iframe src="/iso4138_report.pdf#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="520px"></iframe> | <iframe src="/iso7401_report.pdf#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="520px"></iframe> |
+<table style="table-layout: fixed; width: 100%;">
+  <colgroup>
+    <col style="width: 50%;">
+    <col style="width: 50%;">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>ISO4138 — Steady-State Cornering</th>
+      <th>ISO7401 — Transient Handling</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <video autoplay loop muted playsinline width="100%">
+          <source src="/iso4138.mp4" type="video/mp4">
+        </video>
+      </td>
+      <td>
+        <video autoplay loop muted playsinline width="100%">
+          <source src="/iso7401.mp4" type="video/mp4">
+        </video>
+      </td>
+    </tr>
+    <tr>
+      <td>Steady-state cornering at constant velocity with prescribed curvature using closed-loop control.</td>
+      <td>Transient steering inputs used to evaluate vehicle response, stability, and handling behavior.</td>
+    </tr>
+    <tr>
+      <td><strong>ISO4138 Report</strong></td>
+      <td><strong>ISO7401 Report</strong></td>
+    </tr>
+    <tr>
+      <td>
+        <iframe src="/iso4138_report.pdf#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="520px" style="border: 0;"></iframe>
+      </td>
+      <td>
+        <iframe src="/iso7401_report.pdf#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="520px" style="border: 0;"></iframe>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 </div>
 
