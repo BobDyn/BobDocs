@@ -1,4 +1,5 @@
 import { defineConfig } from "vitepress";
+import mathjax3 from "markdown-it-mathjax3";
 import { withMermaid } from "vitepress-plugin-mermaid";
 
 export default withMermaid(
@@ -8,6 +9,16 @@ export default withMermaid(
 
     cleanUrls: true,
 
+    markdown: {
+      defaultHighlightLang: "txt",
+      languageAlias: {
+        modelica: "txt",
+      },
+      config: (md) => {
+        md.use(mathjax3);
+      },
+    },
+
     themeConfig: {
       logo: "/bob.png",
       siteTitle: "BobDyn",
@@ -15,8 +26,14 @@ export default withMermaid(
       nav: [
         { text: "Startup Guide", link: "/startup-guide/" },
         { text: "Use Guide", link: "/use-guide/" },
-        { text: "Documentation", link: "/documentation/" },
-        { text: "Reference", link: "/reference/" },
+        {
+          text: "Documentation",
+          items: [
+            { text: "BobLib", link: "/boblib/" },
+            { text: "BobSim", link: "/bobsim/" },
+            { text: "Reference", link: "/reference/" },
+          ],
+        },
       ],
 
       sidebar: {
@@ -344,7 +361,7 @@ export default withMermaid(
                       { text: "Reporting", link: "/documentation/bobsim/_0_Utils/reporting" },
                     ],
                   },
-                  { text: "_1_VisualSim", link: "/documentation/bobsim/_1_VisualSim/" },
+                  { text: "_1_VisualSim", link: "/documentation/bobsim/_1_VisualSIm/" },
                   {
                     text: "_2_EnvelopeSim",
                     collapsed: true,
@@ -361,8 +378,8 @@ export default withMermaid(
                       { text: "Overview", link: "/documentation/bobsim/_3_StandardSim/" },
                       { text: "Modelica Runner", link: "/documentation/bobsim/_3_StandardSim/modelica-runner" },
                       { text: "FMU Runner", link: "/documentation/bobsim/_3_StandardSim/fmu-runner" },
-                      { text: "ISO 4138", link: "/documentation/bobsim/_3_StandardSim/iso4138" },
-                      { text: "ISO 7401", link: "/documentation/bobsim/_3_StandardSim/iso7401" },
+                      { text: "SteadyStateEval", link: "/documentation/bobsim/_3_StandardSim/steady-state-eval" },
+                      { text: "TransientEval", link: "/documentation/bobsim/_3_StandardSim/transient-eval" },
                       { text: "KnC", link: "/documentation/bobsim/_3_StandardSim/knc" },
                     ],
                   },
@@ -377,12 +394,19 @@ export default withMermaid(
         "/reference/": [
           {
             text: "Reference",
+            collapsed: false,
             items: [
               { text: "Overview", link: "/reference/" },
-              { text: "Configuration", link: "/reference/configuration" },
-              { text: "Signals", link: "/reference/signals" },
-              { text: "Outputs", link: "/reference/outputs" },
-              { text: "Glossary", link: "/reference/glossary" },
+              {
+                text: "Vehicle Dynamics",
+                collapsed: false,
+                items: [{ text: "Vehicle Performance Metrics", link: "/reference/metrics" }],
+              },
+              {
+                text: "Control Foundations",
+                collapsed: false,
+                items: [{ text: "Control Theory", link: "/reference/control-theory" }],
+              },
             ],
           },
         ],

@@ -5,7 +5,7 @@ Generated FMU output staging directory.
 
 ## Package path
 
-```modelica
+```text
 BobLib.Build.FMU
 ```
 

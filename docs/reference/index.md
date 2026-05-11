@@ -5,15 +5,20 @@ title: Reference
 
 # Reference
 
-Reference pages explain the theory, terminology, and metrics used by BobDyn.
+Reference pages explain the terminology and theory used throughout BobDyn.
 
-## Pages
+## Vehicle dynamics
+
+Use these pages when you are reading reports or comparing vehicle behavior.
 
 - [Vehicle performance metrics](/reference/metrics)
+
+This page defines the steady-state, transient, stability, and frequency-domain quantities that show up in BobDyn reports and CSV outputs.
+
+## Control foundations
+
+Use this page when a workflow or metric depends on feedback, response shaping, or time-domain interpretation.
+
 - [Control theory](/reference/control-theory)
-- [Output signals](/reference/output-signals)
-- [Glossary](/reference/glossary)
 
-## How to use this section
-
-Use the reference when reading reports or adding new metrics. The goal is to keep metric definitions close to the documentation so public users can understand the meaning of each output without reading the entire codebase.
+This page covers the feedback concepts that appear in BobDyn documentation, including open-loop and closed-loop control, bang-bang control, PID, and feedforward.

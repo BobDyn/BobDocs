@@ -39,7 +39,7 @@ The chassis side is the most mature part of BobLib. The current public-release m
 - rack-and-pinion steering templates,
 - MF5.2-style tire evaluation structure,
 - full-vehicle double-wishbone RWD assembly,
-- standard-output records for ISO4138, ISO7401, KnC, and FMI-facing outputs.
+- standard-output records for SteadyStateEval, TransientEval, KnC, and FMI-facing outputs.
 
 Powertrain, aero, electronics, and additional vehicle architectures exist but should be treated as earlier-stage than the core chassis workflow.
 
@@ -50,13 +50,13 @@ Powertrain, aero, electronics, and additional vehicle architectures exist but sh
 | `BobLib.Standards.VehicleModel` | Active unified executable target for BobSim standard workflows. |
 | `BobLib.Vehicle.VehicleDW_RWD_Lock` | Full vehicle assembly used by the active standard model. |
 | `BobLib.Resources.VehicleDefn.OrionRecord` | Vehicle parameter record used by the current standard model. |
-| `BobLib.Standards.StandardSim.ISO4138` | Standard-specific Modelica maneuver model. |
-| `BobLib.Standards.StandardSim.ISO7401` | Standard-specific transient maneuver model. |
+| `BobLib.Standards.StandardSim` steady-state model | SteadyStateEval standard-specific Modelica maneuver model. |
+| `BobLib.Standards.StandardSim` transient model | TransientEval standard-specific transient maneuver model. |
 | `BobLib.Standards.VehicleFMI` | FMI-oriented vehicle model target. |
 
 ## Learn more
 
-- [BobLib structure](/boblib/structure)
-- [Vehicle model](/boblib/vehicle-model)
-- [Parameter records](/boblib/records)
-- [Modelica conventions](/boblib/modelica-conventions)
+- [BobLib docs](/documentation/boblib/)
+- [Standards package](/documentation/boblib/packages/standards/)
+- [Resources package](/documentation/boblib/packages/resources/)
+- [Vehicle package](/documentation/boblib/packages/vehicle/)

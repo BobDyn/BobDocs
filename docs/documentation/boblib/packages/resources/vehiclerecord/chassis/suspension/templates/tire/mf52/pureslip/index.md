@@ -7,7 +7,7 @@ This package is parameter-oriented. The records here should generally remain fre
 
 ## Package path
 
-```modelica
+```text
 BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip
 ```
 

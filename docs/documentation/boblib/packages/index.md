@@ -5,7 +5,7 @@ Root BobLib Modelica package. It ties together the vehicle model, standard-test 
 
 ## Package path
 
-```modelica
+```text
 BobLib
 ```
 

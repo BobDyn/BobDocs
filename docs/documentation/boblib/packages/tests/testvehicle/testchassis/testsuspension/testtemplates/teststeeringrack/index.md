@@ -7,7 +7,7 @@ This package is primarily for validation, examples, and smoke testing. Test mode
 
 ## Package path
 
-```modelica
+```text
 BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestSteeringRack
 ```
 

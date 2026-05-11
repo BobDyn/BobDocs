@@ -5,7 +5,7 @@ title: BobSim
 
 # BobSim
 
-BobSim is the Python orchestration layer for BobDyn. It runs BobLib models, extracts signals, computes metrics, and turns simulation output into reports.
+BobSim is the Python orchestration layer for BobDyn. This documentation follows the `../BobSim` checkout, which also contains BobLib as a submodule. BobSim builds simulations, runs cases, extracts signals, computes metrics, and turns results into reports.
 
 ## Repository layout
 
@@ -14,63 +14,47 @@ BobSim/
 ├─ _0_Utils/        plotting and reporting engines
 ├─ _1_VisualSim/    visualization renderer and templates
 ├─ _2_EnvelopeSim/  GGV and YMD first-principles envelope tools
-├─ _3_StandardSim/  ISO4138, ISO7401, KnC, and shared runners
+├─ _3_StandardSim/  SteadyStateEval, TransientEval, KnC, and shared runners
 └─ _4_DOE/          design-of-experiments pipeline scaffold
 ```
 
-## Active standard workflow
+## Active workflows
 
-The active standard workflow is based on:
+The primary public workflows are:
 
-| File | Role |
-|:--|:--|
-| `_3_StandardSim/_modelica_runner.py` | Runs the compiled OpenModelica executable. |
-| `_3_StandardSim/build.mos` | Builds `BobLib.Standards.VehicleModel`. |
-| `_3_StandardSim/ISO4138/iso4138_sim.py` | ISO4138 case generation, execution, summaries, and reporting. |
-| `_3_StandardSim/ISO7401/iso7401_sim.py` | ISO7401 case generation, execution, summaries, and reporting. |
-| `_0_Utils/reporting/report_engine.py` | Builds PDF reports. |
-| `_0_Utils/plotting/plot_engine.py` | Renders configured plots. |
+| Workflow | Entry point | Purpose |
+|:--|:--|:--|
+| SteadyStateEval | `_3_StandardSim/SteadyStateEval/steady_state_eval_sim.py` | Steady-state cornering characterization. |
+| TransientEval | `_3_StandardSim/TransientEval/transient_eval_sim.py` | Steering transient and frequency-response characterization. |
 
-## What BobSim does during a run
+## What BobSim does
 
-```text
-YAML config
-  ↓
-case generation
-  ↓
-OpenModelica override files
-  ↓
-compiled executable runs
-  ↓
-CSV result files
-  ↓
-signal extraction
-  ↓
-summary metrics
-  ↓
-plots + reports
+<div style="display: flex; justify-content: center;">
+
+```mermaid
+flowchart TD
+    A[YAML config] --> B[Case generation]
+    B --> C[OpenModelica override files]
+    C --> D[Compiled executable runs]
+    D --> E[CSV result files]
+    E --> F[Signal extraction]
+    F --> G[Summary metrics]
+    G --> H[Plots + reports]
 ```
 
-## Public APIs versus internal paths
+</div>
 
-BobSim is still evolving. For public release, the safest user-facing entry points are:
+## Working conventions
 
-```bash
-python3 -m _3_StandardSim.ISO4138.iso4138_sim
-python3 -m _3_StandardSim.ISO7401.iso7401_sim
-make ISO4138
-make ISO7401
-```
-
-Treat lower-level modules as useful and inspectable, but not all of them are stable APIs yet.
+- `make init` initializes the BobLib submodule inside `../BobSim`.
+- `make setup` builds the containerized toolchain.
+- `omc _3_StandardSim/build.mos` compiles the active model.
+- `make SteadyStateEval` and `make TransientEval` run the public standard studies.
 
 ## Learn more
 
-- [Getting started](/bobsim/getting-started)
-- [Configuration](/bobsim/configuration)
-- [Modelica runner](/bobsim/modelica-runner)
-- [Reports and metrics](/bobsim/reports)
-- [Visualization](/bobsim/visualization)
-- [Envelope tools](/bobsim/envelope-tools)
-- [Design of Experiments](/bobsim/doe)
-- [Current status](/bobsim/status)
+- [Startup Guide](/startup-guide/)
+- [Use Guide](/use-guide/)
+- [BobLib](/boblib/)
+- [Vehicle performance metrics](/reference/metrics)
+- [Control theory](/reference/control-theory)

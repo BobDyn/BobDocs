@@ -50,15 +50,15 @@ flowchart TD
 The active standard workflows are implemented as Python modules.
 
 ```bash
-python -m _3_StandardSim.ISO4138.iso4138_sim
-python -m _3_StandardSim.ISO7401.iso7401_sim
+python -m _3_StandardSim.SteadyStateEval.steady_state_eval_sim
+python -m _3_StandardSim.TransientEval.transient_eval_sim
 ```
 
 The Makefile exposes matching convenience targets.
 
 ```bash
-make ISO4138
-make ISO7401
+make SteadyStateEval
+make TransientEval
 ```
 
 ### 2. Load YAML configuration
@@ -68,8 +68,8 @@ Each workflow has a YAML configuration file that describes simulation settings, 
 Example configuration files:
 
 ```text
-_3_StandardSim/ISO4138/iso4138_config.yml
-_3_StandardSim/ISO7401/iso7401_config.yml
+_3_StandardSim/SteadyStateEval/steady_state_eval_config.yml
+_3_StandardSim/TransientEval/transient_eval_config.yml
 _3_StandardSim/KnC/knc_config.yml
 ```
 
@@ -142,8 +142,8 @@ BobSim includes Docker, Makefile, and dependency files to make the OpenModelica/
 make init
 make setup
 omc _3_StandardSim/build.mos
-make ISO4138
-make ISO7401
+make SteadyStateEval
+make TransientEval
 ```
 
 ### Build artifact convention
@@ -171,10 +171,10 @@ _3_StandardSim/results/
 Examples:
 
 ```text
-iso4138_report.pdf
-iso4138_report_metrics.csv
-iso7401_report.pdf
-iso7401_report_metrics.csv
+steady_state_eval_report.pdf
+steady_state_eval_report_metrics.csv
+transient_eval_report.pdf
+transient_eval_report_metrics.csv
 ```
 
 ---
@@ -221,10 +221,10 @@ BobSim workflows are configured with YAML files. The public standard workflows u
 | `cleanup` | Remove per-case run directories after extraction when true. |
 | `stream_logs` | Stream subprocess output live when true. |
 
-### ISO 4138 configuration shape
+### SteadyStateEval configuration shape
 
 ```yaml
-standard: ISO4138
+standard: SteadyStateEval
 
 simulation:
   backend: modelica
@@ -263,15 +263,15 @@ fit:
 report:
   enabled: true
   brand: BobSim
-  title: ISO4138 Vehicle Characterization
+  title: SteadyStateEval Vehicle Characterization
   subtitle: OpenModelica Executable with Modelica PI Control
-  output_path: _3_StandardSim/results/iso4138_report.pdf
+  output_path: _3_StandardSim/results/steady_state_eval_report.pdf
 ```
 
-### ISO 7401 configuration shape
+### TransientEval configuration shape
 
 ```yaml
-standard: ISO7401
+standard: TransientEval
 
 simulation:
   backend: modelica
@@ -329,9 +329,9 @@ test:
 report:
   enabled: true
   brand: BobSim
-  title: ISO7401 Lateral Transient Response
+  title: TransientEval Lateral Transient Response
   subtitle: Comprehensive Open-Loop Characterization
-  output_path: _3_StandardSim/results/iso7401_report.pdf
+  output_path: _3_StandardSim/results/transient_eval_report.pdf
 ```
 
 ### Plot configuration

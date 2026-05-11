@@ -5,7 +5,7 @@ Build output staging area for generated native executables and FMUs.
 
 ## Package path
 
-```modelica
+```text
 BobLib.Build
 ```
 

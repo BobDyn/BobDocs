@@ -14,9 +14,6 @@ hero:
     - theme: alt
       text: Use Guide
       link: /use-guide/
-    - theme: alt
-      text: Reference
-      link: /reference/
 
 features:
   - icon: "🧱"
@@ -34,11 +31,11 @@ features:
 
 ## A physical model for vehicle characterization
 
-Vehicles are dynamic systems, and what the driver feels is the response of that system. BobDyn is built around the idea that vehicle design should be guided by meaningful response metrics: acceleration, yaw, roll, settling behavior, steering response, and the other signals that distinguish setups, vehicles, and architectures.
+Vehicles are dynamic systems, and the driver experiences their response rather than their equations. BobDyn is built around that idea: use meaningful response metrics, keep the model inspectable, and make every study traceable from configuration to report.
 
-To make those metrics useful, the model behind them has to be inspectable. BobLib provides an open-source Modelica multibody vehicle model whose structure closely follows the real machine. BobSim uses that model as the source of truth for repeatable simulation, signal extraction, plotting, reporting, and design exploration.
+BobLib provides the physical vehicle model in Modelica. BobSim takes that model, runs repeatable studies, extracts signals, and turns the results into plots, metrics, and reports.
 
-The result is a transparent workflow for generating simulation ground truth: characterize the vehicle, compare designs, and correlate reduced-order models against a shared physical reference.
+The result is a workflow for generating simulation ground truth that you can inspect, compare, and reuse across design iterations.
 
 ---
 
@@ -46,68 +43,32 @@ The result is a transparent workflow for generating simulation ground truth: cha
 
 | Capability | Description |
 |:--|:--|
-| **Standard tests** | Run repeatable vehicle dynamics studies such as steady-state cornering, transient steering response, and kinematics and compliance workflows. |
-| **Automated reporting** | Convert simulation outputs into structured metrics, plots, CSV files, and engineering reports without hand-built post-processing. |
-| **Model correlation** | Use full-system simulation results as reference data for validating reduced-order models, design tools, and simplifying assumptions. |
-| **Design exploration** | Sweep parameters, compare configurations, and study how physical changes propagate through vehicle-level behavior. |
+| **Standard tests** | Run repeatable studies such as steady-state cornering, transient steering response, and kinematics/compliance workflows. |
+| **Automated reporting** | Turn simulation output into metrics, plots, CSV files, and engineering reports without hand-built post-processing. |
+| **Model correlation** | Use full-system simulation results as reference data for reduced-order models, design tools, and simplifying assumptions. |
+| **Design exploration** | Sweep parameters, compare configurations, and see how physical changes propagate through vehicle-level behavior. |
 
 ---
 
-## See it in motion
+## Sample reports
 
-<div class="desktop-visuals">
+The sample outputs below come from the active BobSim workflows and live in `docs/public/` for easy embedding.
 
-<table style="table-layout: fixed; width: 100%;">
-  <colgroup>
-    <col style="width: 50%;">
-    <col style="width: 50%;">
-  </colgroup>
-  <thead>
-    <tr>
-      <th>ISO4138 — Steady-State Cornering</th>
-      <th>ISO7401 — Transient Handling</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>
-        <video autoplay loop muted playsinline width="100%">
-          <source src="/iso4138.mp4" type="video/mp4">
-        </video>
-      </td>
-      <td>
-        <video autoplay loop muted playsinline width="100%">
-          <source src="/iso7401.mp4" type="video/mp4">
-        </video>
-      </td>
-    </tr>
-    <tr>
-      <td>Steady-state cornering at constant velocity with prescribed curvature using closed-loop control.</td>
-      <td>Transient steering inputs used to evaluate vehicle response, stability, and handling behavior.</td>
-    </tr>
-    <tr>
-      <td><strong>ISO4138 Report</strong></td>
-      <td><strong>ISO7401 Report</strong></td>
-    </tr>
-    <tr>
-      <td>
-        <iframe src="/iso4138_report.pdf#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="520px" style="border: 0;"></iframe>
-      </td>
-      <td>
-        <iframe src="/iso7401_report.pdf#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="520px" style="border: 0;"></iframe>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-</div>
-
-<div class="mobile-visuals-message">
-
-Live simulation previews and embedded reports are intended for larger screens.
-
-Please view this page on desktop or open the documentation from a full-size browser window.
-
+<div class="desktop-visuals" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; width: 100%;">
+  <div>
+    <video autoplay loop muted playsinline width="100%" style="display: block;">
+      <source src="/steady_state_eval.mp4" type="video/mp4">
+    </video>
+    <div style="height: 1rem;"></div>
+    <PdfViewer src="/steady_state_eval_report.pdf" />
+  </div>
+  <div>
+    <video autoplay loop muted playsinline width="100%" style="display: block;">
+      <source src="/transient_eval.mp4" type="video/mp4">
+    </video>
+    <div style="height: 1rem;"></div>
+    <PdfViewer src="/transient_eval_report.pdf" />
+  </div>
 </div>
 
 ---
@@ -128,4 +89,4 @@ BobDyn is built to eliminate black-box behavior through an explicit, inspectable
 - **Results are directly traceable**  
   Outputs can be linked back to the model structure, configuration, and equations that produced them.
 
-All models, solvers, workflows, and reports are built from plain-text, version-controlled sources.
+All models, solvers, workflows, and reports come from plain-text, version-controlled sources.

@@ -9,8 +9,8 @@ _3_StandardSim
 ├── _modelica_runner.py
 ├── _fmu_runner.py
 ├── build.mos
-├── ISO4138
-├── ISO7401
+├── SteadyStateEval
+├── TransientEval
 ├── KnC
 └── results
 ```
@@ -32,21 +32,21 @@ The current active runtime path uses a unified OpenModelica executable:
 
 | Workflow | Module | Status |
 |:--|:--|:--|
-| ISO 4138 | `_3_StandardSim/ISO4138/iso4138_sim.py` | Active. |
-| ISO 7401 | `_3_StandardSim/ISO7401/iso7401_sim.py` | Active. |
+| SteadyStateEval | `_3_StandardSim/SteadyStateEval/steady_state_eval_sim.py` | Active. |
+| TransientEval | `_3_StandardSim/TransientEval/transient_eval_sim.py` | Active. |
 | KnC | `_3_StandardSim/KnC/knc_sim.py` | Present, but more transitional than ISO 4138/ISO 7401. |
 
 ## Entry points
 
 ```bash
-python -m _3_StandardSim.ISO4138.iso4138_sim
-python -m _3_StandardSim.ISO7401.iso7401_sim
+python -m _3_StandardSim.SteadyStateEval.steady_state_eval_sim
+python -m _3_StandardSim.TransientEval.transient_eval_sim
 ```
 
 ## Related pages
 
 - [Modelica runner](./modelica-runner)
 - [FMU runner](./fmu-runner)
-- [ISO 4138](./iso4138)
-- [ISO 7401](./iso7401)
+- [SteadyStateEval](./steady-state-eval)
+- [TransientEval](./transient-eval)
 - [KnC](./knc)

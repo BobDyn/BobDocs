@@ -7,7 +7,7 @@ This package contains reusable helper functions/components. It should stay gener
 
 ## Package path
 
-```modelica
+```text
 BobLib.Utilities.Math
 ```
 

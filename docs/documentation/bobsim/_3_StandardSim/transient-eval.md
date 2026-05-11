@@ -1,19 +1,19 @@
-# ISO 7401 workflow
+# TransientEval workflow
 
-The ISO 7401 workflow is BobSim's transient handling characterization workflow.
+The TransientEval workflow is BobSim's transient steering characterization workflow.
 
 ## Files
 
 ```text
-_3_StandardSim/ISO7401/iso7401_sim.py
-_3_StandardSim/ISO7401/iso7401_config.yml
+_3_StandardSim/TransientEval/transient_eval_sim.py
+_3_StandardSim/TransientEval/transient_eval_config.yml
 ```
 
 ## Purpose
 
-The workflow runs transient steering cases and computes time-domain and frequency-domain response metrics.
+The workflow runs steering step and sine cases, then computes time-domain and frequency-domain response metrics.
 
-Supported input families in the current configuration include:
+## Supported input families
 
 | Input family | Purpose |
 |:--|:--|
@@ -45,8 +45,8 @@ Important config keys include:
 The workflow writes:
 
 ```text
-_3_StandardSim/results/iso7401_report.pdf
-_3_StandardSim/results/iso7401_report_metrics.csv
+_3_StandardSim/results/transient_eval_report.pdf
+_3_StandardSim/results/transient_eval_report_metrics.csv
 ```
 
 ## Metrics and plots
@@ -56,8 +56,11 @@ The summary includes step-response metrics, representative time histories, sine 
 ## Current config
 
 ```yaml
-standard: ISO7401
+standard: TransientEval
 simulation:
+  backend: modelica
+  build_dir: _3_StandardSim/Build
+  exec_name: BobLib.Standards.VehicleModel
   solver: dassl
   output_format: csv
   log_level: LOG_STATS
@@ -107,9 +110,9 @@ test:
 report:
   enabled: true
   brand: BobSim
-  title: ISO7401 Lateral Transient Response
+  title: TransientEval Lateral Transient Response
   subtitle: Comprehensive Open-Loop Characterization
-  output_path: _3_StandardSim/results/iso7401_report.pdf
+  output_path: _3_StandardSim/results/transient_eval_report.pdf
   notes:
   - One-period sinusoidal input
   - Continuous sinusoidal response
@@ -120,7 +123,7 @@ report:
 plots:
   step_response:
     layout: triple
-    title: Step Steer Response (ISO7401)
+    title: Step Steer Response (TransientEval)
     subplots:
     - title: Steering Wheel Angle $\delta_H$
       x:
@@ -146,7 +149,7 @@ plots:
         label: $r$ [rad/s]
   sine_one_period:
     layout: triple
-    title: One-Period Sinusoidal Response (ISO7401)
+    title: One-Period Sinusoidal Response (TransientEval)
     subplots:
     - title: Steering Wheel Angle $\delta_H$
       x:
@@ -198,7 +201,7 @@ plots:
         label: $r$ [rad/s]
   freq_response_gain:
     layout: dual
-    title: "Frequency Response \u2014 Gain (ISO7401)"
+    title: "Frequency Response — Gain (TransientEval)"
     xscale: log
     subplots:
     - title: $|a_y / \delta_{HWA}|$
@@ -217,7 +220,7 @@ plots:
         label: $|r / \delta_{HWA}|$ [(rad/s)/rad]
   freq_response_phase:
     layout: dual
-    title: "Frequency Response \u2014 Phase (ISO7401)"
+    title: "Frequency Response — Phase (TransientEval)"
     xscale: log
     subplots:
     - title: 'Phase: $a_y$ vs $\delta_{HWA}$'
@@ -234,35 +237,3 @@ plots:
       y:
         key: yaw_phase
         label: Phase [deg]
-```
-
-## API inventory
-
-| Symbol | Line | Notes |
-|:--|--:|:--|
-| `load_config()` | 69 |  |
-| `class ISO7401Sim` | 76 |  |
-| `ISO7401Sim.__init__()` | 77 |  |
-| `ISO7401Sim._direction_sign()` | 93 |  |
-| `ISO7401Sim._close()` | 102 |  |
-| `ISO7401Sim._wrap_phase()` | 106 |  |
-| `ISO7401Sim._safe_nanmean()` | 110 |  |
-| `ISO7401Sim._as_list()` | 117 |  |
-| `ISO7401Sim._csv_value()` | 123 |  |
-| `ISO7401Sim._default_stop_time()` | 133 |  |
-| `ISO7401Sim._step_stop_time()` | 153 |  |
-| `ISO7401Sim._one_period_stop_time()` | 159 |  |
-| `ISO7401Sim._continuous_stop_time()` | 165 |  |
-| `ISO7401Sim._attach_case_metadata()` | 175 | ModelicaRunner returns signal data, but may not preserve case metadata. |
-| `ISO7401Sim.build_cases()` | 210 |  |
-| `ISO7401Sim._base_case()` | 389 | Build the runner-facing case dictionary. |
-| `ISO7401Sim.run()` | 422 |  |
-| `ISO7401Sim._is_representative_step()` | 440 |  |
-| `ISO7401Sim._is_representative_one_period()` | 465 |  |
-| `ISO7401Sim._is_representative_continuous()` | 479 |  |
-| `ISO7401Sim._include_in_freq_response()` | 493 |  |
-| `ISO7401Sim._signal()` | 510 | New VehicleModel exposes scalar outputs directly, e.g. accY. |
-| `ISO7401Sim.write_metrics_csv()` | 532 | Write one ISO7401 metrics CSV beside the PDF report. |
-| `ISO7401Sim.summarize()` | 573 |  |
-| `ISO7401Sim._continuous_metrics()` | 1217 |  |
-| `main()` | 1319 |  |

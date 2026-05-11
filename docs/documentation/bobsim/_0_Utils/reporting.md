@@ -1,13 +1,13 @@
 # Reporting utilities
 
-The reporting layer builds PDF reports from standard summary dictionaries and plot configurations.
+The reporting layer builds PDF reports from summary dictionaries and plot configurations.
 
 ## Files
 
 | File | Purpose |
 |:--|:--|
-| `_0_Utils/reporting/report_engine.py` | Main report builder. Opens the PDF and dispatches title/summary/plot pages. |
-| `_0_Utils/reporting/sections.py` | Page-level report sections for summaries and standard-specific report content. |
+| `_0_Utils/reporting/report_engine.py` | Main report builder. Opens the PDF and dispatches title, summary, and plot pages. |
+| `_0_Utils/reporting/sections.py` | Page-level report sections for SteadyStateEval, TransientEval, and KnC. |
 | `_0_Utils/reporting/media/bob.png` | Brand asset used by report pages. |
 
 ## Report flow
@@ -25,6 +25,14 @@ flowchart TD
     G --> H
 ```
 
+## Report sections
+
+The active report sections focus on the current standard workflows:
+
+- Steady-state cornering summary pages
+- Transient steering summary pages
+- KnC summary pages
+
 ## API inventory
 
 ### `report_engine.py`
@@ -39,8 +47,8 @@ flowchart TD
 
 | Symbol | Line | Notes |
 |:--|--:|:--|
-| `add_summary_page()` | 6 |  |
-| `add_knc_summary_page()` | 80 |  |
-| `add_iso7401_step_page()` | 195 |  |
-| `add_iso7401_frequency_page()` | 260 |  |
-| `add_title_page()` | 375 |  |
+| `add_summary_page()` | 6 | Shared summary page builder. |
+| `add_knc_summary_page()` | 80 | KnC summary page builder. |
+| `add_steady_state_step_page()` | 195 | Steady-state sweep summary page builder. |
+| `add_transient_frequency_page()` | 260 | Transient frequency-response page builder. |
+| `add_title_page()` | 375 | Title page builder. |

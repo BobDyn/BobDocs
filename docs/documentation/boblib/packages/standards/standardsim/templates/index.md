@@ -7,7 +7,7 @@ This package is part of the standard-workflow layer. Models here wrap the physic
 
 ## Package path
 
-```modelica
+```text
 BobLib.Standards.StandardSim.Templates
 ```
 

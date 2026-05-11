@@ -7,7 +7,7 @@ This package is part of the physical modeling layer. Models here should represen
 
 ## Package path
 
-```modelica
+```text
 BobLib.Vehicle.Chassis.Suspension.Templates
 ```
 

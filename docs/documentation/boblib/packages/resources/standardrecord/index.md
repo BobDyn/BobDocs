@@ -1,13 +1,12 @@
 # BobLib.Resources.StandardRecord
 
-Records for standard-test and FMI-facing configuration/outputs.
+Records for standard-test and FMI-facing configuration and outputs.
 
-
-This package is parameter-oriented. The records here should generally remain free of simulation logic and should be safe to reuse across models, runners, and standard workflows.
+This package is parameter-oriented. The records here stay free of simulation logic so they can be reused across models, runners, and standard workflows without bringing behavior along with the data.
 
 ## Package path
 
-```modelica
+```text
 BobLib.Resources.StandardRecord
 ```
 
@@ -15,48 +14,14 @@ BobLib.Resources.StandardRecord
 
 | Item | Type | Purpose |
 |:--|:--|:--|
-| `ISO4138Record` | record | Parameter or output record. |
-| `ISO7401Record` | record | Parameter or output record. |
+| SteadyStateEval record | record | Parameter or output record for the steady-state workflow. |
+| TransientEval record | record | Parameter or output record for the transient workflow. |
 | `KnCRecord` | record | Parameter or output record. |
 | `VehicleFMIRecord` | record | Parameter or output record. |
 
 ## How this package fits
 
-This package contributes to the BobLib Modelica library structure and is documented from the current package contents.
-
-## Models, records, and functions
-
-### `ISO4138Record`
-
-- **Kind:** `record`
-- **File:** `Resources/StandardRecord/ISO4138Record.mo`
-- **Imports:** `Modelica.SIunits`
-
-Use this record as a configuration container. The record should be passed into models through `parameter` declarations rather than duplicated as independent scalar parameters.
-
-### `ISO7401Record`
-
-- **Kind:** `record`
-- **File:** `Resources/StandardRecord/ISO7401Record.mo`
-- **Imports:** `Modelica.SIunits`
-
-Use this record as a configuration container. The record should be passed into models through `parameter` declarations rather than duplicated as independent scalar parameters.
-
-### `KnCRecord`
-
-- **Kind:** `record`
-- **File:** `Resources/StandardRecord/KnCRecord.mo`
-- **Imports:** `Modelica.SIunits`
-
-Use this record as a configuration container. The record should be passed into models through `parameter` declarations rather than duplicated as independent scalar parameters.
-
-### `VehicleFMIRecord`
-
-- **Kind:** `record`
-- **File:** `Resources/StandardRecord/VehicleFMIRecord.mo`
-- **Imports:** `Modelica.SIunits`
-
-Use this record as a configuration container. The record should be passed into models through `parameter` declarations rather than duplicated as independent scalar parameters.
+This package contributes the reusable records that the executable models and BobSim runners depend on.
 
 ## Documentation notes
 

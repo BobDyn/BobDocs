@@ -1,6 +1,6 @@
 # VisualSim
 
-`_1_VisualSim` contains visual playback and rendering tools for BobSim visual output bundles.
+`_1_VisualSim` contains visual playback and rendering tools for BobSim output bundles.
 
 ## Files
 
@@ -40,8 +40,8 @@ _1_VisualSim/visual_templates/
 Examples include:
 
 ```text
-iso4138_visual.yml
-iso7401_visual.yml
+steady_state_eval_visual.yml
+transient_eval_visual.yml
 fr_knc_visual.yml
 rr_knc_visual.yml
 ```
@@ -88,7 +88,7 @@ Templates describe scene scale, point names, link connectivity, styling, camera 
 | `VisualScene._build_points()` | 220 | Stack x/y/z signal columns → self._points[name] shape (N, 3). |
 | `VisualScene._build_joints()` | 231 | One sphere actor per point. |
 | `VisualScene._build_links()` | 242 | One unit cylinder per link pair, transformed each frame. |
-| `VisualScene._build_tires()` | 270 | Outer tyre + silver rim cylinders per tire entry. |
+| `VisualScene._build_tires()` | 270 | Outer tyre + rim cylinders per tire entry. |
 | `VisualScene._build_vectors()` | 330 | Arrow actor per vector entry, collapsed to zero when magnitude < 1e-6. |
 | `VisualScene._setup_camera()` | 367 | Read camera config; fall back to reset_camera(). |
 | `VisualScene._time_bracket()` | 387 |  |
@@ -139,7 +139,7 @@ Templates describe scene scale, point names, link connectivity, styling, camera 
 | `PlotPanel.add_plot()` | 903 |  |
 | `PlotPanel._remove_row()` | 912 |  |
 | `PlotPanel.update_cursor_time()` | 919 |  |
-| `class TimelineBar` | 928 | Bottom playback controls: |
+| `class TimelineBar` | 928 | Bottom playback controls. |
 | `TimelineBar.__init__()` | 943 |  |
 | `TimelineBar._toggle_play()` | 1013 |  |
 | `TimelineBar._step()` | 1023 |  |
@@ -148,7 +148,7 @@ Templates describe scene scale, point names, link connectivity, styling, camera 
 | `TimelineBar._on_speed()` | 1035 |  |
 | `TimelineBar.sync_time()` | 1041 | Called by main window every frame to keep slider + label in sync. |
 | `TimelineBar.on_playback_done()` | 1049 | Worker signals end-of-data — reset play button. |
-| `class ViewToolbar` | 1059 | Horizontal toolbar with: |
+| `class ViewToolbar` | 1059 | Horizontal toolbar with view and focus controls. |
 | `ViewToolbar.__init__()` | 1078 |  |
 | `ViewToolbar._build_view_presets()` | 1092 |  |
 | `ViewToolbar._build_focus_dropdown()` | 1106 |  |
@@ -170,7 +170,7 @@ Templates describe scene scale, point names, link connectivity, styling, camera 
 | `BobVisWindow._on_view_preset()` | 1352 |  |
 | `BobVisWindow._on_rotate()` | 1369 |  |
 | `BobVisWindow.closeEvent()` | 1383 |  |
-| `class FilePickerDialog` | 1395 | Small dialog shown on launch so the user can browse for: |
+| `class FilePickerDialog` | 1395 | Small dialog shown on launch so the user can browse for a template and data bundle. |
 | `FilePickerDialog.__init__()` | 1405 |  |
 | `FilePickerDialog._browse_yml()` | 1457 |  |
 | `FilePickerDialog._browse_data()` | 1465 |  |

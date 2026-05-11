@@ -5,7 +5,7 @@ Generated native executable output staging directory.
 
 ## Package path
 
-```modelica
+```text
 BobLib.Build.Native
 ```
 

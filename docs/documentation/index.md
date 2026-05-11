@@ -2,6 +2,8 @@
 
 BobDyn is an open-source framework for physics-based vehicle simulation.
 
+This documentation is written against the `../BobSim` checkout, which contains the BobLib submodule used by the active workflows.
+
 It is organized around a simple separation of responsibilities:
 
 ```text
@@ -76,4 +78,4 @@ This section is split into three parts:
 | [BobLib](./boblib/) | Documents the Modelica vehicle modeling layer. |
 | [BobSim](./bobsim/) | Documents the Python simulation, analysis, and reporting layer. |
 
-Detailed configuration keys, signal names, outputs, and terminology live in the [Reference](/reference/) section.
+Detailed configuration keys, signal names, outputs, and terminology live in the [Vehicle performance metrics](/reference/metrics) and [Control theory](/reference/control-theory) pages.

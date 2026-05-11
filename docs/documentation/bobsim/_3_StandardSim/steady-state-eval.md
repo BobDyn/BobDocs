@@ -1,12 +1,12 @@
-# ISO 4138 workflow
+# SteadyStateEval workflow
 
-The ISO 4138 workflow is BobSim's steady-state cornering characterization workflow.
+The SteadyStateEval workflow is BobSim's steady-state cornering characterization workflow.
 
 ## Files
 
 ```text
-_3_StandardSim/ISO4138/iso4138_sim.py
-_3_StandardSim/ISO4138/iso4138_config.yml
+_3_StandardSim/SteadyStateEval/steady_state_eval_sim.py
+_3_StandardSim/SteadyStateEval/steady_state_eval_config.yml
 ```
 
 ## Purpose
@@ -50,8 +50,8 @@ stopTime
 The workflow writes:
 
 ```text
-_3_StandardSim/results/iso4138_report.pdf
-_3_StandardSim/results/iso4138_report_metrics.csv
+_3_StandardSim/results/steady_state_eval_report.pdf
+_3_StandardSim/results/steady_state_eval_report_metrics.csv
 ```
 
 ## Metrics and plots
@@ -61,7 +61,7 @@ The summary includes lateral acceleration range, steering behavior, curvature tr
 ## Current config
 
 ```yaml
-standard: ISO4138
+standard: SteadyStateEval
 simulation:
   backend: modelica
   build_dir: _3_StandardSim/Build
@@ -95,11 +95,11 @@ fit:
 report:
   enabled: true
   brand: BobSim
-  title: ISO4138 Vehicle Characterization
+  title: SteadyStateEval Vehicle Characterization
   subtitle: OpenModelica Executable with Modelica PI Control
-  output_path: _3_StandardSim/results/iso4138_report.pdf
+  output_path: _3_StandardSim/results/steady_state_eval_report.pdf
   notes:
-  - ISO4138 steady-state circular test performed
+  - SteadyStateEval steady-state circular test performed
   - Constant velocity maintained at 15 m/s
   - Radius sweep from 12.5 m to 100 m
   - Tire model: MF52
@@ -195,17 +195,3 @@ plots:
       y:
         key: steer_gradient
         label: $d\delta/da_y$
-```
-
-## API inventory
-
-| Symbol | Line | Notes |
-|:--|--:|:--|
-| `load_config()` | 48 |  |
-| `class ISO4138Sim` | 63 |  |
-| `ISO4138Sim.__init__()` | 64 |  |
-| `ISO4138Sim.build_cases()` | 83 |  |
-| `ISO4138Sim.run()` | 158 |  |
-| `ISO4138Sim.write_metrics_csv()` | 174 | Write one ISO4138 metrics CSV beside the PDF report. |
-| `ISO4138Sim.summarize()` | 214 |  |
-| `main()` | 455 |  |
