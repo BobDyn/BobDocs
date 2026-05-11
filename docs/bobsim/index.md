@@ -22,10 +22,10 @@ BobSim/
 
 The primary public workflows are:
 
-| Workflow | Entry point | Purpose |
-|:--|:--|:--|
+| Workflow       | Entry point | Purpose |
+| :------------- | :---------- | :------ |
 | SteadyStateEval | `_3_StandardSim/SteadyStateEval/steady_state_eval_sim.py` | Steady-state cornering characterization. |
-| TransientEval | `_3_StandardSim/TransientEval/transient_eval_sim.py` | Steering transient and frequency-response characterization. |
+| TransientEval  | `_3_StandardSim/TransientEval/transient_eval_sim.py` | Steering transient and frequency-response characterization. |
 
 ## What BobSim does
 

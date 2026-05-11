@@ -41,9 +41,9 @@ The result is a workflow for generating simulation ground truth that you can ins
 
 ## What BobDyn enables
 
-| Capability | Description |
-|:--|:--|
-| **Standard tests** | Run repeatable studies such as steady-state cornering, transient steering response, and kinematics/compliance workflows. |
+| Capability           | Description |
+| :------------------- | :---------- |
+| **Standard tests**   | Run repeatable studies such as steady-state cornering, transient steering response, and kinematics/compliance workflows. |
 | **Automated reporting** | Turn simulation output into metrics, plots, CSV files, and engineering reports without hand-built post-processing. |
 | **Model correlation** | Use full-system simulation results as reference data for reduced-order models, design tools, and simplifying assumptions. |
 | **Design exploration** | Sweep parameters, compare configurations, and see how physical changes propagate through vehicle-level behavior. |
