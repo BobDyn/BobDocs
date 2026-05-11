@@ -123,9 +123,9 @@ If you are validating the setup, opening those files is usually enough to confir
 
 Once the stack is running, the next useful pages are:
 
-- [BobSim overview](/documentation/bobsim/)
-- [StandardSim workflow](/documentation/bobsim/_3_StandardSim/)
+- [BobSim overview](/bobsim/)
 - [BobLib overview](/boblib/)
+- [Reference index](/reference/)
 - [Vehicle performance metrics](/reference/metrics)
 - [Control theory](/reference/control-theory)
 

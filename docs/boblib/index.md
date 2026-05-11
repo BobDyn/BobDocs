@@ -56,7 +56,7 @@ Powertrain, aero, electronics, and additional vehicle architectures exist but sh
 
 ## Learn more
 
-- [BobLib docs](/documentation/boblib/)
-- [Standards package](/documentation/boblib/packages/standards/)
-- [Resources package](/documentation/boblib/packages/resources/)
-- [Vehicle package](/documentation/boblib/packages/vehicle/)
+- [BobSim overview](/bobsim/)
+- [Reference index](/reference/)
+- [Vehicle performance metrics](/reference/metrics)
+- [Control theory](/reference/control-theory)

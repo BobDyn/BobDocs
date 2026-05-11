@@ -148,9 +148,9 @@ Use the raw case outputs if you need:
 
 If you want to dig deeper, these pages are the next stop:
 
-- [BobSim overview](/documentation/bobsim/)
-- [StandardSim](/documentation/bobsim/_3_StandardSim/)
-- [Modelica runner](/documentation/bobsim/_3_StandardSim/modelica-runner)
+- [BobSim overview](/bobsim/)
+- [BobLib overview](/boblib/)
+- [Reference index](/reference/)
 - [Vehicle performance metrics](/reference/metrics)
 - [Control theory](/reference/control-theory)
 
