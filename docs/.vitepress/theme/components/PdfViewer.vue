@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, nextTick, ref, watch } from 'vue'
 import * as pdfjsLib from 'pdfjs-dist/legacy/webpack.mjs'
-import type { PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs'
+import type { PDFDocumentLoadingTask, PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs'
 
 const props = defineProps<{
   src: string
@@ -30,14 +30,32 @@ const pageNumbers = ref<number[]>([])
 const containerWidth = ref(0)
 
 let pdfDocument: PDFDocumentProxy | null = null
+let loadingTask: PDFDocumentLoadingTask | null = null
 let renderToken = 0
 let resizeObserver: ResizeObserver | null = null
 let isMounted = false
 
-const cleanupDocument = () => {
-  if (pdfDocument) {
-    void pdfDocument.destroy()
-    pdfDocument = null
+const cleanupDocument = async () => {
+  const pendingTask = loadingTask
+  loadingTask = null
+
+  if (pendingTask) {
+    try {
+      await pendingTask.destroy()
+    } catch {
+      // Ignore worker teardown errors while swapping or unmounting.
+    }
+  }
+
+  const currentDocument = pdfDocument
+  pdfDocument = null
+
+  if (currentDocument) {
+    try {
+      await currentDocument.destroy()
+    } catch {
+      // Ignore teardown errors during route changes or resize refreshes.
+    }
   }
 }
 
@@ -75,7 +93,9 @@ const renderDocument = async () => {
 
   const token = ++renderToken
 
-  cleanupDocument()
+  await cleanupDocument()
+  if (token !== renderToken || !isMounted) return
+
   loading.value = true
   error.value = ''
   clearState()
@@ -83,8 +103,9 @@ const renderDocument = async () => {
   try {
     await waitForWidth()
 
-    const task = pdfjsLib.getDocument({ url: props.src })
-    pdfDocument = await task.promise
+    loadingTask = pdfjsLib.getDocument({ url: props.src })
+    pdfDocument = await loadingTask.promise
+    loadingTask = null
 
     if (token !== renderToken || !pdfDocument) return
 
@@ -160,7 +181,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   renderToken += 1
   resizeObserver?.disconnect()
-  cleanupDocument()
+  void cleanupDocument()
 })
 
 const startObserving = () => {
