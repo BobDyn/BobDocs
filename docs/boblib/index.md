@@ -22,13 +22,13 @@ BobLib/
 
 BobLib is built around a few rules:
 
-| Principle            | Meaning |
-| :------------------- | :------ |
-| Physics first        | Geometry, constraints, forces, and motion should come from physical relationships. |
-| Acausal modeling     | Components connect through Modelica equations rather than prescribed signal flow. |
-| Reusable structure   | Vehicle components live in `Vehicle/`; data lives in `Resources/`. |
-| Inspectable assumptions | Records, parameters, and standard models are plain text and version controlled. |
-| Standards reuse the model | Standard maneuvers should exercise the same underlying vehicle model, not a separate reduced model. |
+|Principle|Meaning|
+|:--|:--|
+|Physics first|Geometry, constraints, forces, and motion should come from physical relationships.|
+|Acausal modeling|Components connect through Modelica equations rather than prescribed signal flow.|
+|Reusable structure|Vehicle components live in `Vehicle/`; data lives in `Resources/`.|
+|Inspectable assumptions|Records, parameters, and standard models are plain text and version controlled.|
+|Standards reuse the model|Standard maneuvers should exercise the same underlying vehicle model, not a separate reduced model.|
 
 ## Current maturity
 
@@ -45,14 +45,14 @@ Powertrain, aero, electronics, and additional vehicle architectures exist but sh
 
 ## Main public entry points
 
-| Model/package                        | Purpose |
-| :----------------------------------- | :------ |
-| `BobLib.Standards.VehicleModel`      | Active unified executable target for BobSim standard workflows. |
-| `BobLib.Vehicle.VehicleDW_RWD_Lock`  | Full vehicle assembly used by the active standard model. |
-| `BobLib.Resources.VehicleDefn.OrionRecord` | Vehicle parameter record used by the current standard model. |
-| `BobLib.Standards.StandardSim` steady-state model | SteadyStateEval standard-specific Modelica maneuver model. |
-| `BobLib.Standards.StandardSim` transient model | TransientEval standard-specific transient maneuver model. |
-| `BobLib.Standards.VehicleFMI`        | FMI-oriented vehicle model target. |
+|Model/package|Purpose|
+|:--|:--|
+|`BobLib.Standards.VehicleModel`|Active unified executable target for BobSim standard workflows.|
+|`BobLib.Vehicle.VehicleDW_RWD_Lock`|Full vehicle assembly used by the active standard model.|
+|`BobLib.Resources.VehicleDefn.OrionRecord`|Vehicle parameter record used by the current standard model.|
+|`BobLib.Standards.StandardSim` steady-state model|SteadyStateEval standard-specific Modelica maneuver model.|
+|`BobLib.Standards.StandardSim` transient model|TransientEval standard-specific transient maneuver model.|
+|`BobLib.Standards.VehicleFMI`|FMI-oriented vehicle model target.|
 
 ## Learn more
 

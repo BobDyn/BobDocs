@@ -93,14 +93,14 @@ The most practical way to use BobSim is to edit the YAML config for the workflow
 
 ### Common config sections
 
-| Section       | Purpose |
-| :------------ | :------ |
-| `simulation`  | Build directory, executable name, solver, output format, time settings, and runner flags |
-| `execution`   | Parallelism, worker count, cleanup, and log streaming |
-| `sweep` / `test` | Case-generation inputs for the study |
-| `report`      | Title page metadata and report output path |
-| `plots`       | Plot layout and signal mapping |
-| `fit`         | Workflow-specific fitting or curve logic |
+|Section|Purpose|
+|:--|:--|
+|`simulation`|Build directory, executable name, solver, output format, time settings, and runner flags|
+|`execution`|Parallelism, worker count, cleanup, and log streaming|
+|`sweep` / `test`|Case-generation inputs for the study|
+|`report`|Title page metadata and report output path|
+|`plots`|Plot layout and signal mapping|
+|`fit`|Workflow-specific fitting or curve logic|
 
 ### Typical run pattern
 
