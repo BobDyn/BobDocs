@@ -16,7 +16,8 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, nextTick, ref, watch } from 'vue'
-import type { PDFDocumentProxy } from 'pdfjs-dist/build/pdf.mjs'
+import * as pdfjsLib from 'pdfjs-dist/legacy/webpack.mjs'
+import type { PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs'
 
 const props = defineProps<{
   src: string
@@ -32,27 +33,12 @@ let pdfDocument: PDFDocumentProxy | null = null
 let renderToken = 0
 let resizeObserver: ResizeObserver | null = null
 let isMounted = false
-let pdfjsModulePromise: Promise<typeof import('pdfjs-dist/build/pdf.mjs')> | null = null
 
 const cleanupDocument = () => {
   if (pdfDocument) {
     void pdfDocument.destroy()
     pdfDocument = null
   }
-}
-
-const loadPdfjs = async () => {
-  if (!pdfjsModulePromise) {
-    pdfjsModulePromise = (async () => {
-      const mod = await import('pdfjs-dist/build/pdf.mjs')
-      const workerUrl = (await import('pdfjs-dist/build/pdf.worker.mjs?url')).default
-
-      mod.GlobalWorkerOptions.workerSrc = workerUrl
-      return mod
-    })()
-  }
-
-  return pdfjsModulePromise
 }
 
 const waitForWidth = async () => {
@@ -97,8 +83,7 @@ const renderDocument = async () => {
   try {
     await waitForWidth()
 
-    const { getDocument } = await loadPdfjs()
-    const task = getDocument({ url: props.src })
+    const task = pdfjsLib.getDocument({ url: props.src })
     pdfDocument = await task.promise
 
     if (token !== renderToken || !pdfDocument) return
