@@ -9,11 +9,11 @@ hero:
     alt: BobDyn
   actions:
     - theme: brand
-      text: Get Started
-      link: /get-started/
+      text: Startup Guide
+      link: /startup-guide/
     - theme: alt
-      text: Documentation
-      link: /docs/
+      text: Use Guide
+      link: /use-guide/
     - theme: alt
       text: Reference
       link: /reference/
