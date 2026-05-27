@@ -73,7 +73,7 @@ Relevant files:
 
 Typical output signals include steering, lateral acceleration, roll, sideslip, yaw rate, wheel loads, and handwheel torque.
 
-### What to look for
+### What to look for in SteadyStateEval
 
 - steering angle versus lateral acceleration
 - curvature or radius tracking error
@@ -97,7 +97,7 @@ Relevant files:
 - `_3_StandardSim/TransientEval/transient_eval_sim.py`
 - `_3_StandardSim/TransientEval/transient_eval_config.yml`
 
-### What to look for
+### What to look for in TransientEval
 
 - steering step response
 - yaw-rate settling
@@ -122,7 +122,7 @@ Relevant files:
 - `_3_StandardSim/FourPostEval/four_post_eval_sim.py`
 - `_3_StandardSim/FourPostEval/four_post_eval_config.yml`
 
-### What to look for
+### What to look for in FourPostEval
 
 - motion ratio near static position
 - camber and toe gains in heave and roll

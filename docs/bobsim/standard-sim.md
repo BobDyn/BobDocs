@@ -18,7 +18,7 @@ _3_StandardSim/
 ## StandardSim Structure
 
 | Path | Role |
-|:--|:--|
+| :-- | :-- |
 | `_3_StandardSim/build_vehicle_sim.mos` | OpenModelica build script for `VehicleSim` |
 | `_3_StandardSim/build_four_post_sim.mos` | OpenModelica build script for `FourPostSim` |
 | `_3_StandardSim/_modelica_runner.py` | Shared OpenModelica executable runner |
@@ -41,7 +41,7 @@ StandardSim has two build paths because the maneuver studies and four-post
 study use different BobDyn/BobLib entry points.
 
 | Command | Builds | Output directory |
-|:--|:--|:--|
+| :-- | :-- | :-- |
 | `make build-vehicle-sim` | `BobLib.Standards.VehicleSim` | `_3_StandardSim/Build/VehicleSim/` |
 | `make build-four-post-sim` | `BobLib.Standards.FourPostSim` | `_3_StandardSim/Build/FourPostSim/` |
 
@@ -51,7 +51,7 @@ is copied into BobDyn/BobLib's active generation workspace before generation/bui
 ## Run Targets
 
 | Command | Workflow | Main config |
-|:--|:--|:--|
+| :-- | :-- | :-- |
 | `make steady-state-eval` | Steady-state cornering characterization | `_3_StandardSim/SteadyStateEval/steady_state_eval_config.yml` |
 | `make transient-eval` | Step steer and sustained-sine response | `_3_StandardSim/TransientEval/transient_eval_config.yml` |
 | `make four-post-eval` | Suspension/chassis K&C-style heave and roll sweeps | `_3_StandardSim/FourPostEval/four_post_eval_config.yml` |
@@ -97,7 +97,7 @@ If either file is missing, rebuild the corresponding Modelica target.
 Current config highlights:
 
 | Key | Current role |
-|:--|:--|
+| :-- | :-- |
 | `simulation.exec_name` | `BobLib.Standards.VehicleSim` |
 | `simulation.build_dir` | `_3_StandardSim/Build/VehicleSim` |
 | `simulation.stop_time` | `20.0` seconds |
@@ -137,7 +137,7 @@ sustained sine cases.
 Current config highlights:
 
 | Key | Current role |
-|:--|:--|
+| :-- | :-- |
 | `simulation.exec_name` | `BobLib.Standards.VehicleSim` |
 | `test.testVel` | `15.0` and `20.0` m/s velocity groups |
 | `test.run_step` | Enables representative step steer cases |
@@ -176,7 +176,7 @@ chassis response through heave and roll sweeps.
 Current config highlights:
 
 | Key | Current role |
-|:--|:--|
+| :-- | :-- |
 | `simulation.exec_name` | `BobLib.Standards.FourPostSim` |
 | `simulation.build_dir` | `_3_StandardSim/Build/FourPostSim` |
 | `procedure.heaveMagnitude` | `0.03` m |

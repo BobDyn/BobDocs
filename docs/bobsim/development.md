@@ -110,7 +110,7 @@ ImageIO.
 Setup:
 
 | Target | Action |
-|:--|:--|
+| :-- | :-- |
 | `make init` | Initialize/update git submodules |
 | `make setup` | Build the Docker image |
 | `make rebuild` | Rebuild the Docker image without cache |
@@ -118,14 +118,14 @@ Setup:
 Shells:
 
 | Target | Action |
-|:--|:--|
+| :-- | :-- |
 | `make shell-bobsim` | Open `/workspace` in the BobDyn/BobSim service |
 | `make shell-doe` | Open `/workspace/_4_OptSim` in the DOE service |
 
 Generation and build:
 
 | Target | Action |
-|:--|:--|
+| :-- | :-- |
 | `make sync-vehicle-yaml` | Copy `vehicle.yml` into BobDyn/BobLib's generation workspace |
 | `make build-records` | Generate active vehicle records |
 | `make build-axle-models` | Generate active axle models |
@@ -137,7 +137,7 @@ Generation and build:
 Run workflows:
 
 | Target | Action |
-|:--|:--|
+| :-- | :-- |
 | `make steady-state-eval` | Run SteadyStateEval |
 | `make transient-eval` | Run TransientEval |
 | `make four-post-eval` | Run FourPostEval |
@@ -163,7 +163,7 @@ python pipeline/plot_sensitivity_tornado.py --source envelope
 Cleanup:
 
 | Target | Action |
-|:--|:--|
+| :-- | :-- |
 | `make clean-doe` | Clear OptSim population/results while preserving `.gitkeep` |
 | `make clean-build` | Empty StandardSim build directories |
 | `make clean-results` | Empty StandardSim result directories |

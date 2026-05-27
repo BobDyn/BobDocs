@@ -19,7 +19,7 @@ _2_EnvelopeSim/
 ## EnvelopeSim Layout
 
 | Path | Role |
-|:--|:--|
+| :-- | :-- |
 | `_2_EnvelopeSim/vehicle_loader.py` | Shared active-vehicle input loader |
 | `_2_EnvelopeSim/GGV/ggv_config.yml` | GGV envelope config |
 | `_2_EnvelopeSim/GGV/ggv_generation.py` | GGV envelope generation script |
@@ -63,7 +63,7 @@ _2_EnvelopeSim/GGV/ggv_config.yml
 Current config highlights:
 
 | Key | Current role |
-|:--|:--|
+| :-- | :-- |
 | `speeds` | `5`, `10`, `15`, `20`, `25` m/s |
 | `ay_max_g` | Lateral acceleration search bound |
 | `ay_points` | Lateral grid resolution |
@@ -102,7 +102,7 @@ _2_EnvelopeSim/YMD/ymd_config.yml
 Current config highlights:
 
 | Key | Current role |
-|:--|:--|
+| :-- | :-- |
 | `speed` | Primary analysis speed, currently `15.0` m/s |
 | `beta_min_deg`, `beta_max_deg` | Sideslip sweep bounds |
 | `hwa_min_deg`, `hwa_max_deg` | Handwheel-angle sweep bounds |

@@ -16,7 +16,7 @@ This page maps the BobDyn/BobLib repository and the top-level Modelica package a
 ## Repository Layout
 
 | Path | Role |
-|:--|:--|
+| :-- | :-- |
 | `BobLib/` | Modelica package root |
 | `BobLib/Vehicle/` | Physical vehicle models and subsystem assemblies |
 | `BobLib/Resources/` | Parameter records and visual/vehicle definitions |

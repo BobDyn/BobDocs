@@ -58,7 +58,7 @@ metric,value
 Representative metric groups:
 
 | Workflow | Examples |
-|:--|:--|
+| :-- | :-- |
 | SteadyStateEval | `ay_min`, `ay_max`, steering gradients, understeer gradient, roll gradient, handwheel torque range |
 | TransientEval | step response, gain/phase response, time lags, velocity trends, fit quality |
 | FourPostEval | camber/toe/caster/KPI gains, motion ratios, roll stiffness, jacking, LLTD |

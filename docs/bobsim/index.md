@@ -54,7 +54,7 @@ flowchart TB
 ## Repository Layout
 
 | Path | Role |
-|:--|:--|
+| :-- | :-- |
 | `vehicle.yml` | Active vehicle source for BobDyn/BobSim workflows |
 | `makefile` | Setup, build, run, and cleanup targets |
 | `Dockerfile` | OpenModelica and Python environment |
@@ -112,7 +112,7 @@ make init
 ## Workflow Map
 
 | Area | Primary commands | Purpose |
-|:--|:--|:--|
+| :-- | :-- | :-- |
 | StandardSim | `make build-vehicle-sim`, `make steady-state-eval`, `make transient-eval` | Full Modelica maneuver simulations and reports |
 | FourPostEval | `make build-four-post-sim`, `make four-post-eval` | Suspension/chassis K&C-style sweeps and metrics |
 | VisualSim | `python _1_VisualSim/run_visual.py ... --mp4 ...` | Render geometry animations from visual signal arrays |
@@ -125,7 +125,7 @@ make init
 Start here, then jump to the page that matches the work:
 
 | Page | Use it for |
-|:--|:--|
+| :-- | :-- |
 | [Configuration](/bobsim/configuration) | YAML structure, active vehicle sync, Modelica build knobs, plot/report config |
 | [StandardSim](/bobsim/standard-sim) | SteadyStateEval, TransientEval, FourPostEval, shared runners, standard reports |
 | [Results](/bobsim/results) | Output paths, metrics CSVs, PDF reports, raw case artifacts, preserving runs |

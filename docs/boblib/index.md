@@ -98,7 +98,7 @@ active package.
 ## Documentation Map
 
 | Page | Use it for |
-|:--|:--|
+| :-- | :-- |
 | [Setup](/boblib/setup) | Clone path, prerequisites, Python environment, OpenModelica install expectations |
 | [CLI Workflow](/boblib/cli-workflow) | `omc` loading, translation, simulation, generation, scratch builds |
 | [OMEdit Workflow](/boblib/omedit-workflow) | Opening BobDyn/BobLib visually, diagram browsing, manual simulation, screenshots |

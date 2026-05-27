@@ -53,7 +53,7 @@ _3_StandardSim/FourPostEval/four_post_eval_config.yml
 They share a common shape:
 
 | Section | Purpose |
-|:--|:--|
+| :-- | :-- |
 | `standard` | Workflow name used by report dispatch |
 | `simulation` | Executable path, solver, time settings, output flags, variable filters |
 | `execution` | Parallelism, worker count, cleanup, log streaming |
@@ -92,7 +92,7 @@ simulation:
 Useful runtime flags:
 
 | Key | Effect |
-|:--|:--|
+| :-- | :-- |
 | `start_time`, `stop_time` | Default run time bounds, unless a case overrides them |
 | `stepSize` or `step_size` | Optional OpenModelica output/integration step size |
 | `solver` | Solver passed as `-s=<solver>` |
@@ -138,7 +138,7 @@ execution:
 ```
 
 | Key | Use |
-|:--|:--|
+| :-- | :-- |
 | `parallel` | Run cases with `ProcessPoolExecutor` when true |
 | `max_workers` | Limit parallel case count |
 | `cleanup` | Delete per-case run directories after extraction |
@@ -164,7 +164,7 @@ report:
 Common keys:
 
 | Key | Use |
-|:--|:--|
+| :-- | :-- |
 | `enabled` | Skip report generation when false |
 | `brand`, `title`, `subtitle` | Title page metadata |
 | `output_path` | PDF output path |
@@ -238,7 +238,7 @@ _4_OptSim/configs/
 ```
 
 | File | Role |
-|:--|:--|
+| :-- | :-- |
 | `vehicle_architecture.yaml` | Source of truth for selected template, sampling method, sample/interval count, seed, and sweep variables |
 | `_doe_config.yaml` | Generated private DOE config; do not edit by hand |
 | `compiler_config.yaml` | BobDyn/BobLib path, standards to build, OMC settings, batch timeout |

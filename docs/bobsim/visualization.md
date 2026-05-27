@@ -19,7 +19,7 @@ _1_VisualSim/
 ## VisualSim Layout
 
 | Path | Role |
-|:--|:--|
+| :-- | :-- |
 | `_1_VisualSim/run_visual.py` | MP4 rendering entry point |
 | `_1_VisualSim/viewer.py` | Interactive/viewer support code |
 | `_1_VisualSim/BobLib.Standards.TransientEval_run_5_visual.npz` | Checked-in transient visual signal sample |
@@ -67,7 +67,7 @@ Visualization templates are declarative. They describe how arrays from the
 Important sections:
 
 | Section | Purpose |
-|:--|:--|
+| :-- | :-- |
 | `style.joints` | Joint radius and color |
 | `style.links.default` | Default link radius and color |
 | `style.links.groups` | Per-link-group styling |

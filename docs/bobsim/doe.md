@@ -27,7 +27,7 @@ them.
 ## OptSim Layout
 
 | Path | Role |
-|:--|:--|
+| :-- | :-- |
 | `_4_OptSim/run_doe.py` | Backward-compatible StandardSim sensitivity entry point |
 | `_4_OptSim/run_standard_sensitivities.py` | End-to-end StandardSim sensitivity DOE runner |
 | `_4_OptSim/run_envelope_sensitivities.py` | End-to-end EnvelopeSim sensitivity runner |
@@ -134,7 +134,7 @@ Each variable maps a high-level design path to a parameter inside the generated
 Modelica record:
 
 | Field | Meaning |
-|:--|:--|
+| :-- | :-- |
 | `path` | Stable design-variable name used in sampled rows and aggregate output |
 | `block` | Modelica parameter record block in the baseline `.mo` file |
 | `param` | Parameter inside that block |
@@ -237,7 +237,7 @@ _4_OptSim/configs/compiler_config.yaml
 Important sections:
 
 | Key | Role |
-|:--|:--|
+| :-- | :-- |
 | `boblib_path` | BobDyn/BobLib package path used by OpenModelica |
 | `max_workers` | Number of variants compiled in parallel |
 | `standards` | Standards to compile and run |
@@ -260,7 +260,7 @@ standards:
 Per-variant outputs follow this shape:
 
 | Path | Role |
-|:--|:--|
+| :-- | :-- |
 | `_4_OptSim/population/variant_0001/variant.mo` | Generated Modelica record for that DOE point |
 | `_4_OptSim/population/variant_0001/build/SteadyStateEval/` | OpenModelica build artifacts for the standard |
 | `_4_OptSim/population/variant_0001/results/SteadyStateEval/` | Per-variant standard report outputs |
@@ -452,7 +452,7 @@ Keep `path` names stable if downstream notebooks or reports depend on them.
 Common DOE failures:
 
 | Symptom | Likely cause |
-|:--|:--|
+| :-- | :-- |
 | BobDyn/BobLib not found | Submodule missing; run `make init` |
 | Population mismatch | Sample count changed without cleaning `_4_OptSim/population/` |
 | Selected architecture mismatch | Standard model imports a different generated record |
