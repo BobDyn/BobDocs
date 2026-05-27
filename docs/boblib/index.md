@@ -1,65 +1,118 @@
 ---
 layout: doc
-title: BobLib
+title: BobDyn/BobLib
 next:
-  text: 'Reference'
-  link: '/reference/'
+  text: 'Setup'
+  link: '/boblib/setup'
 ---
 
-# BobLib
+# BobDyn/BobLib
 
-BobLib is the Modelica modeling layer of BobDyn. It defines vehicle systems using acausal multibody physics and provides the compiled model that BobSim executes.
+BobDyn/BobLib is the low-level Modelica vehicle model layer for BobDyn. It contains the
+multibody vehicle models, suspension assemblies, tire records, generated vehicle
+definitions, utilities, and standard Modelica entry points that BobDyn/BobSim runs.
 
-## What BobLib contains
+Use BobDyn/BobLib when you want to inspect, modify, regenerate, or debug the physical
+models directly.
 
-```text
-BobLib/
-├─ Vehicle/      physical vehicle subsystems and assemblies
-├─ Resources/    parameter records, vehicle definitions, visual records
-├─ Standards/    standard maneuver models and build scripts
-├─ Utilities/    reusable math, FMI, and multibody components
-└─ Tests/        development and validation test models
+Use [BobDyn/BobSim](/bobsim/) when you want full simulation workflows: case execution,
+signal extraction, metrics, plots, reports, sensitivity runs, DOE outputs, and
+dynamic-systems analysis.
+
+::: tip Which layer should I use?
+BobDyn/BobLib is generally the low-level model development and debugging layer. If you
+really want to work with the models, clone BobDyn/BobLib directly and continue here.
+
+If you want meaningful full-vehicle simulation workflows that wrap these models,
+start with the [BobDyn/BobSim documentation](/bobsim/) instead.
+:::
+
+> Note: this repository should not be treated as a general-purpose Modelica
+> vehicle standard library until it implements
+> [VehicleInterfaces](https://github.com/modelica/VehicleInterfaces/) and a
+> newer [Modelica Standard Library](https://github.com/modelica/ModelicaStandardLibrary)
+> target. The current interfaces are a one-off layer targeted at BobDyn/BobSim
+> consumption.
+
+## Highlights
+
+- Modular vehicle architecture for chassis, suspension, powertrain, electronics,
+  and aero models
+- Record-based parameterization that keeps model structure separate from vehicle
+  data
+- Standard simulation models for vehicle maneuvers and four-post/K&C-style
+  evaluations
+- MF5.2-style tire record support backed by local `.tir` templates
+- Python generation scripts for deriving active Modelica records and generated
+  wrapper models from `Generation/vehicle.yml`
+- Utility packages for vector math, tensor helpers, inertia translation,
+  multibody actuators, fixtures, and ground-contact support
+
+## Operating Model
+
+BobDyn/BobLib work usually happens in three phases:
+
+1. Generation
+2. Translation
+3. Simulation
+
+Generation is the optional Python/YAML step. It reads `Generation/vehicle.yml`
+and writes the active Modelica source files: the vehicle record, generated
+vehicle wrapper, active axle models, and standard simulation entry points.
+
+Translation is the Modelica compiler step. OpenModelica reads the declarative
+Modelica equations, resolves packages, flattens component hierarchies, performs
+symbolic transformations and index reduction, then builds executable simulation
+code.
+
+Simulation is the runtime step. The translated model is executed with parameter
+values, solver settings, stop time, and output variable selections. BobDyn/BobSim or
+another post-processing layer consumes the resulting files.
+
+<div class="workflow-diagram">
+
+```mermaid
+flowchart TB
+    yaml["Generation/vehicle.yml<br/>active vehicle data"]
+    gen["Python generation scripts"]
+    modelica["Active BobDyn/BobLib<br/>Modelica package"]
+    omc["OpenModelica translation"]
+    exe["Simulation executable"]
+    consumer["BobDyn/BobSim or direct<br/>OpenModelica run"]
+
+    yaml --> gen
+    gen --> modelica
+    modelica --> omc
+    omc --> exe
+    exe --> consumer
 ```
 
-## Modeling philosophy
+</div>
 
-BobLib is built around a few rules:
+The checked-in package can be translated and simulated as-is once OpenModelica
+and `Modelica 3.2.3+maint.om` are installed. For conciseness, BobDyn/BobLib keeps only
+one generated vehicle architecture active in the Modelica package at a time.
+Other architectures live as YAML/templates and are loaded by regenerating the
+active package.
 
-|Principle|Meaning|
+## Documentation Map
+
+| Page | Use it for |
 |:--|:--|
-|Physics first|Geometry, constraints, forces, and motion should come from physical relationships.|
-|Acausal modeling|Components connect through Modelica equations rather than prescribed signal flow.|
-|Reusable structure|Vehicle components live in `Vehicle/`; data lives in `Resources/`.|
-|Inspectable assumptions|Records, parameters, and standard models are plain text and version controlled.|
-|Standards reuse the model|Standard maneuvers should exercise the same underlying vehicle model, not a separate reduced model.|
+| [Setup](/boblib/setup) | Clone path, prerequisites, Python environment, OpenModelica install expectations |
+| [CLI Workflow](/boblib/cli-workflow) | `omc` loading, translation, simulation, generation, scratch builds |
+| [OMEdit Workflow](/boblib/omedit-workflow) | Opening BobDyn/BobLib visually, diagram browsing, manual simulation, screenshots |
+| [Package Map](/boblib/package-map) | Repository layout and Modelica package areas |
+| [Generation](/boblib/generation) | Active `vehicle.yml`, generated outputs, topology keys, BobDyn/BobSim sync |
+| [Entry Points](/boblib/entry-points) | `VehicleSim`, `FourPostSim`, maneuver modes, common outputs |
+| [Development](/boblib/development) | Generator tests, checks before commit, screenshots, notes, contributing, license |
+| [Troubleshooting](/boblib/troubleshooting) | Common OpenModelica, OMEdit, generation, and translation problems |
 
-## Current maturity
+## Maturity Notes
 
-The chassis side is the most mature part of BobLib. The current public-release model includes:
-
-- double-wishbone suspension architecture,
-- bellcrank, rod, spring, damper, and anti-roll-bar linkages,
-- rack-and-pinion steering templates,
-- MF5.2-style tire evaluation structure,
-- full-vehicle double-wishbone RWD assembly,
-- standard-output records for SteadyStateEval, TransientEval, KnC, and FMI-facing outputs.
-
-Powertrain, aero, electronics, and additional vehicle architectures exist but should be treated as earlier-stage than the core chassis workflow.
-
-## Main public entry points
-
-|Model/package|Purpose|
-|:--|:--|
-|`BobLib.Standards.VehicleModel`|Active unified executable target for BobSim standard workflows.|
-|`BobLib.Vehicle.VehicleDW_RWD_Lock`|Full vehicle assembly used by the active standard model.|
-|`BobLib.Resources.VehicleDefn.OrionRecord`|Vehicle parameter record used by the current standard model.|
-|`BobLib.Standards.StandardSim` steady-state model|SteadyStateEval standard-specific Modelica maneuver model.|
-|`BobLib.Standards.StandardSim` transient model|TransientEval standard-specific transient maneuver model.|
-|`BobLib.Standards.VehicleFMI`|FMI-oriented vehicle model target.|
-
-## Learn more
-
-- [BobSim overview](/bobsim/)
-- [Reference index](/reference/)
-- [Vehicle performance metrics](/reference/metrics)
-- [Control theory](/reference/control-theory)
+- The library is still evolving, so some subsystems are more complete than
+  others.
+- The chassis, suspension, tire, and standard-simulation areas are the most
+  mature parts of the tree.
+- BobDyn/BobLib is generated in an "active vehicle" shape rather than carrying every
+  possible generated variant at once.

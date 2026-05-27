@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="BobDyn/BobLib icon">
+  <g fill="none" stroke="#6bb6ff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+    <path d="M24 5 40 14v20L24 43 8 34V14L24 5Z"/>
+    <path d="M24 24 40 14"/>
+    <path d="M24 24 8 14"/>
+    <path d="M24 24v19"/>
+    <path d="M16 30h16"/>
+  </g>
+</svg>

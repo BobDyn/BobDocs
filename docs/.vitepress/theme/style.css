@@ -103,7 +103,7 @@ h4:hover .header-anchor {
     object-fit: contain;
 }
 
-/* Hide the default gradient glow — doesn't suit the pencil-drawn bear */
+/* Hide the default gradient glow so the logo stands on its own */
 .VPHero .image-bg {
     display: none;
 }
@@ -122,6 +122,14 @@ h4:hover .header-anchor {
   width: 100%;
 }
 
+.sample-output-label {
+  margin: 0 0 0.5rem;
+  color: var(--vp-c-text-1);
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
 .mobile-visuals-message {
   display: none;
 }
@@ -129,6 +137,66 @@ h4:hover .header-anchor {
 .centered-diagram {
   display: flex;
   justify-content: center;
+}
+
+.wide-diagram,
+.model-structure-diagram,
+.workflow-diagram {
+  width: 100%;
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.wide-diagram .mermaid,
+.wide-diagram svg {
+  min-width: 720px;
+  max-width: none;
+}
+
+.model-structure-diagram,
+.workflow-diagram {
+  display: flex;
+  justify-content: center;
+}
+
+.model-structure-diagram .mermaid,
+.workflow-diagram .mermaid {
+  width: 100%;
+}
+
+.model-structure-diagram svg,
+.workflow-diagram svg {
+  width: 100% !important;
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", "Ubuntu", sans-serif;
+}
+
+.mermaid .nodeLabel,
+.mermaid .edgeLabel,
+.mermaid .cluster-label {
+  line-height: 1.28;
+}
+
+.mermaid .nodeLabel p,
+.mermaid .edgeLabel p,
+.mermaid .cluster-label p {
+  margin: 0;
+  line-height: 1.28;
+}
+
+.model-structure-diagram .text-outer-tspan:nth-child(n + 2) .text-inner-tspan {
+  fill: var(--vp-c-text-2);
+  font-size: 0.88em;
+}
+
+.mermaid foreignObject {
+  overflow: visible;
 }
 
 @media (max-width: 768px) {

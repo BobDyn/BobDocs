@@ -11,9 +11,12 @@ Reference pages explain the terminology and theory used throughout BobDyn.
 
 Use these pages when you are reading reports or comparing vehicle behavior.
 
+- [Vehicle dynamics](/reference/vehicle-dynamics)
 - [Vehicle performance metrics](/reference/metrics)
 
-This page defines the steady-state, transient, stability, and frequency-domain quantities that show up in BobDyn reports and CSV outputs.
+The vehicle dynamics page presents vehicle dynamics as a nonlinear dynamic systems and controls problem: states, constraints, force laws, load paths, compliance, tires, aero, and transient response.
+
+The metrics page defines the steady-state, transient, stability, and frequency-domain quantities that show up in BobDyn reports and CSV outputs.
 
 ## Control foundations
 

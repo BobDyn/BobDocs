@@ -11,7 +11,18 @@ prev:
 This guide explains how to work with BobDyn after the environment is set up.
 
 ::: info Starting point
-In this guide, `/BobSim` means the root of the `../BobSim` checkout. Start there before running commands or editing workflow files.
+In this guide, the BobDyn/BobSim root means the repository directory created by
+the BobDyn/BobSim clone step. Start there before running commands or editing
+workflow files.
+:::
+
+::: tip Choose the right layer
+Go to [BobDyn/BobSim](/bobsim/) when you want simulation workflows: cases, sweeps,
+reports, metrics, plots, and result files.
+
+Go to [BobDyn/BobLib](/boblib/) when you want the low-level vehicle model layer:
+Modelica package structure, generated vehicle records, suspension assemblies,
+tire models, or direct OpenModelica/OMEdit debugging.
 :::
 
 The short version is:
@@ -25,31 +36,34 @@ The short version is:
 
 BobDyn keeps the physical model and the simulation workflow separate:
 
-- **BobLib** defines the vehicle and its subsystem architecture
-- **BobSim** runs the standard studies, extracts signals, and produces reports
+- **BobDyn/BobLib** defines the vehicle and its subsystem architecture
+- **BobDyn/BobSim** runs the standard studies, extracts signals, and produces reports
 - **BobDocs** explains the workflow, terminology, and outputs
 
 That separation is what lets you change the study without hiding the physics behind a black box.
 
 ## The main workflows
 
-The currently active standard workflows in BobSim are:
+The currently active standard workflows in BobDyn/BobSim are:
 
 - `SteadyStateEval` for steady-state cornering characterization
 - `TransientEval` for transient steering response and frequency-response analysis
+- `FourPostEval` for suspension/chassis K&C-style heave and roll sweeps
 
-KnC, envelope tools, visualization, and DOE are documented as well, but the standard eval workflows are the most reliable place to start.
+Envelope tools, visualization, and DOE are documented as well, but the standard
+eval workflows are the most reliable place to start.
 
 ## SteadyStateEval
 
-Use `SteadyStateEval` when you want a quasi-steady characterization of the vehicle across a radius sweep.
+Use `SteadyStateEval` when you want a quasi-steady characterization of lateral
+vehicle behavior across ramp-steer velocity isolines.
 
 What it does:
 
 - holds vehicle speed constant
-- sweeps turn radius in both directions
+- runs the open-loop ramp-steer mode in `BobLib.Standards.VehicleSim`
 - runs the unified `BobLib.Standards.VehicleSim` executable
-- averages the settled part of each run
+- fits response curves against measured lateral acceleration
 - produces a report and a metrics CSV
 
 Relevant files:
@@ -59,7 +73,7 @@ Relevant files:
 
 Typical output signals include steering, lateral acceleration, roll, sideslip, yaw rate, wheel loads, and handwheel torque.
 
-### Transient Response Checks
+### What to look for
 
 - steering angle versus lateral acceleration
 - curvature or radius tracking error
@@ -90,9 +104,35 @@ Relevant files:
 - lateral acceleration rise time
 - phase lag and gain trends versus frequency
 
+## FourPostEval
+
+Use `FourPostEval` when you want suspension and chassis K&C-style response
+metrics.
+
+What it does:
+
+- builds and runs `BobLib.Standards.FourPostSim`
+- performs heave and roll sweeps
+- extracts front and rear K&C output records
+- computes camber, toe, caster, KPI, trail, scrub, motion-ratio, jacking, roll-stiffness, and LLTD metrics
+- writes a report and metrics CSV
+
+Relevant files:
+
+- `_3_StandardSim/FourPostEval/four_post_eval_sim.py`
+- `_3_StandardSim/FourPostEval/four_post_eval_config.yml`
+
+### What to look for
+
+- motion ratio near static position
+- camber and toe gains in heave and roll
+- roll stiffness split between springs and anti-roll bars
+- lateral load transfer distribution
+- jacking/anti behavior
+
 ## How to run a study
 
-The most practical way to use BobSim is to edit the YAML config for the workflow you want to run.
+The most practical way to use BobDyn/BobSim is to edit the YAML config for the workflow you want to run.
 
 ### Common config sections
 
@@ -108,16 +148,23 @@ The most practical way to use BobSim is to edit the YAML config for the workflow
 ### Typical run pattern
 
 ```bash
-omc _3_StandardSim/build.mos
-make SteadyStateEval
-make TransientEval
+make build-vehicle-sim
+make steady-state-eval
+make transient-eval
+```
+
+For the four-post workflow:
+
+```bash
+make build-four-post-sim
+make four-post-eval
 ```
 
 If you want to run only one workflow, just run the corresponding target or module.
 
 ## Where results go
 
-BobSim writes the active standard-study outputs under:
+BobDyn/BobSim writes the active standard-study outputs under:
 
 ```text
 _3_StandardSim/results/
@@ -151,8 +198,11 @@ Use the raw case outputs if you need:
 
 If you want to dig deeper, these pages are the next stop:
 
-- [BobSim overview](/bobsim/)
-- [BobLib overview](/boblib/)
+- [BobDyn/BobSim overview](/bobsim/) for workflow structure and standard-study entry points
+- [StandardSim](/bobsim/standard-sim) for SteadyStateEval, TransientEval, and FourPostEval
+- [Configuration](/bobsim/configuration) for YAML and build configuration
+- [Results](/bobsim/results) for output paths, metrics CSVs, and raw artifacts
+- [BobDyn/BobLib overview](/boblib/) for low-level model structure and debugging
 - [Reference index](/reference/)
 - [Vehicle performance metrics](/reference/metrics)
 - [Control theory](/reference/control-theory)
@@ -161,5 +211,6 @@ If you want to dig deeper, these pages are the next stop:
 
 - Start with `SteadyStateEval` if you are validating a new setup.
 - Use `TransientEval` when you care about response dynamics instead of a settled operating point.
+- Use `FourPostEval` before envelope review work when you want updated LLTD and suspension metrics.
 - Keep the report and metrics CSV under version control only when you intentionally want to show a baseline result.
 - When a run fails, check the run log before changing the model. Many issues are configuration or build-path problems, not physics problems.

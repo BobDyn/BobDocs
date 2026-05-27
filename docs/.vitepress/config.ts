@@ -1,40 +1,15 @@
 /// <reference types="node" />
-import { readFileSync } from "fs";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
 import { defineConfig } from "vitepress";
 import mathjax3 from "markdown-it-mathjax3";
 import { withMermaid } from "vitepress-plugin-mermaid";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const docsDir = resolve(__dirname, "..");
-
 // ---------------------------------------------------------------------------
 // Sidebar helpers
-// Reads a markdown file and returns its ## headings as anchor sub-items.
-// Matches VitePress's default slug: lowercase, strip non-word chars, spaces→hyphens.
+// Build page-level sidebar entries. In-page headings are handled by the right
+// outline, so the left sidebar stays focused on document navigation.
 // ---------------------------------------------------------------------------
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-}
-
-function h2items(relPath: string, urlBase: string) {
-  const content = readFileSync(resolve(docsDir, relPath), "utf-8");
-  return content
-    .split("\n")
-    .filter((line: string) => line.startsWith("## "))
-    .map((line: string) => line.slice(3).trim())
-    .map((text: string) => ({ text, link: `${urlBase}#${slugify(text)}` }));
-}
-
-// Build a sidebar entry: page title + its ## headings as sub-items.
-function page(title: string, urlPath: string, relFile: string) {
-  return { text: title, link: urlPath, items: h2items(relFile, urlPath) };
+function page(title: string, urlPath: string) {
+  return { text: title, link: urlPath };
 }
 
 // ---------------------------------------------------------------------------
@@ -47,7 +22,7 @@ export default withMermaid(
 
     cleanUrls: true,
 
-    head: [["link", { rel: "icon", href: "/bob.png" }]],
+    head: [["link", { rel: "icon", href: "/bobdyn.png" }]],
 
     markdown: {
       defaultHighlightLang: "txt",
@@ -55,8 +30,21 @@ export default withMermaid(
       config: (md) => { md.use(mathjax3); },
     },
 
+    mermaid: {
+      htmlLabels: false,
+      fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Ubuntu, sans-serif",
+      themeVariables: {
+        fontSize: "15px",
+      },
+      flowchart: {
+        nodeSpacing: 52,
+        rankSpacing: 72,
+        padding: 24,
+      },
+    },
+
     themeConfig: {
-      logo: "/bob.png",
+      logo: "/bobdyn.png",
       siteTitle: "BobDyn",
 
       outline: 2,
@@ -67,8 +55,8 @@ export default withMermaid(
         {
           text: "Documentation",
           items: [
-            { text: "BobLib",    link: "/boblib/" },
-            { text: "BobSim",    link: "/bobsim/" },
+            { text: "BobDyn/BobLib", link: "/boblib/" },
+            { text: "BobDyn/BobSim", link: "/bobsim/" },
             { text: "Reference", link: "/reference/" },
           ],
         },
@@ -77,23 +65,42 @@ export default withMermaid(
 
       sidebar: {
         "/startup-guide/": [
-          page("Startup Guide", "/startup-guide/", "startup-guide/index.md"),
+          page("Startup Guide", "/startup-guide/"),
         ],
 
         "/use-guide/": [
-          page("Use Guide", "/use-guide/", "use-guide/index.md"),
+          page("Use Guide", "/use-guide/"),
         ],
 
         "/boblib/": [
-          page("BobLib", "/boblib/", "boblib/index.md"),
+          {
+            text: "BobDyn/BobLib",
+            items: [
+              page("Overview",        "/boblib/"),
+              page("Setup",           "/boblib/setup"),
+              page("CLI Workflow",    "/boblib/cli-workflow"),
+              page("OMEdit Workflow", "/boblib/omedit-workflow"),
+              page("Package Map",     "/boblib/package-map"),
+              page("Generation",      "/boblib/generation"),
+              page("Entry Points",    "/boblib/entry-points"),
+              page("Development",     "/boblib/development"),
+              page("Troubleshooting", "/boblib/troubleshooting"),
+            ],
+          },
         ],
 
         "/bobsim/": [
           {
-            text: "BobSim",
+            text: "BobDyn/BobSim",
             items: [
-              page("BobSim",                  "/bobsim/",    "bobsim/index.md"),
-              page("Design of Experiments",   "/bobsim/doe", "bobsim/doe.md"),
+              page("Overview",       "/bobsim/"),
+              page("Configuration",  "/bobsim/configuration"),
+              page("StandardSim",    "/bobsim/standard-sim"),
+              page("Results",        "/bobsim/results"),
+              page("Visualization",  "/bobsim/visualization"),
+              page("EnvelopeSim",    "/bobsim/envelope"),
+              page("OptSim / DOE",   "/bobsim/doe"),
+              page("Development",    "/bobsim/development"),
             ],
           },
         ],
@@ -102,15 +109,16 @@ export default withMermaid(
           {
             text: "Reference",
             items: [
-              page("Reference",                  "/reference/",                "reference/index.md"),
-              page("Vehicle Performance Metrics", "/reference/metrics",        "reference/metrics.md"),
-              page("Control Theory",             "/reference/control-theory",  "reference/control-theory.md"),
+              page("Reference",                   "/reference/"),
+              page("Vehicle Dynamics",            "/reference/vehicle-dynamics"),
+              page("Vehicle Performance Metrics", "/reference/metrics"),
+              page("Control Theory",              "/reference/control-theory"),
             ],
           },
         ],
 
         "/contributing": [
-          page("Contributing", "/contributing", "contributing.md"),
+          page("Contributing", "/contributing"),
         ],
       },
 
