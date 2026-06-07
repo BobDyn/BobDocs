@@ -217,7 +217,7 @@ currents, torques, and reactions appear as terms that change stored quantity.
 For a control volume, the generic mass balance is:
 
 $$
-\frac{dm}{dt} = \dot{m}_{in} - \dot{m}_{out}
+\frac{dm}{dt} = \dot{m}_{\text{in}} - \dot{m}_{\text{out}}
 $$
 
 For a rigid body, the fundamental linear momentum balance is:
@@ -433,7 +433,7 @@ Common failure-related quantities:
 Von Mises stress is commonly used for ductile materials:
 
 $$
-\sigma_{vm} =
+\sigma_{\text{vm}} =
 \sqrt{\frac{(\sigma_1-\sigma_2)^2+
 (\sigma_2-\sigma_3)^2+
 (\sigma_3-\sigma_1)^2}{2}}
@@ -455,14 +455,14 @@ Mean stress corrections such as Goodman-style relations are used when cyclic
 loads are not fully reversed:
 
 $$
-\frac{\sigma_a}{S_e}+\frac{\sigma_m}{S_{ut}}\leq \frac{1}{n}
+\frac{\sigma_a}{S_e}+\frac{\sigma_m}{S_{\text{ut}}}\leq \frac{1}{n}
 $$
 
 Buckling can control slender members before material yield. For an ideal
 pinned column:
 
 $$
-P_{cr}=\frac{\pi^2EI}{(KL)^2}
+P_{\text{cr}}=\frac{\pi^2EI}{(KL)^2}
 $$
 
 Connections need the same level of attention as primary members. Bolts,
@@ -495,7 +495,7 @@ and production rate.
 Tolerance stackup matters when multiple parts locate each other:
 
 $$
-\Delta_{assembly} \approx \sum_i \Delta_i
+\Delta_{\text{assembly}} \approx \sum_i \Delta_i
 $$
 
 for a worst-case linear stack. Statistical tolerance analysis may be less
@@ -673,10 +673,10 @@ inputs, PWM outputs, communication buses, interrupts, timers, and memory.
 PWM controls average actuator command by changing duty cycle:
 
 $$
-D=\frac{t_{on}}{T}
+D=\frac{t_{\text{on}}}{T}
 $$
 
-where $D$ is duty cycle, $t_{on}$ is on-time, and $T$ is the period.
+where $D$ is duty cycle, $t_{\text{on}}$ is on-time, and $T$ is the period.
 
 For a DC motor, voltage, current, torque, and speed are coupled. A common
 ideal structure is:
@@ -697,11 +697,11 @@ grounding, communication latency, actuator saturation, sensor calibration, and
 failure modes that do not appear in pure simulation.
 
 Analog-to-digital conversion quantizes a continuous voltage into a finite
-number of counts. For an $N$-bit converter over range $V_{ref}$, the nominal
+number of counts. For an $N$-bit converter over range $V_{\text{ref}}$, the nominal
 voltage resolution is:
 
 $$
-\Delta V=\frac{V_{ref}}{2^N}
+\Delta V=\frac{V_{\text{ref}}}{2^N}
 $$
 
 Real ADC quality also depends on noise, reference stability, input impedance,
@@ -764,10 +764,10 @@ s=j\omega
 $$
 
 Sampling a continuous signal introduces a sample frequency $f_s$. To avoid
-aliasing for content up to $f_{max}$:
+aliasing for content up to $f_{\text{max}}$:
 
 $$
-f_s>2f_{max}
+f_s>2f_{\text{max}}
 $$
 
 Filtering can reduce noise, but it can also attenuate real signal content or
@@ -841,7 +841,7 @@ handled.
 Feedforward uses a model to supply the predictable part of the command:
 
 $$
-u(t)=u_{ff}(t)+u_{fb}(t)
+u(t)=u_{\text{ff}}(t)+u_{\text{fb}}(t)
 $$
 
 Feedback then corrects disturbances, modeling error, and unmeasured effects.
@@ -860,13 +860,13 @@ Steady-state error depends on loop gain and system type. For unity feedback,
 the position error constant is:
 
 $$
-K_{pos}=\lim_{s\to 0}C(s)G(s)
+K_{\text{pos}}=\lim_{s\to 0}C(s)G(s)
 $$
 
 The steady-state error to a unit step is:
 
 $$
-e_{ss}=\frac{1}{1+K_{pos}}
+e_{\text{ss}}=\frac{1}{1+K_{\text{pos}}}
 $$
 
 Integral action increases low-frequency loop gain and can remove step
@@ -943,7 +943,7 @@ Reference tracking with state feedback often requires a steady-state command
 or prefilter, not only $u=-Kx$. A common structure is:
 
 $$
-u=u_{ss}-K(x-x_{ss})
+u=u_{\text{ss}}-K(x-x_{\text{ss}})
 $$
 
 This separates equilibrium selection from transient regulation.
@@ -1072,25 +1072,25 @@ $$
 Radiation to large surroundings:
 
 $$
-q=\epsilon\sigma A(T_s^4-T_{sur}^4)
+q=\epsilon\sigma A(T_s^4-T_{\text{sur}}^4)
 $$
 
 Thermal resistance gives:
 
 $$
-q=\frac{\Delta T}{R_{th}}
+q=\frac{\Delta T}{R_{\text{th}}}
 $$
 
 For a plane wall:
 
 $$
-R_{cond}=\frac{L}{kA}
+R_{\text{cond}}=\frac{L}{kA}
 $$
 
 For convection:
 
 $$
-R_{conv}=\frac{1}{hA}
+R_{\text{conv}}=\frac{1}{hA}
 $$
 
 Lumped capacitance assumes spatially uniform body temperature. The Biot number
@@ -1128,10 +1128,10 @@ base temperature.
 For heat exchangers, the log-mean temperature difference method uses:
 
 $$
-q=UA\Delta T_{lm}
+q=UA\Delta T_{\text{lm}}
 $$
 
-where $U$ is overall heat-transfer coefficient and $\Delta T_{lm}$ accounts
+where $U$ is overall heat-transfer coefficient and $\Delta T_{\text{lm}}$ accounts
 for the changing hot-cold temperature difference along the exchanger.
 
 Convection correlations usually have the form:
@@ -1160,9 +1160,9 @@ For many engineering control volumes at steady state:
 
 $$
 \dot{Q}-\dot{W}+
-\sum \dot{m}\left(h+\frac{V^2}{2}+gz\right)_{in}
+\sum \dot{m}\left(h+\frac{V^2}{2}+gz\right)_{\text{in}}
 =
-\sum \dot{m}\left(h+\frac{V^2}{2}+gz\right)_{out}
+\sum \dot{m}\left(h+\frac{V^2}{2}+gz\right)_{\text{out}}
 $$
 
 State properties include pressure, temperature, volume, internal energy,
@@ -1192,7 +1192,7 @@ The second law introduces entropy and limits on energy conversion. For a heat
 engine, thermal efficiency is:
 
 $$
-\eta=\frac{W_{out}}{Q_{in}}
+\eta=\frac{W_{\text{out}}}{Q_{\text{in}}}
 $$
 
 Thermodynamic models depend on property data, phase, ideal-gas assumptions,
@@ -1203,7 +1203,7 @@ For a reversible heat engine operating between two reservoirs, the Carnot
 efficiency is:
 
 $$
-\eta_{Carnot}=1-\frac{T_L}{T_H}
+\eta_{\text{Carnot}}=1-\frac{T_L}{T_H}
 $$
 
 Real cycles fall below this limit because of irreversibility, finite
@@ -1447,7 +1447,7 @@ structure.
 One-factor ANOVA compares variation between groups to variation within groups:
 
 $$
-F=\frac{MS_{between}}{MS_{within}}
+F=\frac{MS_{\text{between}}}{MS_{\text{within}}}
 $$
 
 It tests whether group means differ more than expected from within-group
@@ -1791,7 +1791,8 @@ $$
 K_I=Y\sigma\sqrt{\pi a}
 $$
 
-Fracture becomes critical when $K_I$ approaches the fracture toughness $K_{IC}$.
+Fracture becomes critical when $K_{\text{I}}$ approaches the fracture toughness
+$K_{\text{IC}}$.
 
 Hardness, tensile tests, microscopy, spectroscopy, and fractography answer
 different material questions. A useful material investigation connects the
@@ -1877,10 +1878,10 @@ y=mx+b
 $$
 
 Sampling must capture the relevant signal content. For a maximum signal
-frequency $f_{max}$, the Nyquist criterion requires:
+frequency $f_{\text{max}}$, the Nyquist criterion requires:
 
 $$
-f_s>2f_{max}
+f_s>2f_{\text{max}}
 $$
 
 Filtering can reduce noise but can also add phase lag or remove real signal
@@ -2028,7 +2029,11 @@ End-to-end delay can include processing delay, queueing delay, transmission
 delay, and propagation delay:
 
 $$
-d_{total}=d_{proc}+d_{queue}+d_{trans}+d_{prop}
+d_{\text{total}}=
+d_{\text{proc}}+
+d_{\text{queue}}+
+d_{\text{trans}}+
+d_{\text{prop}}
 $$
 
 Application behavior depends on protocol semantics, network latency, packet
@@ -2093,7 +2098,7 @@ Nominal and effective interest rates differ when compounding frequency matters.
 For a nominal rate $r$ compounded $m$ times per year:
 
 $$
-i_{eff}=\left(1+\frac{r}{m}\right)^m-1
+i_{\text{eff}}=\left(1+\frac{r}{m}\right)^m-1
 $$
 
 Book depreciation methods include straight-line, declining-balance, and
@@ -2139,11 +2144,11 @@ assumptions.
 A common planar lateral balance is:
 
 $$
-m(\dot{v}_y+v_xr)=F_{yf}+F_{yr}
+m(\dot{v}_y+v_xr)=F_{y,\text{f}}+F_{y,\text{r}}
 $$
 
 $$
-I_z\dot{r}=l_fF_{yf}-l_rF_{yr}
+I_z\dot{r}=l_{\text{f}}F_{y,\text{f}}-l_{\text{r}}F_{y,\text{r}}
 $$
 
 where $v_y$ is lateral velocity, $v_x$ is longitudinal velocity, $r$ is yaw
@@ -2170,7 +2175,7 @@ where $h$ is center-of-gravity height and $L$ is wheelbase.
 Aerodynamic forces commonly scale with dynamic pressure:
 
 $$
-F_{aero}=\frac{1}{2}\rho V^2 C A
+F_{\text{aero}}=\frac{1}{2}\rho V^2 C A
 $$
 
 This makes high-speed behavior sensitive to ride height, pitch, yaw, blockage,

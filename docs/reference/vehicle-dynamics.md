@@ -104,6 +104,12 @@ assumes comfort with calculus, ordinary differential equations, and basic
 controls language, but the goal is not mathematical density. The goal is a
 clear physical model.
 
+For an FSAE-specific application of this framework, see
+[FSAE Bridge](/reference/fsae-bridge). This page explains what the
+vehicle system is; the FSAE page explains what a team can responsibly claim
+about that system using simulation, controlled tests, and competition
+telemetry.
+
 ## Geometry Is Not The Goal
 
 Suspension geometry is important because it changes tire states, contact patch
@@ -181,16 +187,16 @@ sprung-mass attitude moment for the load direction being considered.
 For a longitudinal case, the reference scale is:
 
 $$
-F_{\text{jack, 100\%}} = F_x \frac{h_{cg}}{L}
+F_{\text{jack, 100\%}} = F_x \frac{h_{\text{cg}}}{L}
 $$
 
 For a lateral case, the reference scale is:
 
 $$
-F_{\text{jack, 100\%}} = F_y \frac{h_{cg}}{T}
+F_{\text{jack, 100\%}} = F_y \frac{h_{\text{cg}}}{T}
 $$
 
-where $h_{cg}$ is CG height, $L$ is wheelbase, and $T$ is track width. The
+where $h_{\text{cg}}$ is CG height, $L$ is wheelbase, and $T$ is track width. The
 specific direction and sign depend on the case being analyzed.
 
 This scaling clears away a lot of confusion. A 100% anti-dive statement does
@@ -492,7 +498,8 @@ a parameterized attitude space, then interpolate an aero map:
 
 $$
 F_{\text{aero}} =
-F(V, h_{FL}, h_{FR}, h_{RL}, h_{RR}, \beta, \delta, ...)
+F(V, h_{\text{FL}}, h_{\text{FR}}, h_{\text{RL}}, h_{\text{RR}},
+\beta, \delta, ...)
 $$
 
 With enough compute and a meaningful parameterization, this can be powerful. It

@@ -19,7 +19,7 @@ hero:
       link: /reference/vehicle-dynamics
     - theme: alt
       text: FSAE Bridge
-      link: /reference/fsae-connection
+      link: /reference/fsae-bridge
 
 features:
   - icon:

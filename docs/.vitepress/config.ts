@@ -115,7 +115,7 @@ export default withMermaid(
             text: "Reference",
             items: [
               page("Vehicle Dynamics",            "/reference/vehicle-dynamics"),
-              page("FSAE Connection",             "/reference/fsae-connection"),
+              page("FSAE Bridge",                 "/reference/fsae-bridge"),
               page("Vehicle Performance Metrics", "/reference/metrics"),
               page("Engineering Knowledge Base",   "/reference/field-notes"),
             ],

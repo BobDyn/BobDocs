@@ -127,7 +127,7 @@ G_r = \frac{r}{\delta}
 $$
 
 $$
-A_r = \frac{r_{peak}}{r_{ss}}
+A_r = \frac{r_{\text{peak}}}{r_{\text{ss}}}
 $$
 
 $$
