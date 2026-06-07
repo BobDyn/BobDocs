@@ -8,209 +8,229 @@ prev:
 
 # Use Guide
 
-This guide explains how to work with BobDyn after the environment is set up.
+This guide explains how to use BobDyn after the environment is set up.
 
 ::: info Starting point
 In this guide, the BobDyn/BobSim root means the repository directory created by
-the BobDyn/BobSim clone step. Start there before running commands or editing
-workflow files.
+the BobSim clone step. Start there before running commands or editing workflow
+files.
 :::
 
 ::: tip Choose the right layer
-Go to [BobDyn/BobSim](/bobsim/) when you want simulation workflows: cases, sweeps,
-reports, metrics, plots, and result files.
+Use [BobDyn/BobSim](/bobsim/) for simulation workflows: cases, sweeps, metrics,
+plots, reports, envelopes, sensitivities, and result files.
 
-Go to [BobDyn/BobLib](/boblib/) when you want the low-level vehicle model layer:
-Modelica package structure, generated vehicle records, suspension assemblies,
-tire models, or direct OpenModelica/OMEdit debugging.
+Use [BobDyn/BobLib](/boblib/) for the low-level Modelica model layer:
+suspension assemblies, generated records, tire models, direct OpenModelica
+debugging, and OMEdit diagram inspection.
 :::
 
-The short version is:
+## Normal Workflow
 
-1. choose a workflow
-2. edit its YAML configuration
-3. run the simulation
-4. inspect the metrics, plots, and report
+The normal BobSim loop is:
 
-## What BobDyn is doing
+1. Pick a workflow.
+2. Edit the workflow YAML or the active `vehicle.yml`.
+3. Build the required Modelica executable if the vehicle or model changed.
+4. Run the evaluation.
+5. Review the report and metrics CSV.
 
-BobDyn keeps the physical model and the simulation workflow separate:
+BobDyn keeps these layers separate:
 
-- **BobDyn/BobLib** defines the vehicle and its subsystem architecture
-- **BobDyn/BobSim** runs the standard studies, extracts signals, and produces reports
-- **BobDocs** explains the workflow, terminology, and outputs
+| Layer | Role |
+| :-- | :-- |
+| BobDyn/BobLib | Modelica vehicle library and generated active vehicle records |
+| BobDyn/BobSim | High-fidelity analysis workflows, envelopes, sensitivities, reports |
+| BobDocs | Public documentation, examples, and reference material |
 
-That separation is what lets you change the study without hiding the physics behind a black box.
+That split keeps the physics inspectable while still making the analysis
+workflow scriptable.
 
-## The main workflows
+## StandardSim
 
-The currently active standard workflows in BobDyn/BobSim are:
+StandardSim is the main high-fidelity simulation lane. It lives under:
 
-- `SteadyStateEval` for steady-state cornering characterization
-- `TransientEval` for transient steering response and frequency-response analysis
-- `FourPostEval` for suspension/chassis K&C-style heave and roll sweeps
+```text
+_3_StandardSim/
+```
 
-Envelope tools, visualization, and DOE are documented as well, but the standard
-eval workflows are the most reliable place to start.
+The active standard studies are:
+
+| Study | Use it for | Target |
+| :-- | :-- | :-- |
+| SteadyStateEval | Ramp-steer velocity isolines and quasi-steady handling metrics | `make standard-eval-steady-state` |
+| TransientEval | Step steer and continuous sine response | `make standard-eval-transient` |
+| FourPostEval | Heave and roll K&C-style suspension/chassis metrics | `make standard-eval-four-post` |
+
+Build the maneuver model:
+
+```bash
+make standard-build
+```
+
+Run the maneuver evaluations:
+
+```bash
+make standard-eval-steady-state
+make standard-eval-transient
+```
+
+Build and run the four-post evaluation:
+
+```bash
+make standard-build-four-post
+make standard-eval-four-post
+```
+
+Run the complete standard baseline:
+
+```bash
+make standard-eval-all
+```
 
 ## SteadyStateEval
 
-Use `SteadyStateEval` when you want a quasi-steady characterization of lateral
+Use SteadyStateEval when you want a quasi-steady characterization of lateral
 vehicle behavior across ramp-steer velocity isolines.
 
-What it does:
+It:
 
-- holds vehicle speed constant
-- runs the open-loop ramp-steer mode in `BobLib.Standards.VehicleSim`
-- runs the unified `BobLib.Standards.VehicleSim` executable
+- holds vehicle speed with the BobLib speed controller
+- runs `BobLib.Standards.VehicleSim` in open-loop ramp-steer mode
+- terminates when the ramp-steer quasi-steady plateau is reached
+- extracts steering, lateral acceleration, yaw, roll, sideslip, tire loads, and handwheel torque
 - fits response curves against measured lateral acceleration
-- produces a report and a metrics CSV
+- writes a PDF report and metrics CSV
 
 Relevant files:
 
-- `_3_StandardSim/SteadyStateEval/steady_state_eval_sim.py`
-- `_3_StandardSim/SteadyStateEval/steady_state_eval_config.yml`
-
-Typical output signals include steering, lateral acceleration, roll, sideslip, yaw rate, wheel loads, and handwheel torque.
-
-### What to look for in SteadyStateEval
-
-- steering angle versus lateral acceleration
-- curvature or radius tracking error
-- roll and sideslip trends
-- understeer behavior across the sweep
+```text
+_3_StandardSim/SteadyStateEval/steady_state_eval_config.yml
+_3_StandardSim/SteadyStateEval/steady_state_eval_sim.py
+```
 
 ## TransientEval
 
-Use `TransientEval` when you want to study response to steering inputs over time.
+Use TransientEval when you want time-domain steering response.
 
-What it does:
+It:
 
-- generates step and sinusoidal steering cases
-- runs left and right directions when configured
-- measures time histories directly from the simulation output
-- computes gain and phase behavior from the sine cases
-- writes a report and a metrics CSV
+- runs step-steer cases
+- runs continuous sine cases
+- uses `BobLib.Standards.VehicleSim` with transient tire slip enabled
+- computes step response metrics
+- computes frequency-response gain, phase, and equivalent lag from sine cases
+- writes a PDF report and metrics CSV
 
 Relevant files:
 
-- `_3_StandardSim/TransientEval/transient_eval_sim.py`
-- `_3_StandardSim/TransientEval/transient_eval_config.yml`
-
-### What to look for in TransientEval
-
-- steering step response
-- yaw-rate settling
-- lateral acceleration rise time
-- phase lag and gain trends versus frequency
+```text
+_3_StandardSim/TransientEval/transient_eval_config.yml
+_3_StandardSim/TransientEval/transient_eval_sim.py
+```
 
 ## FourPostEval
 
-Use `FourPostEval` when you want suspension and chassis K&C-style response
-metrics.
+Use FourPostEval when you want suspension and chassis K&C-style metrics.
 
-What it does:
+It:
 
 - builds and runs `BobLib.Standards.FourPostSim`
-- performs heave and roll sweeps
+- sweeps heave and roll positions
 - extracts front and rear K&C output records
-- computes camber, toe, caster, KPI, trail, scrub, motion-ratio, jacking, roll-stiffness, and LLTD metrics
-- writes a report and metrics CSV
+- computes camber, toe, caster, KPI, trail, scrub, motion ratio, anti/jacking, roll stiffness, and LLTD metrics
+- writes a PDF report and metrics CSV
 
 Relevant files:
 
-- `_3_StandardSim/FourPostEval/four_post_eval_sim.py`
-- `_3_StandardSim/FourPostEval/four_post_eval_config.yml`
-
-### What to look for in FourPostEval
-
-- motion ratio near static position
-- camber and toe gains in heave and roll
-- roll stiffness split between springs and anti-roll bars
-- lateral load transfer distribution
-- jacking/anti behavior
-
-## How to run a study
-
-The most practical way to use BobDyn/BobSim is to edit the YAML config for the workflow you want to run.
-
-### Common config sections
-
-|Section|Purpose|
-|:--|:--|
-|`simulation`|Build directory, executable name, solver, output format, time settings, and runner flags|
-|`execution`|Parallelism, worker count, cleanup, and log streaming|
-|`sweep` / `test`|Case-generation inputs for the study|
-|`report`|Title page metadata and report output path|
-|`plots`|Plot layout and signal mapping|
-|`fit`|Workflow-specific fitting or curve logic|
-
-### Typical run pattern
-
-```bash
-make build-vehicle-sim
-make steady-state-eval
-make transient-eval
+```text
+_3_StandardSim/FourPostEval/four_post_eval_config.yml
+_3_StandardSim/FourPostEval/four_post_eval_sim.py
 ```
 
-For the four-post workflow:
+## EnvelopeSim
+
+EnvelopeSim is an optional reduced-order lane for common envelope maps. It is a
+separate implementation of calculations such as GGV and YMD maps, which are
+used widely in vehicle dynamics work.
+
+Run:
 
 ```bash
-make build-four-post-sim
-make four-post-eval
+make envelope-ggv
+make envelope-ymd
 ```
 
-If you want to run only one workflow, just run the corresponding target or module.
+or:
 
-## Where results go
+```bash
+make envelope-all
+```
 
-BobDyn/BobSim writes the active standard-study outputs under:
+Use these outputs for quick plausibility checks, tire/aero/mass assumption
+reviews, and limit-trend inspection. They are not intended to be BobDyn's gold
+standard or theory reference for envelope analysis. Use StandardSim when the
+question depends on multibody transient behavior.
+
+## OptSim
+
+OptSim is the sensitivity and response-surface lane. It lives under:
+
+```text
+_4_OptSim/
+```
+
+Run:
+
+```bash
+make opt-standard
+make opt-envelope
+make opt-refined
+```
+
+Use `opt-standard` for StandardSim pre-screen sensitivities, `opt-envelope` for
+EnvelopeSim sensitivities, and `opt-refined` for refined StandardSim response
+surfaces.
+
+## Results
+
+Standard reports and metrics live under:
 
 ```text
 _3_StandardSim/results/
 ```
 
-That directory usually contains:
+Common public artifacts:
 
-- a PDF report for human review
-- a metrics CSV for downstream analysis
-- per-case run folders while a job is executing
+```text
+_3_StandardSim/results/steady_state_eval_report.pdf
+_3_StandardSim/results/steady_state_eval_report_metrics.csv
+_3_StandardSim/results/transient_eval_report.pdf
+_3_StandardSim/results/transient_eval_report_metrics.csv
+_3_StandardSim/results/four_post_eval_report.pdf
+_3_StandardSim/results/four_post_eval_report_metrics.csv
+```
 
-The per-run folders are useful when debugging a failed case because they contain the overrides file, log output, and result CSV.
+Use the PDF first for an engineering readout. Use the metrics CSV when comparing
+runs, feeding a notebook, or tracking a release baseline.
 
-## Reading the outputs
+## Debugging Runs
 
-Use the report first if you want a quick engineering readout.
+If a simulation fails:
 
-Use the metrics CSV if you want:
+1. Confirm the relevant build target completed.
+2. Set `execution.cleanup: false` in the workflow config.
+3. Rerun the workflow.
+4. Inspect the retained run directory under the build tree.
+5. Check `overrides.txt`, `run.log`, and the result CSV.
 
-- a spreadsheet-friendly summary
-- comparison across runs
-- post-processing in Python, MATLAB, or a notebook
+The shared runner deletes per-case directories by default after signal
+extraction, so disable cleanup before investigating raw artifacts.
 
-Use the raw case outputs if you need:
+## Related Pages
 
-- a specific time history
-- a failed-run log
-- deeper investigation of a suspicious metric
-
-## Related documentation
-
-If you want to dig deeper, these pages are the next stop:
-
-- [BobDyn/BobSim overview](/bobsim/) for workflow structure and standard-study entry points
-- [StandardSim](/bobsim/standard-sim) for SteadyStateEval, TransientEval, and FourPostEval
-- [Configuration](/bobsim/configuration) for YAML and build configuration
-- [Results](/bobsim/results) for output paths, metrics CSVs, and raw artifacts
-- [BobDyn/BobLib overview](/boblib/) for low-level model structure and debugging
-- [Reference index](/reference/)
-- [Vehicle performance metrics](/reference/metrics)
-- [Control theory](/reference/control-theory)
-
-## Practical advice
-
-- Start with `SteadyStateEval` if you are validating a new setup.
-- Use `TransientEval` when you care about response dynamics instead of a settled operating point.
-- Use `FourPostEval` before envelope review work when you want updated LLTD and suspension metrics.
-- Keep the report and metrics CSV under version control only when you intentionally want to show a baseline result.
-- When a run fails, check the run log before changing the model. Many issues are configuration or build-path problems, not physics problems.
+- [BobDyn/BobSim overview](/bobsim/) for repository structure and target language
+- [StandardSim](/bobsim/standard-sim) for the standard high-fidelity evaluations
+- [Configuration](/bobsim/configuration) for YAML sections and build settings
+- [Results](/bobsim/results) for artifact locations and preservation practices
+- [BobDyn/BobLib overview](/boblib/) for Modelica model structure and regression checks

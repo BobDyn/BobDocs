@@ -5,40 +5,35 @@ title: Configuration
 
 # Configuration
 
-BobDyn/BobSim configuration is mostly plain YAML plus a small number of OpenModelica
-build scripts. The important rule is simple: edit the durable source files, then
-let the generation/build scripts produce derived artifacts.
+BobDyn/BobSim configuration is mostly plain YAML plus a small number of
+OpenModelica build scripts. Edit durable sources, then let the build targets
+produce generated artifacts.
 
 ## Active Vehicle Source
 
-The vehicle source owned by BobDyn/BobSim is:
+BobSim owns the active vehicle source at:
 
 ```text
 vehicle.yml
 ```
 
-BobDyn/BobLib's active generation input is:
+BobLib's active generation input is:
 
 ```text
 _0_Utils/external/BobLib/Generation/vehicle.yml
 ```
 
-Sync them with:
+The standard build targets copy the repo-root `vehicle.yml` into that BobLib
+generation path before compiling:
 
 ```bash
-make sync-vehicle-yaml
+make standard-build
+make standard-build-four-post
 ```
 
-The build targets do this automatically:
-
-```bash
-make build-vehicle-sim
-make build-four-post-sim
-```
-
-When changing vehicle architecture or vehicle data, treat the repo-root
-`vehicle.yml`, BobDyn/BobLib's templates, and the generator scripts as the durable
-inputs. Generated Modelica files are active package artifacts.
+When changing the vehicle, treat `vehicle.yml`, BobLib's templates, and the
+generator scripts as durable inputs. Generated Modelica files are active
+package artifacts.
 
 ## Standard Workflow Configs
 
@@ -55,19 +50,19 @@ They share a common shape:
 | Section | Purpose |
 | :-- | :-- |
 | `standard` | Workflow name used by report dispatch |
-| `simulation` | Executable path, solver, time settings, output flags, variable filters |
+| `simulation` | Executable path, solver, runtime flags, output settings |
 | `execution` | Parallelism, worker count, cleanup, log streaming |
 | `sweep`, `test`, or `procedure` | Workflow-specific case generation |
-| `fit` | Workflow-specific curve fitting and filtering |
+| `fit` | Workflow-specific fitting and filtering |
 | `report` | PDF/CSV output paths, title metadata, summary controls |
-| `plots` | Plot pages, layouts, signal keys, labels, scaling, optional overlays |
+| `plots` | Plot pages, layouts, signal keys, labels, scaling, overlays |
 
 ## Simulation Section
 
-The `simulation` section tells BobDyn/BobSim which executable to run and which
+The `simulation` section tells BobSim which executable to run and which
 OpenModelica runtime flags to apply.
 
-Typical keys:
+Typical shape:
 
 ```yaml
 simulation:
@@ -82,32 +77,37 @@ simulation:
   output_format: csv
 
   log_level: LOG_STATS
-  no_grid: false
+  extra_args:
+    - -jacobian=internalNumerical
+
+  no_grid: true
   no_event_emit: true
 ```
 
-`build_dir` must match the directory produced by the relevant build script.
-`exec_name` must match the OpenModelica executable name in that directory.
-
-Useful runtime flags:
+Useful keys:
 
 | Key | Effect |
 | :-- | :-- |
+| `build_dir` | Directory containing the executable and init XML |
+| `exec_name` | OpenModelica executable name |
 | `start_time`, `stop_time` | Default run time bounds, unless a case overrides them |
 | `stepSize` or `step_size` | Optional OpenModelica output/integration step size |
 | `solver` | Solver passed as `-s=<solver>` |
-| `tolerance` | Runtime tolerance passed to the executable |
-| `log_level` | OpenModelica log flags passed as `-lv=...` |
+| `tolerance` | Runtime tolerance |
+| `log_level` | OpenModelica log flags passed with `-lv` |
 | `variable_filter` | Limits variables emitted to the result file |
+| `extra_args` | Appended runtime arguments, such as `-jacobian=internalNumerical` |
 | `no_grid` | Adds `-noEquidistantTimeGrid` |
 | `no_event_emit` | Adds `-noEventEmit` |
-| `extra_args` | Appends additional runtime arguments |
+
+The current public StandardSim configs use `-jacobian=internalNumerical` for
+the OpenModelica runtime Jacobian path.
 
 ## Initial Parameters
 
 Some workflows define common Modelica overrides under
 `simulation.init_parameters`. SteadyStateEval uses this for the maneuver mode,
-steer timing, ramp duration, settling behavior, and velocity controller gains.
+steer timing, ramp behavior, termination logic, and velocity controller gains.
 
 Example:
 
@@ -116,7 +116,8 @@ simulation:
   init_parameters:
     useMode: 0
     steerStart: 2.0
-    ayRampDuration: 8.0
+    handwheelRampRate: 0.14
+    enableLinearityTermination: true
     velGain: 100.0
     velTi: 2.0
 ```
@@ -126,13 +127,12 @@ writes `overrides.txt`.
 
 ## Execution Section
 
-The `execution` section controls how many simulation cases run and how much
-debug output is retained.
+The `execution` section controls case parallelism and retained debug output.
 
 ```yaml
 execution:
   parallel: true
-  max_workers: 8
+  max_workers: 4
   cleanup: true
   stream_logs: false
 ```
@@ -143,6 +143,7 @@ execution:
 | `max_workers` | Limit parallel case count |
 | `cleanup` | Delete per-case run directories after extraction |
 | `stream_logs` | Print selected solver/log lines while each case runs |
+| `fail_fast` | Stop on the first failed case when supported |
 
 Set `cleanup: false` when debugging a failed case. That preserves run
 directories with overrides, logs, and result CSVs.
@@ -155,8 +156,8 @@ The `report` section controls the public report artifact.
 report:
   enabled: true
   brand: BobSim
-  title: SteadyStateEval Vehicle Characterization
-  subtitle: Measured-a_y ramp-steer isolines with robust fits
+  title: Ramp-Steer Vehicle Characterization
+  subtitle: Measured-$a_y$ ramp-response isolines with robust metric fits
   output_path: _3_StandardSim/results/steady_state_eval_report.pdf
   metric_target_velocity_mps: 15.0
 ```
@@ -168,16 +169,16 @@ Common keys:
 | `enabled` | Skip report generation when false |
 | `brand`, `title`, `subtitle` | Title page metadata |
 | `output_path` | PDF output path |
-| `metrics_csv_path` | Explicit metrics CSV path when supported by the workflow |
+| `metrics_csv_path` | Explicit metrics CSV path when supported |
 | `metric_target_velocity_mps` | Velocity used for exported summary metrics |
 | `notes` | Human-readable assumptions shown in the report |
-| `summary_units` | Per-metric unit/scale overrides for FourPostEval tables |
+| `summary_units` | Per-metric unit and scale overrides for FourPostEval tables |
 
 ## Plots Section
 
 Plots are declared in YAML and rendered by the shared plot engine.
 
-Layouts currently used by the docs:
+Layouts used by the standard workflows include:
 
 - `single`
 - `dual`
@@ -198,8 +199,7 @@ plots:
         y: { key: ay_gain, label: "|a_y / delta_HWA|" }
 ```
 
-Use `scale` when a signal needs unit conversion for display. For example, many
-steering angles are stored in radians and plotted in degrees.
+Use `scale` when a signal needs unit conversion for display.
 
 ## Build Scripts
 
@@ -210,61 +210,72 @@ _3_StandardSim/build_vehicle_sim.mos
 _3_StandardSim/build_four_post_sim.mos
 ```
 
-They load the vendored BobDyn/BobLib package, configure OpenModelica command-line
-options, change into the build directory, and call `buildModel(...)`.
+They load the BobLib submodule package, set OpenModelica command-line options,
+change into the build directory, and call `buildModel(...)`.
 
-Important build options currently used:
-
-- C simulation code target
-- larger linear tearing systems
-- dynamic state selection for index-reduced multibody systems
-- `PFPlusExt` matching algorithm
-- optimized C flags
-- analytic Jacobians for FourPostSim nonlinear components
-
-Prefer the make targets over calling `omc` directly:
+Prefer make targets over direct `omc` calls:
 
 ```bash
-make build-vehicle-sim
-make build-four-post-sim
+make standard-build
+make standard-build-four-post
 ```
+
+## Envelope Configs
+
+EnvelopeSim is an optional, separate implementation of common GGV/YMD-style
+envelope calculations. Its configs live under:
+
+```text
+_2_EnvelopeSim/GGV/ggv_config.yml
+_2_EnvelopeSim/YMD/ymd_config.yml
+```
+
+Run them through:
+
+```bash
+make envelope-ggv
+make envelope-ymd
+make envelope-all
+```
+
+EnvelopeSim reads the same active vehicle data and uses the latest useful
+standard-study metrics when available. It is intended as a sane, transparent
+implementation that can be used when desired, not as the canonical envelope
+reference for BobDyn.
 
 ## OptSim Configs
 
-OptSim uses its own configs under:
+OptSim is split by workflow:
 
 ```text
-_4_OptSim/configs/
+_4_OptSim/StandardSens/
+_4_OptSim/EnvelopeSens/
 ```
+
+Key StandardSens configs:
 
 | File | Role |
 | :-- | :-- |
-| `vehicle_architecture.yaml` | Source of truth for selected template, sampling method, sample/interval count, seed, and sweep variables |
-| `_doe_config.yaml` | Generated private DOE config; do not edit by hand |
-| `compiler_config.yaml` | BobDyn/BobLib path, standards to build, OMC settings, batch timeout |
-| `aggregator_config.yaml` | Mapping from report metric names to aggregate output columns |
-| `build_template.mos` | Per-variant OpenModelica build template |
+| `_4_OptSim/StandardSens/configs/vehicle_architecture.yaml` | Human-edited architecture and sweep source |
+| `_4_OptSim/StandardSens/configs/_doe_config.yaml` | Generated DOE config |
+| `_4_OptSim/StandardSens/configs/compiler_config.yaml` | BobLib path, standards, OMC settings, batch timeout |
+| `_4_OptSim/StandardSens/configs/aggregator_config.yaml` | Metric extraction map |
+| `_4_OptSim/EnvelopeSens/config.yml` | Envelope sensitivity config |
 
-For one-factor sensitivity and tornado diagrams, use
-`sampling.method: interval_splice` in `vehicle_architecture.yaml`. For broader
-exploratory DOE, use `sampling.method: lhs`.
-
-Regenerate `_doe_config.yaml` by running the DOE or sensitivity pipeline:
+Run:
 
 ```bash
-make sim-doe
-make sim-standard-sensitivities
-make sim-envelope-sensitivities
+make opt-standard
+make opt-envelope
+make opt-refined
 ```
-
-or by calling the config generator from `_4_OptSim` during development.
 
 ## Common Changes
 
 To change the active vehicle:
 
 1. Edit `vehicle.yml`.
-2. Run `make build-vehicle-sim` or `make build-four-post-sim`.
+2. Run `make standard-build` or `make standard-build-four-post`.
 3. Rerun the relevant study.
 
 To change a standard study:
@@ -280,8 +291,8 @@ To change a report page:
 2. Edit `_0_Utils/reporting/` or `_0_Utils/plotting/` for report engine behavior.
 3. Rerun the workflow.
 
-To change a DOE sweep:
+To change a sensitivity sweep:
 
-1. Edit `_4_OptSim/configs/vehicle_architecture.yaml`.
-2. Run `make clean-doe` if sample count or variable dimensions changed.
-3. Run `make sim-doe`.
+1. Edit the relevant OptSim config.
+2. Run `make clean-opt` if the sample set or variable dimensions changed.
+3. Run the matching `make opt-*` target.

@@ -5,10 +5,14 @@ title: Visualization
 
 # Visualization
 
-VisualSim renders geometry animations from simulation signal arrays. It is the
-most direct way to see whether the generated vehicle motion looks plausible:
-suspension links moving in the expected direction, wheels following the car,
-steering motion matching the input, and body motion staying physically sane.
+BobSim's core visualization path is currently OMEdit. Use OMEdit when you want
+to inspect the generated Modelica diagrams, enable animation, and verify vehicle
+motion through the standard Modelica toolchain.
+
+VisualSim still exists under `_1_VisualSim/`, but it is not an active primary
+workflow right now. Treat it as experimental/offline tooling for rendering
+geometry animations from simulation signal arrays, not as the main public
+visualization path.
 
 The visualization code lives under:
 
@@ -32,6 +36,9 @@ _1_VisualSim/
 The renderer uses PyVista/VTK for the 3D scene, Matplotlib/Pillow/ImageIO for
 frame handling, and YAML templates for geometry, styling, camera, and signal
 mapping.
+
+For the current core visualization workflow, see the BobLib
+[OMEdit Workflow](/boblib/omedit-workflow).
 
 ## Rendering Command
 

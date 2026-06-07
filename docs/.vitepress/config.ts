@@ -57,7 +57,7 @@ export default withMermaid(
           items: [
             { text: "BobDyn/BobLib", link: "/boblib/" },
             { text: "BobDyn/BobSim", link: "/bobsim/" },
-            { text: "Reference", link: "/reference/" },
+            { text: "Reference", link: "/reference/vehicle-dynamics" },
           ],
         },
         { text: "Contributing", link: "/contributing" },
@@ -97,10 +97,15 @@ export default withMermaid(
               page("Configuration",  "/bobsim/configuration"),
               page("StandardSim",    "/bobsim/standard-sim"),
               page("Results",        "/bobsim/results"),
-              page("Visualization",  "/bobsim/visualization"),
               page("EnvelopeSim",    "/bobsim/envelope"),
               page("OptSim / DOE",   "/bobsim/doe"),
               page("Development",    "/bobsim/development"),
+            ],
+          },
+          {
+            text: "In Progress",
+            items: [
+              page("VisualSim",      "/bobsim/visualization"),
             ],
           },
         ],
@@ -109,10 +114,10 @@ export default withMermaid(
           {
             text: "Reference",
             items: [
-              page("Reference",                   "/reference/"),
               page("Vehicle Dynamics",            "/reference/vehicle-dynamics"),
+              page("FSAE Connection",             "/reference/fsae-connection"),
               page("Vehicle Performance Metrics", "/reference/metrics"),
-              page("Control Theory",              "/reference/control-theory"),
+              page("Engineering Knowledge Base",   "/reference/field-notes"),
             ],
           },
         ],

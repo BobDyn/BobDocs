@@ -11,14 +11,14 @@ next:
 
 # Generation
 
-BobDyn/BobLib's active vehicle is generated from:
+BobLib's active vehicle is generated from:
 
 ```text
 Generation/vehicle.yml
 ```
 
-The generation layer is what lets BobDyn/BobLib keep one active Modelica package shape
-while still supporting multiple vehicle architectures through YAML templates.
+The generation layer lets BobLib keep one active Modelica package shape while
+still supporting multiple vehicle architectures through YAML templates.
 
 ## What The YAML Controls
 
@@ -26,15 +26,15 @@ The YAML controls:
 
 - front and rear suspension topology
 - vehicle record name and generated wrapper model
-- BobDyn/BobLib, vehicle-template, and tire-template paths
+- BobLib, vehicle-template, and tire-template paths
 - sprung mass and driver mass properties
 - body torsional stiffness
-- front and rear wheel, tire, suspension, steering, actuation, stabar, and mass
-  data
+- front and rear wheel, tire, suspension, steering, actuation, stabar, and mass data
 - aero map data
 - tire template selection
+- standard simulation wrapper settings
 
-Supported suspension topology keys are:
+Supported suspension topology keys include:
 
 - `direct`
 - `bellcrank`
@@ -53,14 +53,13 @@ The generator currently emits or updates:
 - `BobLib/Standards/FourPostSim.mo`
 - affected `package.order` files
 
-Generated files are part of the active BobDyn/BobLib package. Treat
+Generated files are part of the active BobLib package. Treat
 `Generation/vehicle.yml`, the templates in `Generation/`, and the source model
-templates as the durable inputs when changing vehicle architecture or data.
+templates as durable inputs when changing vehicle architecture or data.
 
-## Standalone BobDyn/BobLib Generation
+## Standalone BobLib Generation
 
-From a standalone BobDyn/BobLib checkout, update the `paths.boblib`,
-`paths.vehicle_templates`, and `paths.tire_templates` values in
+From a standalone BobLib checkout, update the path values in
 `Generation/vehicle.yml` before running the generator.
 
 Then run:
@@ -79,31 +78,52 @@ python Generation/scripts/build_vehicle_sim.py
 python Generation/scripts/build_four_post_sim.py
 ```
 
-## Generation From BobDyn/BobSim
+## Generation From BobSim
 
-When BobDyn/BobLib is used from BobDyn/BobSim, the usual sequence is:
+When BobLib is used from BobSim, BobSim owns the root `vehicle.yml`. The BobSim
+standard build targets copy that file into BobLib's generation workspace,
+regenerate the needed Modelica sources, and compile the executable.
 
-```bash
-make sync-vehicle-yaml
-python _0_Utils/external/BobLib/Generation/generate_vehicle_model.py
-```
-
-When working from the BobDyn/BobLib directory inside a BobDyn/BobSim checkout:
+From the BobSim root:
 
 ```bash
-python Generation/generate_vehicle_model.py
+make standard-build
+make standard-build-four-post
 ```
 
-In that workflow, the BobDyn/BobSim repository root owns the source `vehicle.yml`, and
-`make sync-vehicle-yaml` copies it into:
+The generated input copy lives at:
 
 ```text
 _0_Utils/external/BobLib/Generation/vehicle.yml
 ```
 
+## Tire Records
+
+MF5.2 tire records include pure/combined slip data and a `relaxation` record.
+The generated vehicle wires tire relaxation parameters into the transient slip
+model for both front and rear tires.
+
+The relaxation record lives under:
+
+```text
+BobLib/Resources/VehicleRecord/Chassis/Suspension/Templates/Tire/MF52/RelaxationRecord.mo
+```
+
+This keeps the tire's steady-state fit data and transient relaxation
+assumptions encoded together in the active Modelica record.
+
 ## Active Vehicle Shape
 
-BobDyn/BobLib is generated in an active vehicle shape rather than carrying every
+BobLib is generated in an active vehicle shape rather than carrying every
 possible generated variant at once. This keeps the Modelica package concise and
 loadable, but it means generated files should always be interpreted together
 with the active `Generation/vehicle.yml` that produced them.
+
+After regeneration, run:
+
+```bash
+make modelica-translation
+make modelica-initialization
+```
+
+Run `make ci` before release or before committing generated model changes.

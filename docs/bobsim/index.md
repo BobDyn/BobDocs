@@ -5,47 +5,45 @@ title: BobDyn/BobSim
 
 # BobDyn/BobSim
 
-BobDyn/BobSim is the workflow layer for BobDyn. It takes BobDyn/BobLib vehicle models, builds
-OpenModelica executables, runs repeatable studies, extracts signals, computes
-metrics, renders plots, writes reports, and supports design exploration.
+BobDyn/BobSim is the high-fidelity vehicle analysis workspace for BobDyn. It
+takes BobDyn/BobLib Modelica vehicle models, builds OpenModelica executables,
+runs repeatable studies, extracts signals, computes metrics, renders plots, and
+writes public review artifacts.
 
-Use BobDyn/BobSim when the question is about vehicle response: what the car does in a
-standard maneuver, how a change moves a metric, which envelope limit is active,
-or whether a design direction is worth deeper model work.
+Use BobDyn/BobSim when the question is about vehicle response: how the car
+behaves in a standard maneuver, which limit is active, how a parameter change
+moves a metric, or whether a design direction deserves deeper model work.
 
-Use [BobDyn/BobLib](/boblib/) when the question is about the low-level model itself:
-Modelica package structure, suspension assemblies, generated vehicle records,
-tire templates, direct OMEdit inspection, or model initialization debugging.
+Use [BobDyn/BobLib](/boblib/) when the question is about the low-level model
+itself: Modelica package structure, tire records, suspension assemblies,
+generated vehicle definitions, direct OMEdit inspection, or initialization
+debugging.
 
 ## Operating Model
 
-BobDyn/BobSim deliberately keeps the physical model and the analysis workflow separate.
-The model stays inspectable in BobDyn/BobLib; the simulation workflow stays scriptable
-in Python.
+BobSim keeps the physical model and the analysis workflow separate.
 
-The normal path is:
+1. Edit the active vehicle definition in `vehicle.yml`.
+2. Build the relevant BobLib standard model.
+3. Run a standard, envelope, or sensitivity workflow.
+4. Inspect the report, metrics CSV, plots, or aggregate table.
 
-1. Choose or edit the active vehicle definition.
-2. Sync that vehicle definition into BobDyn/BobLib's generation workspace.
-3. Generate/build the required Modelica executable.
-4. Run a standard study, envelope analysis, visualization, or DOE sweep.
-5. Inspect the PDF, CSV, plot, video, or aggregated result table.
-
-The key handoff is the active vehicle YAML:
+The build targets copy `vehicle.yml` into BobLib's generation workspace before
+generating and compiling Modelica source.
 
 <div class="workflow-diagram">
 
 ```mermaid
 flowchart TB
-    vehicle["vehicle.yml<br/>BobDyn/BobSim active vehicle source"]
-    synced["BobDyn/BobLib<br/>generation copy<br/>Generation/vehicle.yml"]
-    generated["Generated BobDyn/BobLib<br/>Modelica source"]
+    vehicle["vehicle.yml<br/>BobSim active vehicle source"]
+    copy["BobLib Generation/vehicle.yml<br/>generation input"]
+    modelica["Generated BobLib<br/>Modelica package"]
     executable["OpenModelica<br/>executable"]
-    outputs["BobDyn/BobSim outputs<br/>reports, metrics, plots, videos, sweeps"]
+    outputs["BobSim outputs<br/>reports, metrics, plots, sensitivities"]
 
-    vehicle --> synced
-    synced --> generated
-    generated --> executable
+    vehicle --> copy
+    copy --> modelica
+    modelica --> executable
     executable --> outputs
 ```
 
@@ -55,131 +53,118 @@ flowchart TB
 
 | Path | Role |
 | :-- | :-- |
-| `vehicle.yml` | Active vehicle source for BobDyn/BobSim workflows |
-| `makefile` | Setup, build, run, and cleanup targets |
+| `vehicle.yml` | Active vehicle source for BobSim workflows |
+| `makefile` | Public command language for setup, build, run, test, and cleanup |
 | `Dockerfile` | OpenModelica and Python environment |
-| `docker-compose.yml` | `bobsim` and `doe` services |
+| `docker-compose.yml` | Workflow services used by the make targets |
 | `requirements.txt` | Python analysis/reporting dependencies |
-| `_0_Utils/` | Plotting, reporting, utility code, and vendored dependencies |
-| `_0_Utils/external/BobLib/` | BobDyn/BobLib submodule checkout |
-| `_1_VisualSim/` | PyVista visualization templates and MP4 rendering |
-| `_2_EnvelopeSim/` | GGV, YMD, and vehicle-review tools |
-| `_3_StandardSim/` | Standard maneuver and K&C-style workflows |
-| `_4_OptSim/` | Architecture-driven DOE / exploration pipeline |
-
-BobDyn/BobLib lives inside BobDyn/BobSim as a git submodule:
-
-```text
-_0_Utils/external/BobLib/
-```
-
-For full simulation workflows, clone BobDyn/BobSim and let the submodule provide
-BobDyn/BobLib. Clone BobDyn/BobLib directly only when you intentionally want to work at the
-model-debugging layer.
+| `_0_Utils/` | Shared utilities, plotting, reporting, and the BobLib submodule |
+| `_0_Utils/external/BobLib/` | BobDyn/BobLib Modelica library checkout |
+| `_1_VisualSim/` | Experimental/offline visualization templates; core visualization currently happens in OMEdit |
+| `_2_EnvelopeSim/` | Optional GGV and YMD envelope calculations implemented separately from the Modelica standard workflows |
+| `_3_StandardSim/` | SteadyStateEval, TransientEval, and FourPostEval |
+| `_4_OptSim/` | Sensitivity and response-surface workflows |
+| `tests/` | Release-polish and workflow regression checks |
 
 ## Quick Start
-
-From a fresh checkout:
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
 cd BobSim
-make setup
-make shell-bobsim
-```
-
-Inside the BobDyn/BobSim shell, build and run the core standard workflows:
-
-```bash
-make build-vehicle-sim
-make steady-state-eval
-make transient-eval
-```
-
-Build and run the four-post/K&C-style workflow:
-
-```bash
-make build-four-post-sim
-make four-post-eval
-```
-
-If the repository was cloned without submodules, initialize them with:
-
-```bash
 make init
+make docker-build
+make help
 ```
 
-## Workflow Map
+Run the high-fidelity baseline:
+
+```bash
+make standard-eval-all
+```
+
+That target builds the required executables when needed, then runs
+SteadyStateEval, TransientEval, and FourPostEval.
+
+## Target Language
+
+BobSim's make targets are intentionally compact and prefix-driven:
 
 | Area | Primary commands | Purpose |
 | :-- | :-- | :-- |
-| StandardSim | `make build-vehicle-sim`, `make steady-state-eval`, `make transient-eval` | Full Modelica maneuver simulations and reports |
-| FourPostEval | `make build-four-post-sim`, `make four-post-eval` | Suspension/chassis K&C-style sweeps and metrics |
-| VisualSim | `python _1_VisualSim/run_visual.py ... --mp4 ...` | Render geometry animations from visual signal arrays |
-| EnvelopeSim | `make ggv-envelope`, `make ymd-envelope`, `make vehicle-review` | Reduced first-principles envelope maps and review reports |
-| OptSim | `make sim-doe`, `make sim-standard-sensitivities`, `make sim-envelope-sensitivities` | Architecture-driven DOE, one-factor sensitivities, aggregation, and tornado-ready outputs |
-| BobDyn/BobLib generation | `make sync-vehicle-yaml`, `make build-records`, `make build-axle-models` | Update generated Modelica sources from vehicle YAML |
+| Docker | `make docker-build`, `make docker-rebuild` | Build the reproducible OpenModelica/Python environment |
+| Shells | `make shell`, `make shell-standard`, `make shell-envelope`, `make shell-opt` | Open interactive workflow contexts |
+| StandardSim | `make standard-build`, `make standard-eval-all` | Build and run high-fidelity Modelica evaluations |
+| EnvelopeSim | `make envelope-ggv`, `make envelope-ymd`, `make envelope-all` | Generate reduced GGV and YMD envelope outputs |
+| OptSim | `make opt-standard`, `make opt-envelope`, `make opt-refined` | Run sensitivities and response-surface workflows |
+| Quality | `make lint`, `make typecheck`, `make test`, `make ci` | Run release checks |
+| Cleanup | `make clean-standard`, `make clean-envelope`, `make clean-opt`, `make clean-all` | Remove generated artifacts |
+
+Run `make help` for the exact target list in the current checkout.
 
 ## Documentation Map
 
-Start here, then jump to the page that matches the work:
+| Page | Use it for |
+| :-- | :-- |
+| [Configuration](/bobsim/configuration) | Active vehicle sync, workflow YAML, runtime flags, report and plot config |
+| [StandardSim](/bobsim/standard-sim) | SteadyStateEval, TransientEval, FourPostEval, runners, reports |
+| [Results](/bobsim/results) | Output paths, metrics CSVs, raw case artifacts, preservation |
+| [EnvelopeSim](/bobsim/envelope) | Optional GGV and YMD envelope calculations |
+| [OptSim](/bobsim/doe) | Standard sensitivities, envelope sensitivities, refined response surfaces |
+| [Development](/bobsim/development) | Docker, local Python, make targets, quality checks, troubleshooting |
+
+In-progress tooling:
 
 | Page | Use it for |
 | :-- | :-- |
-| [Configuration](/bobsim/configuration) | YAML structure, active vehicle sync, Modelica build knobs, plot/report config |
-| [StandardSim](/bobsim/standard-sim) | SteadyStateEval, TransientEval, FourPostEval, shared runners, standard reports |
-| [Results](/bobsim/results) | Output paths, metrics CSVs, PDF reports, raw case artifacts, preserving runs |
-| [Visualization](/bobsim/visualization) | PyVista animation templates, visual signal files, MP4 rendering |
-| [EnvelopeSim](/bobsim/envelope) | GGV, YMD, vehicle review, reduced envelope inputs and outputs |
-| [OptSim / DOE](/bobsim/doe) | DOE variables, sensitivity generation, tornado diagrams, compile/run pipeline, aggregated tables |
-| [Development](/bobsim/development) | Docker, local Python, make targets, cleanup, quality checks, troubleshooting |
+| [VisualSim](/bobsim/visualization) | Inactive/offline visualization tooling; core visualization currently happens in OMEdit |
 
 ## What To Run First
 
-For setup validation, run the standard maneuver path:
+For a release baseline:
 
 ```bash
-make build-vehicle-sim
-make steady-state-eval
-make transient-eval
+make standard-eval-all
+make ci
 ```
 
-Expected public outputs:
+Expected standard outputs:
 
 ```text
 _3_StandardSim/results/steady_state_eval_report.pdf
 _3_StandardSim/results/steady_state_eval_report_metrics.csv
 _3_StandardSim/results/transient_eval_report.pdf
 _3_StandardSim/results/transient_eval_report_metrics.csv
-```
-
-Then run FourPostEval if you need suspension/chassis metrics used by downstream
-envelope tools:
-
-```bash
-make build-four-post-sim
-make four-post-eval
-```
-
-Expected outputs:
-
-```text
 _3_StandardSim/results/four_post_eval_report.pdf
 _3_StandardSim/results/four_post_eval_report_metrics.csv
 ```
 
-## Philosophy
+Optional envelope outputs:
 
-BobDyn/BobSim is not just a button around a black-box model. It is the transparent
-analysis layer around an explicit physical vehicle model.
+```text
+_2_EnvelopeSim/results/ggv_report.pdf
+_2_EnvelopeSim/results/ggv_report_metrics.csv
+_2_EnvelopeSim/results/ymd_report.pdf
+_2_EnvelopeSim/results/ymd_report_metrics.csv
+```
 
-- Vehicle definitions are plain YAML and generated Modelica records.
-- Build scripts are checked in and readable.
+## Public Release Posture
+
+BobSim is built to make results traceable:
+
+- Vehicle inputs are plain YAML.
+- Generated Modelica sources are inspectable.
 - Simulation overrides are written as text files.
 - Metrics are exported as CSV.
-- Reports are generated from the same config used to run the study.
-- DOE variants are materialized as per-variant Modelica records and directories.
+- Reports come from the same configs that ran the studies.
+- Sensitivity variants are materialized as per-variant Modelica records and result tables.
+- The command language is small enough to remember.
 
-That traceability is the point. A metric in a report should be traceable back to
-the case configuration, the signals extracted from the run, the generated
-Modelica executable, and the vehicle definition that produced it.
+The aim is that a public report metric can be traced back to the workflow
+config, the extracted signals, the generated Modelica executable, and the active
+vehicle definition.
+
+EnvelopeSim should be read in that same spirit: it is a separate, transparent
+implementation of common vehicle envelope calculations such as GGV and YMD
+maps. These calculations appear in many vehicle dynamics toolchains. BobSim's
+implementation is intended to be sane and usable when desired, not the gold
+standard or the canonical reference for envelope theory.

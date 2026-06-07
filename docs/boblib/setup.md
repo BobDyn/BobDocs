@@ -11,21 +11,20 @@ next:
 
 # BobDyn/BobLib Setup
 
-BobDyn/BobLib can be used directly as a standalone Modelica package, or indirectly as
-the BobDyn/BobLib submodule inside BobDyn/BobSim. For model development and debugging, clone
-BobDyn/BobLib directly.
+BobDyn/BobLib can be used directly as a standalone Modelica package, or
+indirectly as the BobLib submodule inside BobSim. For model development and
+debugging, clone BobLib directly.
 
 ## Install Paths
 
-BobDyn/BobLib can be used in two distinct ways:
+BobLib can be used in two distinct ways:
 
-- Pure CLI: use the OpenModelica Compiler (`omc`) and Python generation tools
-  without opening a graphical tool.
-- Visual OMEdit: install the OpenModelica GUI stack and open `BobLib` in OMEdit
-  for package browsing, diagram inspection, parameter edits, and screenshots.
+- Pure CLI: use `omc`, make targets, and Python generation tools.
+- Visual OMEdit: open `BobLib/package.mo` for package browsing, diagram
+  inspection, parameter edits, manual simulation, and screenshots.
 
-For repeatable simulation work, prefer the pure CLI path. For documentation,
-debugging component wiring, or teaching the model structure, use OMEdit.
+For repeatable regression work, prefer the CLI path. For diagram polish and
+model-structure debugging, use OMEdit.
 
 Useful official OpenModelica links:
 
@@ -35,47 +34,28 @@ Useful official OpenModelica links:
 - [macOS notes](https://openmodelica.org/download/download-mac/)
 - [OMEdit user guide](https://openmodelica.org/doc/OpenModelicaUsersGuide/latest/omedit.html)
 
-Arch users: the AUR has `openmodelica` builds. You know the drill. Note that
-OMEdit drag-and-drop does not currently work with tiling window managers.
+## Get BobLib Source
 
-## Get BobDyn/BobLib Source
-
-This page assumes you are working directly with the Modelica models: inspecting
-package structure, debugging equations, editing records, regenerating active
-vehicle source files, or opening the package in OpenModelica/OMEdit.
-
-Clone BobDyn/BobLib directly and continue from the BobDyn/BobLib repository root:
+Clone BobLib directly and continue from the repository root:
 
 ```bash
 git clone https://github.com/BobDyn/BobLib.git
 cd BobLib
 ```
 
-In the rest of the BobDyn/BobLib docs, "this repository root" means this `BobLib`
-directory, which contains `BobLib/package.mo`, `Generation/`, and
-`msl_setup.mos`.
+In the rest of the BobLib docs, "repository root" means this `BobLib`
+directory, which contains:
 
-If you want complete simulation workflows, case execution, signal extraction,
-metrics, plots, reports, sensitivity studies, or DOE runs, use the
-[BobDyn/BobSim documentation](/bobsim/) instead.
-
-## Python Prerequisite
-
-Python is not required to load the checked-in Modelica package in OMEdit or
-`omc`, but it is required when regenerating active Modelica source files from
-`Generation/vehicle.yml` or running generator tests.
-
-Install Python 3 with `pip` and `venv` support, then verify:
-
-```bash
-python --version
-python -m pip --version
-python -m venv --help
+```text
+BobLib/package.mo
+Generation/
+Tests/
+makefile
+msl_setup.mos
 ```
 
-On Linux distributions where `venv` or `pip` is split into separate packages,
-install the matching packages for your Python version, commonly `python3-venv`
-and `python3-pip`.
+If you want complete vehicle-analysis workflows, use the
+[BobDyn/BobSim documentation](/bobsim/) instead.
 
 ## OpenModelica Prerequisites
 
@@ -83,52 +63,74 @@ For CLI use, install:
 
 - `omc` available on `PATH`
 - a C/C++ compiler toolchain usable by OpenModelica
-- `Modelica 3.2.3+maint.om` installed in the OpenModelica library manager
+- `Complex`, `ModelicaServices`, and `Modelica` `3.2.3+maint.om`
 
 For OMEdit use, install the full OpenModelica GUI stack, not only the compiler.
 
-Install the expected Modelica Standard Library version:
+Install the expected Modelica libraries:
 
 ```bash
-omc msl_setup.mos
+make modelica-deps
 ```
 
-`msl_setup.mos` currently contains:
-
-```txt
-installPackage(Modelica, "3.2.3+maint.om", exactMatch=true)
-```
-
-If package resolution fails, open `OMShell` or `omc`, run `getErrorString()`,
-and confirm that `~/.openmodelica/libraries` contains the installed Modelica
-package.
-
-## Python Generation Environment
-
-The checked-in Modelica package can be loaded and simulated without Python, but
-new model generation requires the Python helper scripts. Create a local virtual
-environment before running those scripts:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install PyYAML pytest
-```
-
-On Windows PowerShell, activate the environment with:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-`PyYAML` is required for generation. `pytest` is optional, but useful for
-running the generator tests.
+That target runs `omc msl_setup.mos`, which installs the Modelica Standard
+Library packages expected by the test harness.
 
 Verify:
 
 ```bash
 omc --version
-python --version
-python -c "import yaml; print(yaml.__version__)"
 ```
+
+## Python Environment
+
+Python is required for generation and the regression harness. Create a local
+environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install PyYAML pytest ruff
+```
+
+On Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Verify:
+
+```bash
+python --version
+python -c "import yaml, pytest; print('ok')"
+```
+
+## First Health Check
+
+Run the full local release gate:
+
+```bash
+make ci
+```
+
+For a smaller first check:
+
+```bash
+make modelica-translation
+```
+
+That verifies OpenModelica can load BobLib, translate the public standards, and
+translate the `BobLib.Tests` fixtures.
+
+## BobSim Submodule Path
+
+When BobLib is used inside BobSim, it lives at:
+
+```text
+_0_Utils/external/BobLib/
+```
+
+In that workflow, BobSim owns the repo-root `vehicle.yml` and its standard
+build targets copy that file into BobLib's generation workspace automatically.

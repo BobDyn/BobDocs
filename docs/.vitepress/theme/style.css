@@ -92,6 +92,16 @@ h4:hover .header-anchor {
     color: var(--vp-c-text-2);
 }
 
+@media (min-width: 960px) {
+    .VPHero .actions {
+        flex-wrap: nowrap;
+    }
+
+    .VPHero .actions .VPButton {
+        white-space: nowrap;
+    }
+}
+
 /* ----------------------------------------------------------
    Hero — image
    VitePress absolutely-positions .image-src inside .image-container

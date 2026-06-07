@@ -17,6 +17,9 @@ hero:
     - theme: alt
       text: VehDyn Overview
       link: /reference/vehicle-dynamics
+    - theme: alt
+      text: FSAE Bridge
+      link: /reference/fsae-connection
 
 features:
   - icon:

@@ -8,7 +8,7 @@
     "build": "vitepress build docs",
     "preview": "vitepress preview docs",
     "deploy": "npm run build && gh-pages -d docs/.vitepress/dist",
-    "lint:ts": "eslint docs/.vitepress"
+    "lint:ts": "eslint docs/.vitepress/config.ts"
   },
   "devDependencies": {
     "@types/node": "^25.7.0",

@@ -12,14 +12,15 @@ next:
 # OMEdit Workflow
 
 Use OMEdit when you want to browse diagrams, inspect parameters visually, run
-quick manual experiments, or capture screenshots for documentation.
+quick manual experiments, view animations, or capture screenshots for
+documentation.
 
 ## Prerequisites
 
 - A full OpenModelica installation that includes OMEdit
 - `Modelica 3.2.3+maint.om` installed through the OpenModelica package manager
-  or by running `omc msl_setup.mos`
-- The BobDyn/BobLib repository available on a local filesystem path without unusual
+  or by running `make modelica-deps`
+- The BobLib repository available on a local filesystem path without unusual
   permissions
 - On Linux, desktop/X11 or Wayland integration for Qt applications
 - On Windows, the standard OpenModelica installer is the preferred route
@@ -31,7 +32,7 @@ Linux package note: installing only `omc` is enough for CLI work, but not for
 OMEdit. Install the full OpenModelica package set from the official repository
 when you need the GUI.
 
-## Open BobDyn/BobLib In OMEdit
+## Open BobLib In OMEdit
 
 1. Start OMEdit.
 2. Select `File > Open Model/Library File(s)`.
@@ -50,8 +51,8 @@ when you need the GUI.
    BobLib.Vehicle.Vehicle_DWBCStabar_DWBCStabar
    ```
 
-6. If OMEdit reports a missing `Modelica` package, install
-   `Modelica 3.2.3+maint.om`, restart OMEdit, and reload `BobLib/package.mo`.
+6. If OMEdit reports a missing `Modelica` package, run `make modelica-deps`,
+   restart OMEdit, and reload `BobLib/package.mo`.
 
 ## Run Locally In OMEdit
 
@@ -81,11 +82,24 @@ simulation. That directory contains the translated model artifacts, executable,
 initialization XML, logs, and result files. If a run gets weird, clear that
 model's scratch directory and simulate again.
 
+## Animation
+
+The public standard models default to animation off for cleaner and faster
+simulation:
+
+```text
+inner parameter Boolean enableAnimation = false
+```
+
+To view animations in OMEdit, set `enableAnimation = true` on the standard
+model you are simulating. The generated standards propagate that inner flag to
+the world and structural components, including fixed structural translations.
+
 ## Screenshot Targets
 
 Recommended screenshots for future documentation:
 
-- `docs/images/omedit-library-browser.png` - BobDyn/BobLib expanded in the Libraries
+- `docs/images/omedit-library-browser.png` - BobLib expanded in the Libraries
   browser
 - `docs/images/omedit-vehicle-sim-diagram.png` - `BobLib.Standards.VehicleSim`
   in Diagram View
