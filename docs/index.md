@@ -130,34 +130,61 @@ The result is a workflow for generating simulation ground truth that you can ins
 
 ---
 
-## Sample reports
+## Sample Outputs
 
-The sample outputs below come from the active BobDyn/BobSim workflows and live in `docs/public/` for easy embedding.
+The sample outputs below come from active BobDyn/BobSim workflows. The videos
+show representative runs; the linked PDFs show the generated engineering
+reports. They are direct files, so a first-time viewer can open them without
+waiting on a browser-side PDF renderer.
 
-<div class="desktop-visuals">
-  <div>
-    <p class="sample-output-label">PI Control to Target Radius</p>
-    <video autoplay loop muted playsinline width="100%" style="display: block;">
+<div class="sample-output-grid">
+  <article class="sample-output-card">
+    <p class="sample-output-label">SteadyStateEval</p>
+    <video autoplay loop muted playsinline width="100%">
       <source src="/steady_state_eval.mp4" type="video/mp4">
     </video>
-    <div style="height: 1rem;"></div>
-    <p class="sample-output-label">Steady-State Metric Summary</p>
-    <PdfEmbed src="/steady_state_eval_report.pdf" />
-  </div>
-  <div>
-    <p class="sample-output-label">Frequency Response Run (0.5 Hz)</p>
-    <video autoplay loop muted playsinline width="100%" style="display: block;">
+    <p>
+      Ramp-steer velocity-isoline workflow with controller behavior, response
+      traces, fitted handling metrics, and CSV-ready summary values.
+    </p>
+    <div class="sample-output-links">
+      <a href="/steady_state_eval_report.pdf" target="_blank" rel="noreferrer">Open PDF report</a>
+      <a href="/steady_state_eval.mp4" target="_blank" rel="noreferrer">Open video</a>
+    </div>
+  </article>
+  <article class="sample-output-card">
+    <p class="sample-output-label">TransientEval</p>
+    <video autoplay loop muted playsinline width="100%">
       <source src="/transient_eval.mp4" type="video/mp4">
     </video>
-    <div style="height: 1rem;"></div>
-    <p class="sample-output-label">Transient Metric Summary</p>
-    <PdfEmbed src="/transient_eval_report.pdf" />
-  </div>
+    <p>
+      Step-steer and sine-response workflow with gain, phase, lag, rise-time,
+      and overshoot metrics from the same generated vehicle model.
+    </p>
+    <div class="sample-output-links">
+      <a href="/transient_eval_report.pdf" target="_blank" rel="noreferrer">Open PDF report</a>
+      <a href="/transient_eval.mp4" target="_blank" rel="noreferrer">Open video</a>
+    </div>
+  </article>
 </div>
 
-<div class="mobile-visuals-message">
-Sample reports are best viewed on a wider screen.
-</div>
+## Minimal Worked Example
+
+The fastest proof path uses the example `vehicle.yml` in BobDyn/BobSim and runs
+the complete standard baseline:
+
+```bash
+git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
+cd BobSim
+make init
+make docker-build
+make standard-eval-all
+```
+
+The `standard-eval-all` target builds the required Modelica executables when
+they are missing, then runs SteadyStateEval, TransientEval, and FourPostEval.
+The expected review artifacts are PDF reports and metrics CSVs under
+`_3_StandardSim/results/`.
 
 ---
 

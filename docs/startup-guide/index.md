@@ -86,50 +86,17 @@ make shell-opt
 You can run the make targets from the host or from inside a shell. Outside
 Docker, the targets dispatch through Compose. Inside Docker, they run directly.
 
-## Step 3: Build Standard Models
+## Step 3: Run The Minimal Worked Example
 
-The standard maneuver workflows use:
-
-```text
-BobLib.Standards.VehicleSim
-```
-
-Build it with:
-
-```bash
-make standard-build
-```
-
-The four-post/K&C workflow uses:
-
-```text
-BobLib.Standards.FourPostSim
-```
-
-Build it with:
-
-```bash
-make standard-build-four-post
-```
-
-Both build targets copy the repo-root `vehicle.yml` into BobLib's generation
-workspace before generating and compiling the Modelica source.
-
-## Step 4: Run The Baseline Studies
-
-Run the core public baseline studies:
-
-```bash
-make standard-eval-steady-state
-make standard-eval-transient
-make standard-eval-four-post
-```
-
-Or run all three standard evaluations:
+Run the complete standard baseline:
 
 ```bash
 make standard-eval-all
 ```
+
+This is the first proof path for a fresh checkout. The target builds the
+required Modelica executables when they are missing, then runs SteadyStateEval,
+TransientEval, and FourPostEval against the repo-root `vehicle.yml`.
 
 Standard reports and metric CSVs are written under:
 
@@ -147,6 +114,28 @@ _3_StandardSim/results/transient_eval_report_metrics.csv
 _3_StandardSim/results/four_post_eval_report.pdf
 _3_StandardSim/results/four_post_eval_report_metrics.csv
 ```
+
+## Step 4: Run Focused Standard Workflows
+
+The standard maneuver workflows use `BobLib.Standards.VehicleSim`:
+
+```bash
+make standard-build
+make standard-eval-steady-state
+make standard-eval-transient
+```
+
+The four-post/K&C workflow uses `BobLib.Standards.FourPostSim`:
+
+```bash
+make standard-build-four-post
+make standard-eval-four-post
+```
+
+Both build targets copy the repo-root `vehicle.yml` into BobLib's generation
+workspace before generating and compiling the Modelica source. The run targets
+also depend on the matching build targets, so they rebuild missing executables
+automatically.
 
 ## Step 5: Run Release Checks
 

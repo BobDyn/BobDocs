@@ -54,6 +54,16 @@ StandardSim is the main high-fidelity simulation lane. It lives under:
 _3_StandardSim/
 ```
 
+The fastest release-baseline run is:
+
+```bash
+make standard-eval-all
+```
+
+That target builds missing executables, runs the active SteadyStateEval,
+TransientEval, and FourPostEval configs, then writes reports and metrics under
+`_3_StandardSim/results/`.
+
 The active standard studies are:
 
 | Study | Use it for | Target |
@@ -62,31 +72,24 @@ The active standard studies are:
 | TransientEval | Step steer and continuous sine response | `make standard-eval-transient` |
 | FourPostEval | Heave and roll K&C-style suspension/chassis metrics | `make standard-eval-four-post` |
 
-Build the maneuver model:
+For focused maneuver work, build the maneuver model and run either maneuver
+evaluation:
 
 ```bash
 make standard-build
-```
-
-Run the maneuver evaluations:
-
-```bash
 make standard-eval-steady-state
 make standard-eval-transient
 ```
 
-Build and run the four-post evaluation:
+For focused four-post work, build and run the four-post evaluation:
 
 ```bash
 make standard-build-four-post
 make standard-eval-four-post
 ```
 
-Run the complete standard baseline:
-
-```bash
-make standard-eval-all
-```
+The run targets depend on the matching build targets, so focused runs also
+rebuild missing executables automatically.
 
 ## SteadyStateEval
 

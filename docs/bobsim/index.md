@@ -82,8 +82,8 @@ Run the high-fidelity baseline:
 make standard-eval-all
 ```
 
-That target builds the required executables when needed, then runs
-SteadyStateEval, TransientEval, and FourPostEval.
+That target builds missing Modelica executables, then runs SteadyStateEval,
+TransientEval, and FourPostEval against the repo-root `vehicle.yml`.
 
 ## Target Language
 

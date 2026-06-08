@@ -125,11 +125,18 @@ h4:hover .header-anchor {
     }
 }
 
-.desktop-visuals {
+.sample-output-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
   width: 100%;
+}
+
+.sample-output-card {
+  padding: 1rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  background: var(--vp-c-bg-soft);
 }
 
 .sample-output-label {
@@ -140,8 +147,43 @@ h4:hover .header-anchor {
   line-height: 1.35;
 }
 
-.mobile-visuals-message {
-  display: none;
+.sample-output-card video {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: var(--vp-c-bg);
+}
+
+.sample-output-card p:not(.sample-output-label) {
+  margin: 0.85rem 0 0;
+  color: var(--vp-c-text-2);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.sample-output-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.sample-output-links a {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--vp-c-brand-1);
+  border-radius: 999px;
+  color: var(--vp-c-brand-1);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.sample-output-links a:hover {
+  background: var(--vp-c-brand-soft);
 }
 
 .centered-diagram {
@@ -210,16 +252,7 @@ h4:hover .header-anchor {
 }
 
 @media (max-width: 768px) {
-  .desktop-visuals {
-    display: none;
-  }
-
-  .mobile-visuals-message {
-    display: block;
-    padding: 1rem;
-    border: 1px solid var(--vp-c-divider);
-    border-radius: 12px;
-    background: var(--vp-c-bg-soft);
-    color: var(--vp-c-text-2);
+  .sample-output-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
