@@ -132,38 +132,63 @@ The result is a workflow for generating simulation ground truth that you can ins
 
 ## Sample Outputs
 
-The sample outputs below come from active BobDyn/BobSim workflows. The videos
-show representative runs; the linked PDFs show the generated engineering
-reports. They are direct files, so a first-time viewer can open them without
-waiting on a browser-side PDF renderer.
+The report links below come from current BobDyn/BobSim StandardSim workflows.
+They render on the page for quick inspection, with direct PDF links available
+for a wider view.
 
 <div class="sample-output-grid">
   <article class="sample-output-card">
-    <p class="sample-output-label">SteadyStateEval</p>
-    <video autoplay loop muted playsinline width="100%">
-      <source src="/steady_state_eval.mp4" type="video/mp4">
-    </video>
+    <p class="sample-output-label">SteadyStateEval Report</p>
     <p>
       Ramp-steer velocity-isoline workflow with controller behavior, response
       traces, fitted handling metrics, and CSV-ready summary values.
     </p>
     <div class="sample-output-links">
       <a href="/steady_state_eval_report.pdf" target="_blank" rel="noreferrer">Open PDF report</a>
-      <a href="/steady_state_eval.mp4" target="_blank" rel="noreferrer">Open video</a>
     </div>
+    <PdfEmbed src="/steady_state_eval_report.pdf" max-height="34rem" />
   </article>
   <article class="sample-output-card">
-    <p class="sample-output-label">TransientEval</p>
-    <video autoplay loop muted playsinline width="100%">
-      <source src="/transient_eval.mp4" type="video/mp4">
-    </video>
+    <p class="sample-output-label">TransientEval Report</p>
     <p>
       Step-steer and sine-response workflow with gain, phase, lag, rise-time,
       and overshoot metrics from the same generated vehicle model.
     </p>
     <div class="sample-output-links">
       <a href="/transient_eval_report.pdf" target="_blank" rel="noreferrer">Open PDF report</a>
-      <a href="/transient_eval.mp4" target="_blank" rel="noreferrer">Open video</a>
+    </div>
+    <PdfEmbed src="/transient_eval_report.pdf" max-height="34rem" />
+  </article>
+</div>
+
+The videos below are visual context only. They are not labeled as the exact
+runs shown in the PDF reports.
+
+<div class="sample-output-grid">
+  <article class="sample-output-card">
+    <p class="sample-output-label">Closed-Loop PI Control Sample</p>
+    <video autoplay loop muted playsinline width="100%">
+      <source src="/steady_state_eval.mp4" type="video/mp4">
+    </video>
+    <p>
+      A proof-of-concept PI radius-control run. It is not presented as a tuned
+      controller or as the exact report case.
+    </p>
+    <div class="sample-output-links">
+      <a href="/steady_state_eval.mp4" target="_blank" rel="noreferrer">Open sample</a>
+    </div>
+  </article>
+  <article class="sample-output-card">
+    <p class="sample-output-label">Prescribed Frequency Input Sample</p>
+    <video autoplay loop muted playsinline width="100%">
+      <source src="/transient_eval.mp4" type="video/mp4">
+    </video>
+    <p>
+      A prescribed steering-frequency input sample. It shows the workflow
+      visually without claiming one-to-one correspondence to the report pages.
+    </p>
+    <div class="sample-output-links">
+      <a href="/transient_eval.mp4" target="_blank" rel="noreferrer">Open sample</a>
     </div>
   </article>
 </div>

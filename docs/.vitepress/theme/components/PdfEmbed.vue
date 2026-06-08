@@ -1,5 +1,5 @@
 <template>
-    <div ref="containerRef" class="pdf-embed">
+    <div ref="containerRef" class="pdf-embed" :style="{ maxHeight: props.maxHeight }">
         <div v-if="loading" class="pdf-state">Loading…</div>
         <div v-else-if="error" class="pdf-state pdf-state--error">{{ error }}</div>
         <canvas
@@ -14,8 +14,9 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
-const props = defineProps<{ src: string }>()
+const props = defineProps<{ src: string; maxHeight?: string }>()
 
 const containerRef = ref<HTMLElement | null>(null)
 const loading = ref(true)
@@ -37,8 +38,8 @@ async function render() {
     pageCount.value = 0
 
     try {
-        const { getDocument, GlobalWorkerOptions, version } = await import('pdfjs-dist')
-        GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`
+        const { getDocument, GlobalWorkerOptions } = await import('pdfjs-dist')
+        GlobalWorkerOptions.workerSrc = workerSrc
 
         const pdf = await getDocument({ url: props.src }).promise
         if (myToken !== token) return
