@@ -6,34 +6,29 @@ title: Configuration
 # Configuration
 
 BobDyn/BobSim configuration is mostly plain YAML plus a small number of
-OpenModelica build scripts. Edit durable sources, then let the build targets
-produce generated artifacts.
+OpenModelica build scripts. BobLib owns the physical vehicle records and
+Modelica entry points; BobSim owns workflow cases, runtime overrides, output
+extraction, plotting, and reporting.
 
-## Active Vehicle Source
+## Vehicle Source
 
-BobSim owns the active vehicle source at:
-
-```text
-vehicle.yml
-```
-
-BobLib's active generation input is:
+Vehicle data lives in checked-in BobLib Modelica records. In the integrated
+transition package, the default vehicle record is:
 
 ```text
-_0_Utils/external/BobLib/Generation/vehicle.yml
+BobLibVehicleInterfaces.Records.VehicleDefn.DWBCStabar_DWBCStabarRecord
 ```
 
-The standard build targets copy the repo-root `vehicle.yml` into that BobLib
-generation path before compiling:
+The standard build targets compile the selected Modelica entry points:
 
 ```bash
 make standard-build
 make standard-build-four-post
 ```
 
-When changing the vehicle, treat `vehicle.yml`, BobLib's templates, and the
-generator scripts as durable inputs. Generated Modelica files are active
-package artifacts.
+When changing the vehicle, treat BobLib records, subsystem redeclares, and
+standard entry-point templates as durable inputs. BobSim workflow YAML should
+only carry case definitions and runtime overrides.
 
 ## Standard Workflow Configs
 
@@ -68,7 +63,7 @@ Typical shape:
 simulation:
   backend: modelica
   build_dir: _3_StandardSim/Build/VehicleSim
-  exec_name: BobLib.Standards.VehicleSim
+  exec_name: BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
 
   start_time: 0.0
   stop_time: 20.0
@@ -102,6 +97,15 @@ Useful keys:
 
 The current public StandardSim configs use `-jacobian=internalNumerical` for
 the OpenModelica runtime Jacobian path.
+
+## Compliance and Damping Studies
+
+Halfshaft compliance and damping are valid study parameters in the integrated
+powertrain model. Increasing compliance detail can add faster torsional modes,
+so refine the simulation settings when studying these effects: reduce the
+default step size or output interval, keep the adaptive solver tolerance tight
+enough for the target dynamics, and confirm the solver is actually resolving
+the halfshaft transient instead of stepping across it.
 
 ## Initial Parameters
 
@@ -274,14 +278,14 @@ make opt-refined
 
 To change the active vehicle:
 
-1. Edit `vehicle.yml`.
+1. Edit the relevant BobLib Modelica record or subsystem redeclare.
 2. Run `make standard-build` or `make standard-build-four-post`.
 3. Rerun the relevant study.
 
 To change a standard study:
 
 1. Edit that workflow's config YAML.
-2. Rebuild only if the Modelica source or generated vehicle changed.
+2. Rebuild only if the Modelica source or selected vehicle record changed.
 3. Run the workflow target.
 4. Inspect the report and metrics CSV.
 

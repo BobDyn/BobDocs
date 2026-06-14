@@ -2,7 +2,7 @@
 layout: doc
 title: Entry Points
 prev:
-  text: 'Generation'
+  text: 'Static Templates'
   link: '/boblib/generation'
 next:
   text: 'Development'
@@ -14,11 +14,24 @@ next:
 BobLib standard entry points are Modelica models intended for BobSim workflows
 and direct OpenModelica experiments.
 
-## `BobLib.Standards.VehicleSim`
+## `BobLibVehicleInterfaces.Experiments.Standards.VehicleSim`
 
-`VehicleSim` is the main maneuver simulation wrapper. It instantiates the
-active generated vehicle, tire/ground interaction components, steer input,
-speed control, and standard response outputs.
+`VehicleSim` is the main maneuver simulation wrapper. It follows the
+VehicleInterfaces demo-style stack while inserting BobLib's detailed physics
+through explicit subsystem redeclares.
+
+The visible vehicle-level assembly includes:
+
+- road and atmosphere models from VehicleInterfaces
+- driver environment and brakes from VehicleInterfaces
+- BobLib chassis and suspension
+- BobLib aero interface and CFD aero map
+- BobLib battery pack
+- BobLib VCU
+- BobLib DC inverter
+- BobLib electric motor
+- BobLib rear final drive and differential
+- Modelica MultiBody world
 
 Current maneuver mode parameter:
 
@@ -27,8 +40,6 @@ Current maneuver mode parameter:
 | `0` | open-loop ramp steer |
 | `1` | open-loop sinusoidal steer |
 | `2` | step steer |
-
-The model asserts that `useMode` is one of those three values.
 
 Common output variables include:
 
@@ -44,14 +55,15 @@ Common output variables include:
 - `rightSteerAngle`
 - `Fz_FL`, `Fz_FR`, `Fz_RL`, `Fz_RR`
 
-BobSim uses this entry point for SteadyStateEval and TransientEval.
+BobSim uses this entry point for SteadyStateEval and TransientEval once the
+integrated package replaces the legacy standard model.
 
 ## Tire Transients
 
-Generated vehicles redeclare the MF52 tire slip model to:
+Integrated vehicle wrappers redeclare the MF52 tire slip model to:
 
 ```text
-BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.TransientSlip
+BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlip
 ```
 
 for front-left, front-right, rear-left, and rear-right tires. The transient slip
@@ -65,50 +77,29 @@ pVehicle.pRrTireModel.relaxation
 The relaxation data is encoded in:
 
 ```text
-BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.RelaxationRecord
-```
-
-The implemented PAC2002-style relaxation lengths are:
-
-$$
-\sigma_\kappa =
-F_z (p_{Tx1} + p_{Tx2} dF_z)
-\exp(-p_{Tx3} dF_z)
-\left(\frac{R_0}{F_{z0}}\right)
-\lambda_{\sigma\kappa}
-$$
-
-$$
-\sigma_\alpha =
-p_{Ty1}\sin\left(2\arctan\left(\frac{F_z}{p_{Ty2}F_{z0}\lambda_{Fz0}}\right)\right)
-(1 - p_{Ky3}|\gamma|)
-R_0\lambda_{Fz0}\lambda_{\sigma\alpha}
-$$
-
-where:
-
-```text
-dF_z = (F_z - F_z0 * LFZO) / (F_z0 * LFZO)
+BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.RelaxationRecord
 ```
 
 If the relaxation coefficients are not populated, the transient slip model
 falls back to default longitudinal and lateral relaxation lengths.
 
-## Animation
+## Animation And Batch Runs
 
-`VehicleSim` exposes:
+The integrated package uses:
 
 ```text
-inner parameter Boolean enableAnimation = false
+inner parameter Boolean headless = false
 ```
 
-The world and structural components use that inner flag so OMEdit animations can
-be enabled from the standard model without editing lower-level components.
+by default on the public simulation paths. This means OMEdit examples open with
+MultiBody animation geometry visible. Set `headless=true` for batch or CI runs
+where visualization geometry is not needed.
 
-## `BobLib.Standards.FourPostSim`
+## `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim`
 
 `FourPostSim` isolates suspension/chassis response for heave and roll sweeps.
-It uses `FourPostEvalRecord` outputs so K&C-style response data can be extracted
+It extends a static four-post architecture template and uses
+`FourPostEvalRecord` outputs so K&C-style response data can be extracted
 consistently.
 
 Common output records:
@@ -116,7 +107,5 @@ Common output records:
 - `frKnC`
 - `rrKnC`
 
-`FourPostSim` also exposes `inner parameter Boolean enableAnimation = false` for
-OMEdit diagram and animation workflows.
-
-BobSim uses this entry point for FourPostEval and downstream suspension metrics.
+BobSim uses this entry point for FourPostEval and downstream suspension metrics
+once the integrated package replaces the legacy standard model.

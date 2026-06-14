@@ -85,15 +85,15 @@ _3_StandardSim/Build/FourPostSim/
 The two files the runner needs are:
 
 ```text
-BobLib.Standards.VehicleSim
-BobLib.Standards.VehicleSim_init.xml
+BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
+BobLibVehicleInterfaces.Experiments.Standards.VehicleSim_init.xml
 ```
 
 or:
 
 ```text
-BobLib.Standards.FourPostSim
-BobLib.Standards.FourPostSim_init.xml
+BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
+BobLibVehicleInterfaces.Experiments.Standards.FourPostSim_init.xml
 ```
 
 Generated C files, object files, makefiles, binary Jacobian data, logs, and
@@ -126,7 +126,8 @@ _2_EnvelopeSim/Build/YMD/
 ## Visualization Results
 
 Core visualization currently happens through OMEdit, using the BobLib standard
-models and their `enableAnimation` parameter.
+models. Integrated models default to `headless=false`, so MultiBody animation
+geometry is visible unless you explicitly set `headless=true`.
 
 VisualSim is not an active primary workflow right now. If you intentionally use
 the offline VisualSim renderer, MP4 outputs are usually written to:
@@ -146,7 +147,7 @@ Example:
 ```bash
 python _1_VisualSim/run_visual.py \
   _1_VisualSim/visual_templates/transient_eval_visual.yml \
-  _1_VisualSim/BobLib.Standards.TransientEval_run_5_visual.npz \
+  _1_VisualSim/sample_transient_visual.npz \
   --mp4 _1_VisualSim/results/transient_eval_test.mp4
 ```
 
@@ -207,7 +208,7 @@ BobDocs when updating the website.
 Use these conventions when comparing runs:
 
 - Keep the source config with the result whenever possible.
-- Preserve the matching `vehicle.yml`.
+- Preserve the matching BobLib Modelica record and workflow config.
 - Export metrics CSVs for spreadsheet or notebook comparisons.
 - Keep raw case directories only for failures or deep debugging.
 - Clean build artifacts before timing compile performance.

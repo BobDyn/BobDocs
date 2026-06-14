@@ -45,7 +45,8 @@ openmodelica/openmodelica:v1.26.3-ompython
 The Dockerfile installs:
 
 - OpenModelica runtime
-- `Complex`, `ModelicaServices`, and `Modelica` `3.2.3+maint.om`
+- Modelica Standard Library `4.1.0`
+- VehicleInterfaces `2.0.2`
 - Python virtual environment under `/opt/venv`
 - BobSim Python requirements
 - plotting, reporting, PyVista, and video dependencies
@@ -124,8 +125,8 @@ StandardSim targets:
 
 | Target | Action |
 | :-- | :-- |
-| `make standard-build` | Generate/build `BobLib.Standards.VehicleSim` |
-| `make standard-build-four-post` | Generate/build `BobLib.Standards.FourPostSim` |
+| `make standard-build` | Build the integrated `VehicleSim` entry point |
+| `make standard-build-four-post` | Build the integrated `FourPostSim` entry point |
 | `make standard-eval-steady-state` | Run SteadyStateEval |
 | `make standard-eval-transient` | Run TransientEval |
 | `make standard-eval-four-post` | Run FourPostEval |
@@ -241,7 +242,7 @@ make init
 `Modelica package cannot load`
 
 Use the Docker path first. For local installs, confirm OpenModelica can find
-the expected Modelica Standard Library packages.
+Modelica Standard Library `4.1.0` and VehicleInterfaces `2.0.2`.
 
 `yaml` import fails
 

@@ -18,19 +18,21 @@ This page covers checks and conventions for changing BobLib itself.
 From the BobLib repository root:
 
 ```bash
-make ci
+make test PYTHON=.venv/bin/python
 ```
 
-That target runs Python checks and all Modelica regression checks.
+That target runs Python checks and all Modelica regression checks. During the
+transition it covers both the legacy `BobLib` package and the integrated
+`BobLibVehicleInterfaces` package.
 
 For narrower loops:
 
 ```bash
 make lint
-make test-python
-make modelica-translation
-make modelica-initialization
-make modelica-regression
+make test-python PYTHON=.venv/bin/python
+make modelica-translation PYTHON=.venv/bin/python
+make modelica-initialization PYTHON=.venv/bin/python
+make modelica-regression PYTHON=.venv/bin/python
 ```
 
 ## Python Tests
@@ -43,14 +45,15 @@ Tests/
 
 The focused Python tests cover:
 
-- generator output behavior
-- vehicle test fixture coverage
+- vehicle test fixture coverage for the legacy package
 - selected signal-level Modelica regressions through pytest
+- integrated-package OpenModelica smoke checks
 
 Run:
 
 ```bash
-make test-python
+make test-python PYTHON=.venv/bin/python
+python -m pytest Tests/test_boblibvehicleinterfaces_modelica.py
 ```
 
 ## Modelica Translation Checks
@@ -61,18 +64,21 @@ make test-python
 Tests/modelica_translation_checks.py
 ```
 
-It loads Modelica `3.2.3`, loads `BobLib/package.mo`, and runs `checkModel`.
+It loads Modelica `4.1.0`, loads `BobLib/package.mo`, and runs `checkModel`
+for the legacy standards and fixtures. Equation counts are pinned for the
+legacy standards and key regression models so major structural changes remain
+visible while the transition package is developed.
 
-The core checks include:
+The integrated package smoke check lives in:
 
-- `BobLib.Standards.VehicleSim`
-- `BobLib.Standards.FourPostSim`
-- `BobLib.Tests.Regression.VehicleSimAnimationOn`
-- `BobLib.Tests.Regression.MF52PureSlipSmoke`
-- every model fixture under `BobLib/Tests/`
+```text
+Tests/test_boblibvehicleinterfaces_modelica.py
+```
 
-Equation counts are pinned for the standards and key regression models so major
-structural changes are visible in CI.
+It loads Modelica `4.1.0`, VehicleInterfaces `2.0.2`,
+`BobLibVehicleInterfaces/package.mo`, and `BobLibVehicleInterfacesTests/package.mo`,
+then runs `checkModel` on the integrated standard entry points and representative
+fixtures.
 
 ## Initialization Checks
 
@@ -82,15 +88,15 @@ structural changes are visible in CI.
 Tests/modelica_initialization_checks.py
 ```
 
-It zero-time simulates every `BobLib.Tests` fixture, extracts compact numeric
-initialization metrics, and compares them against:
+It zero-time simulates every legacy `BobLib.Tests` fixture, extracts compact
+numeric initialization metrics, and compares them against:
 
 ```text
 Tests/modelica_initialization_baseline.csv
 ```
 
-This catches regressions where a model still translates but initializes to a
-different state.
+The integrated package currently uses smoke translation and representative test
+fixtures while the replacement package is being finalized.
 
 ## Signal Regressions
 
@@ -98,50 +104,58 @@ different state.
 
 ```text
 Tests/test_modelica_regression.py
+Tests/test_boblibvehicleinterfaces_modelica.py
 ```
 
-It simulates selected low-level models and checks important output signals.
 Current coverage includes:
 
 - MF52 pure-slip force and moment sanity
 - bilinear aero interpolation
 - CFD aero map output
-- speed controller output
-- curvature controller output
 - VCU request and torque limiting
+- integrated `VehicleSim` and `FourPostSim` smoke translation
+- representative integrated chassis, tire, aero, and powertrain fixtures
 
-## Modelica Fixtures
+## Architecture Rules
 
-Modelica fixtures live under:
+The integrated package should read as though it started from VehicleInterfaces
+and then built BobLib physics inside those contracts.
 
-```text
-BobLib/Tests/
-```
+- VehicleInterfaces extensions should live at the first level of each public
+  root package.
+- Underlying BobLib physics should start one level deeper.
+- Avoid duplicate public connector systems when VehicleInterfaces already
+  provides the contract.
+- Chassis, suspension, tire, aero, powertrain, controls, records, and utilities
+  should own their local helpers rather than sharing ambiguous top-level
+  dumping grounds.
+- Reusable mechanics and multibody helpers belong under `Utilities.Mechanics`.
+- Modelica records are the schemas and durable vehicle data.
+- Tests for the integrated package live in `BobLibVehicleInterfacesTests`, not
+  inside the production package.
 
-The intent is that low-level vehicle models have analogous test fixtures where
-practical. Add fixtures when a subsystem grows enough behavior that translation
-alone is not a meaningful guardrail.
+## Before Committing
 
-## Generated Changes
+Before committing vehicle architecture or template changes, check:
 
-Before committing generated changes, check:
-
-- generated Modelica files match the active `Generation/vehicle.yml`
-- `package.order` files include the active generated model names expected for this package state
-- `make modelica-translation` passes
-- `make modelica-initialization` passes
-- `make modelica-regression` passes when tire, controller, aero, or standard behavior changed
-- OMEdit can load `BobLib/package.mo` if the change touches package structure or diagram annotations
-- BobSim can build `standard-build` and `standard-build-four-post` if standard entry points changed
+- `package.order` files include the records, subsystem models, templates, and
+  tests expected for the package state
+- public entry points use the intended
+  `BobLibVehicleInterfaces.Experiments.Standards.*` models
+- `make test PYTHON=.venv/bin/python` passes
+- OMEdit can load `BobLibVehicleInterfaces/package.mo` if the change touches
+  package structure or diagram annotations
+- BobSim can build the standard entry points if the public executable names
+  changed
 
 ## Screenshot Targets
 
 Recommended screenshots for future documentation:
 
-- `docs/images/omedit-library-browser.png` - BobLib expanded in the Libraries browser
-- `docs/images/omedit-vehicle-sim-diagram.png` - `BobLib.Standards.VehicleSim` in Diagram View
-- `docs/images/omedit-vehicle-wrapper-diagram.png` - active generated vehicle wrapper in Diagram View
-- `docs/images/omedit-four-post-sim-diagram.png` - `BobLib.Standards.FourPostSim` in Diagram View
+- `docs/images/omedit-library-browser.png` - `BobLibVehicleInterfaces` expanded in the Libraries browser
+- `docs/images/omedit-vehicle-sim-diagram.png` - integrated `VehicleSim` in Diagram View
+- `docs/images/omedit-chassis-diagram.png` - active chassis model in Diagram View
+- `docs/images/omedit-four-post-sim-diagram.png` - integrated `FourPostSim` in Diagram View
 - `docs/images/omedit-vehicle-record-parameters.png` - active vehicle record parameter dialog
 
 Keep screenshots small enough for the repository and prefer PNG for crisp OMEdit
@@ -153,11 +167,10 @@ Useful areas of work include:
 
 - model robustness and initialization behavior
 - low-level fixture coverage for every reusable vehicle subsystem
-- additional suspension and powertrain templates
-- tire model validation and additional `.tir` templates
-- standard workflow coverage
+- further VehicleInterfaces alignment and connector cleanup
+- tire model validation and additional tire records
+- standard workflow coverage through BobSim
 - OMEdit diagram polish and screenshot documentation
-- generator schema validation for `Generation/vehicle.yml`
 
 ## License
 

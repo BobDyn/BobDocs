@@ -11,8 +11,8 @@ next:
 
 # CLI Workflow
 
-Use the CLI path for automated generation, translation, initialization checks,
-and direct simulation. It does not require OMEdit.
+Use the CLI path for translation, initialization checks, regression checks, and
+direct simulation. It does not require OMEdit.
 
 ## Make Targets
 
@@ -26,20 +26,22 @@ Important targets:
 
 | Target | Action |
 | :-- | :-- |
-| `make lint` | Run Ruff over generation and test harness code |
-| `make test-python` | Run Python generator and coverage tests |
+| `make lint` | Run Ruff over the Python test harness |
+| `make test-python` | Run Python coverage and regression harness tests |
 | `make modelica-deps` | Install OpenModelica library dependencies |
-| `make modelica-translation` | Translate standards and all `BobLib.Tests` fixtures |
-| `make modelica-initialization` | Initialize all fixtures and compare the baseline CSV |
-| `make modelica-regression` | Simulate signal-level Modelica regressions |
+| `make modelica-translation` | Translate legacy standards and legacy `BobLib.Tests` fixtures |
+| `make modelica-initialization` | Initialize legacy fixtures and compare the baseline CSV |
+| `make modelica-regression` | Simulate signal-level regressions and smoke-check `BobLibVehicleInterfaces` |
 | `make test-modelica` | Run all Modelica checks |
 | `make test` | Run Python and Modelica checks |
 | `make ci` | Run the full local CI suite |
 
+During the transition, `make test` intentionally checks both packages.
+
 For public release confidence, run:
 
 ```bash
-make ci
+make test PYTHON=.venv/bin/python
 ```
 
 ## Loading Smoke Test
@@ -53,81 +55,72 @@ omc
 Then in the OpenModelica prompt:
 
 ```txt
-loadModel(Modelica, {"3.2.3"});
-loadFile("BobLib/package.mo");
+loadModel(Modelica, {"4.1.0"});
+loadModel(VehicleInterfaces, {"2.0.2"});
+loadFile("BobLibVehicleInterfaces/package.mo");
+loadFile("BobLibVehicleInterfacesTests/package.mo");
 getErrorString();
 ```
 
-A clean load should return `true` for `loadFile(...)` and an empty or
-non-critical `getErrorString()` result.
+A clean load should return `true` for both `loadFile(...)` calls and an empty
+or non-critical `getErrorString()` result.
 
 ## Translation And Simulation
 
 To translate and build the active maneuver simulation without running it:
 
 ```txt
-loadModel(Modelica, {"3.2.3"});
-loadFile("BobLib/package.mo");
-buildModel(BobLib.Standards.VehicleSim);
+loadModel(Modelica, {"4.1.0"});
+loadModel(VehicleInterfaces, {"2.0.2"});
+loadFile("BobLibVehicleInterfaces/package.mo");
+buildModel(BobLibVehicleInterfaces.Experiments.Standards.VehicleSim);
 getErrorString();
 ```
 
 To simulate the checked-in active package as-is:
 
 ```txt
-loadModel(Modelica, {"3.2.3"});
-loadFile("BobLib/package.mo");
-simulate(BobLib.Standards.VehicleSim);
+loadModel(Modelica, {"4.1.0"});
+loadModel(VehicleInterfaces, {"2.0.2"});
+loadFile("BobLibVehicleInterfaces/package.mo");
+simulate(BobLibVehicleInterfaces.Experiments.Standards.VehicleSim);
 getErrorString();
 ```
 
 The same pattern works for:
 
 ```text
-BobLib.Standards.FourPostSim
+BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
 ```
 
-## Generation
+## Static Vehicle Templates
 
-The active generation input is:
+Vehicle architectures are checked in as Modelica records, subsystem models,
+four-post adapters, and standard templates. The default integrated entry points
+are:
 
 ```text
-Generation/vehicle.yml
+BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
+BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
 ```
 
-Regenerate the active package artifacts with:
+They extend or redeclare templates under:
 
-```bash
-python Generation/generate_vehicle_model.py
+```text
+BobLibVehicleInterfaces.Experiments.Standards.Templates
 ```
 
-The generator writes the active vehicle record, generated vehicle wrapper,
-standard `VehicleSim`, `FourPostEvalRecord`, and `FourPostSim` sources.
-
-Lower-level script entry points are available when you only want one generated
-area:
-
-```bash
-python Generation/scripts/build_records.py
-python Generation/scripts/build_axle_models.py
-python Generation/scripts/build_vehicle_sim.py
-python Generation/scripts/build_four_post_sim.py
-```
-
-Generated files are part of the active BobLib package. Treat
-`Generation/vehicle.yml`, the templates in `Generation/`, and the source model
-templates as the durable inputs when changing vehicle architecture or data.
+To switch the front-facing vehicle architecture, update `VehicleSim.mo` or
+`FourPostSim.mo` to extend or redeclare the desired template. Project/year-
+specific standard models can also extend the desired template and redeclare
+explicit values there.
 
 ## BobSim Handoff
 
-When BobLib is used as the BobSim submodule, BobSim owns the root `vehicle.yml`.
-BobSim's build targets copy that file into:
-
-```text
-_0_Utils/external/BobLib/Generation/vehicle.yml
-```
-
-Then they run the relevant BobLib generator and OpenModelica build script.
+When BobLib is used as the BobSim submodule, BobSim consumes the checked-in
+Modelica package. BobSim owns the workflow YAML, case generation, result
+extraction, plotting, and reporting; BobLib owns the physical models and
+records.
 
 From the BobSim root, use:
 
@@ -154,9 +147,10 @@ Create a build script in that scratch directory:
 ```bash
 cat > "$RUN_DIR/build_vehicle_sim.mos" <<MOS
 OpenModelica.Scripting.cd("$RUN_DIR");
-loadModel(Modelica, {"3.2.3"});
-loadFile("$BOBLIB_ROOT/BobLib/package.mo");
-buildModel(BobLib.Standards.VehicleSim);
+loadModel(Modelica, {"4.1.0"});
+loadModel(VehicleInterfaces, {"2.0.2"});
+loadFile("$BOBLIB_ROOT/BobLibVehicleInterfaces/package.mo");
+buildModel(BobLibVehicleInterfaces.Experiments.Standards.VehicleSim);
 getErrorString();
 MOS
 ```
@@ -171,8 +165,8 @@ Run the generated executable from the same scratch directory:
 
 ```bash
 cd /tmp/BobLibVehicleSim
-./BobLib.Standards.VehicleSim
+./BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
 ```
 
 For the four-post model, use a separate scratch directory and replace the model
-class with `BobLib.Standards.FourPostSim`.
+class with `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim`.

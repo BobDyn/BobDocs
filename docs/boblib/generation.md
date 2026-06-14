@@ -1,6 +1,6 @@
 ---
 layout: doc
-title: Generation
+title: Static Vehicle Templates
 prev:
   text: 'Package Map'
   link: '/boblib/package-map'
@@ -9,121 +9,103 @@ next:
   link: '/boblib/entry-points'
 ---
 
-# Generation
+# Static Vehicle Templates
 
-BobLib's active vehicle is generated from:
+BobLib no longer uses a Python/YAML generation step for the active vehicle.
+Vehicle architectures are checked in as ordinary Modelica classes and records
+so the package can be inspected, edited, translated, and reviewed without
+regenerating source files first.
 
-```text
-Generation/vehicle.yml
+## VehicleInterfaces Boundary
+
+The integrated package is organized so VehicleInterfaces-facing models are
+obvious:
+
+- top-level subsystem models extend or adapt the VehicleInterfaces contracts
+- deeper packages contain BobLib's reusable physics
+- subsystem-specific actuators, records, tires, and helpers live with the
+  package that owns them
+- shared math, FMI, mechanics, and multibody helpers live under `Utilities`
+
+This keeps the shared contract separate from the physics implementation.
+
+## Standard Template Layer
+
+`BobLibVehicleInterfaces.Experiments.Standards.Templates.BaseVehicleSim`
+contains the shared maneuver simulation assembly. It exposes the complete
+subsystem set as redeclareable items:
+
+```txt
+replaceable record VehicleRecord =
+  BobLibVehicleInterfaces.Records.VehicleDefn.DWBCStabar_DWBCStabarRecord;
+
+replaceable BobLibVehicleInterfaces.Chassis.Chassis_DWBCStabar_DWBCStabar chassis;
+replaceable BobLibVehicleInterfaces.EnergyStorage.BatteryPack battery;
+replaceable BobLibVehicleInterfaces.Controllers.VCU vcu;
+replaceable BobLibVehicleInterfaces.PowerElectronics.InverterDC inverter;
+replaceable BobLibVehicleInterfaces.ElectricDrives.Motor motor;
+replaceable BobLibVehicleInterfaces.Drivelines.RearFinalDriveDifferential driveline;
 ```
 
-The generation layer lets BobLib keep one active Modelica package shape while
-still supporting multiple vehicle architectures through YAML templates.
+The front-facing entry point stays small:
 
-## What The YAML Controls
+```txt
+model VehicleSim
+  extends Templates.BaseVehicleSim(
+    redeclare record VehicleRecord =
+      BobLibVehicleInterfaces.Records.VehicleDefn.DWBCStabar_DWBCStabarRecord,
+    redeclare BobLibVehicleInterfaces.Chassis.Chassis_DWBCStabar_DWBCStabar chassis,
+    redeclare BobLibVehicleInterfaces.EnergyStorage.BatteryPack battery,
+    redeclare BobLibVehicleInterfaces.Controllers.VCU vcu,
+    redeclare BobLibVehicleInterfaces.PowerElectronics.InverterDC inverter,
+    redeclare BobLibVehicleInterfaces.ElectricDrives.Motor motor,
+    redeclare BobLibVehicleInterfaces.Drivelines.RearFinalDriveDifferential driveline);
+end VehicleSim;
+```
 
-The YAML controls:
+Users can follow the template pattern, redeclare a different architecture, or
+hard-code a year-specific model once the architecture is fixed.
 
-- front and rear suspension topology
-- vehicle record name and generated wrapper model
-- BobLib, vehicle-template, and tire-template paths
-- sprung mass and driver mass properties
-- body torsional stiffness
-- front and rear wheel, tire, suspension, steering, actuation, stabar, and mass data
-- aero map data
-- tire template selection
-- standard simulation wrapper settings
+## Four-Post Templates
 
-Supported suspension topology keys include:
+`BaseFourPostSim` follows the same idea for K&C/four-post evaluation. The
+front-facing `FourPostSim` extends the selected architecture template, and the
+template redeclares the vehicle record plus matching front and rear four-post
+axle adapters.
 
-- `direct`
-- `bellcrank`
-- `bellcrank_stabar`
+The current checked-in suspension matrix covers:
 
-## Generated Outputs
+- `DWDirect`
+- `DWBC`
+- `DWBCStabar`
 
-The generator currently emits or updates:
+for front and rear axle positions.
 
-- `BobLib/Resources/VehicleDefn/<ActiveRecord>.mo`
-- `BobLib/Vehicle/Vehicle_<ActiveVariant>.mo`
-- `BobLib/Vehicle/Chassis/Suspension/FrAxleDW_*.mo`
-- `BobLib/Vehicle/Chassis/Suspension/RrAxleDW_*.mo`
-- `BobLib/Standards/VehicleSim.mo`
-- `BobLib/Resources/StandardRecord/FourPostEvalRecord.mo`
-- `BobLib/Standards/FourPostSim.mo`
-- affected `package.order` files
+## Extending The Matrix
 
-Generated files are part of the active BobLib package. Treat
-`Generation/vehicle.yml`, the templates in `Generation/`, and the source model
-templates as durable inputs when changing vehicle architecture or data.
+To add a new vehicle architecture, add or update the Modelica sources directly:
 
-## Standalone BobLib Generation
+1. Add the record under `BobLibVehicleInterfaces/Records/VehicleDefn/`.
+2. Add subsystem records under `Records/VehicleRecord/` near the owning domain.
+3. Add any needed axle assembly under `Chassis/Suspension/`.
+4. Add or update domain models one level below the public package boundary.
+5. Add a `VehicleSim` template or direct experiment that exposes the full
+   redeclare set.
+6. Add a `FourPostSim` template when the architecture needs four-post/K&C
+   coverage.
+7. Add the new classes to the relevant `package.order` files.
+8. Add or update `BobLibVehicleInterfacesTests` fixtures.
+9. Run the translation, initialization, and smoke checks.
 
-From a standalone BobLib checkout, update the path values in
-`Generation/vehicle.yml` before running the generator.
+## Validation
 
-Then run:
+After changing static vehicle templates, run:
 
 ```bash
-python Generation/generate_vehicle_model.py
+make modelica-translation PYTHON=.venv/bin/python
+make modelica-initialization PYTHON=.venv/bin/python
+python -m pytest Tests/test_boblibvehicleinterfaces_modelica.py
 ```
 
-Lower-level script entry points are available when you only want one generated
-area:
-
-```bash
-python Generation/scripts/build_records.py
-python Generation/scripts/build_axle_models.py
-python Generation/scripts/build_vehicle_sim.py
-python Generation/scripts/build_four_post_sim.py
-```
-
-## Generation From BobSim
-
-When BobLib is used from BobSim, BobSim owns the root `vehicle.yml`. The BobSim
-standard build targets copy that file into BobLib's generation workspace,
-regenerate the needed Modelica sources, and compile the executable.
-
-From the BobSim root:
-
-```bash
-make standard-build
-make standard-build-four-post
-```
-
-The generated input copy lives at:
-
-```text
-_0_Utils/external/BobLib/Generation/vehicle.yml
-```
-
-## Tire Records
-
-MF5.2 tire records include pure/combined slip data and a `relaxation` record.
-The generated vehicle wires tire relaxation parameters into the transient slip
-model for both front and rear tires.
-
-The relaxation record lives under:
-
-```text
-BobLib/Resources/VehicleRecord/Chassis/Suspension/Templates/Tire/MF52/RelaxationRecord.mo
-```
-
-This keeps the tire's steady-state fit data and transient relaxation
-assumptions encoded together in the active Modelica record.
-
-## Active Vehicle Shape
-
-BobLib is generated in an active vehicle shape rather than carrying every
-possible generated variant at once. This keeps the Modelica package concise and
-loadable, but it means generated files should always be interpreted together
-with the active `Generation/vehicle.yml` that produced them.
-
-After regeneration, run:
-
-```bash
-make modelica-translation
-make modelica-initialization
-```
-
-Run `make ci` before release or before committing generated model changes.
+Run `make test PYTHON=.venv/bin/python` before release or before committing
+behavior changes.

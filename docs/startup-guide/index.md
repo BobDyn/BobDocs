@@ -96,7 +96,8 @@ make standard-eval-all
 
 This is the first proof path for a fresh checkout. The target builds the
 required Modelica executables when they are missing, then runs SteadyStateEval,
-TransientEval, and FourPostEval against the repo-root `vehicle.yml`.
+TransientEval, and FourPostEval against the checked-in BobLib records and
+BobSim workflow configs.
 
 Standard reports and metric CSVs are written under:
 
@@ -117,7 +118,7 @@ _3_StandardSim/results/four_post_eval_report_metrics.csv
 
 ## Step 4: Run Focused Standard Workflows
 
-The standard maneuver workflows use `BobLib.Standards.VehicleSim`:
+The standard maneuver workflows use the integrated `VehicleSim` entry point:
 
 ```bash
 make standard-build
@@ -125,15 +126,14 @@ make standard-eval-steady-state
 make standard-eval-transient
 ```
 
-The four-post/K&C workflow uses `BobLib.Standards.FourPostSim`:
+The four-post/K&C workflow uses the integrated `FourPostSim` entry point:
 
 ```bash
 make standard-build-four-post
 make standard-eval-four-post
 ```
 
-Both build targets copy the repo-root `vehicle.yml` into BobLib's generation
-workspace before generating and compiling the Modelica source. The run targets
+Both build targets compile checked-in BobLib Modelica sources. The run targets
 also depend on the matching build targets, so they rebuild missing executables
 automatically.
 

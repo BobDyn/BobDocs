@@ -5,7 +5,7 @@ title: StandardSim
 
 # StandardSim
 
-StandardSim is BobDyn/BobSim's high-fidelity simulation lane. It runs generated
+StandardSim is BobDyn/BobSim's high-fidelity simulation lane. It runs
 BobDyn/BobLib Modelica executables through Python workflows that define cases,
 run the solver, extract signals, compute metrics, and build engineering
 reports.
@@ -33,11 +33,10 @@ _3_StandardSim/
 
 | Command | Builds | Output directory |
 | :-- | :-- | :-- |
-| `make standard-build` | `BobLib.Standards.VehicleSim` | `_3_StandardSim/Build/VehicleSim/` |
-| `make standard-build-four-post` | `BobLib.Standards.FourPostSim` | `_3_StandardSim/Build/FourPostSim/` |
+| `make standard-build` | `BobLibVehicleInterfaces.Experiments.Standards.VehicleSim` | `_3_StandardSim/Build/VehicleSim/` |
+| `make standard-build-four-post` | `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim` | `_3_StandardSim/Build/FourPostSim/` |
 
-Both targets sync the repo-root `vehicle.yml` into BobLib's generation
-workspace before generating and compiling the active Modelica source.
+Both targets compile the selected checked-in BobLib Modelica entry point.
 
 ## Run Targets
 
@@ -92,7 +91,7 @@ Current config highlights:
 
 | Key | Current role |
 | :-- | :-- |
-| `simulation.exec_name` | `BobLib.Standards.VehicleSim` |
+| `simulation.exec_name` | `BobLibVehicleInterfaces.Experiments.Standards.VehicleSim` |
 | `simulation.build_dir` | `_3_StandardSim/Build/VehicleSim` |
 | `simulation.init_parameters.useMode` | `0`, open-loop ramp steer |
 | `simulation.extra_args` | includes `-jacobian=internalNumerical` |
@@ -122,7 +121,7 @@ Current config highlights:
 
 | Key | Current role |
 | :-- | :-- |
-| `simulation.exec_name` | `BobLib.Standards.VehicleSim` |
+| `simulation.exec_name` | `BobLibVehicleInterfaces.Experiments.Standards.VehicleSim` |
 | `simulation.extra_args` | includes `-jacobian=internalNumerical` |
 | `test.testVel` | `15.0` and `20.0` m/s velocity groups |
 | `test.run_step` | enables representative step-steer cases |
@@ -132,7 +131,7 @@ Current config highlights:
 | `test.sweep_amp_deg` | `5.0` degree sine amplitude |
 | `test.n_cycles` | `4` cycles per sine run |
 
-BobLib's generated vehicle model uses transient tire slip, with relaxation
+BobLib's integrated vehicle model uses transient tire slip, with relaxation
 parameters supplied by each tire record. That matters most here because the
 workflow is explicitly measuring time-domain steering response.
 
@@ -149,13 +148,13 @@ time, overshoot, gain, phase, equivalent lag, and frequency-response trends.
 ## FourPostEval
 
 FourPostEval evaluates suspension and chassis response through heave and roll
-sweeps using `BobLib.Standards.FourPostSim`.
+sweeps using `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim`.
 
 Current config highlights:
 
 | Key | Current role |
 | :-- | :-- |
-| `simulation.exec_name` | `BobLib.Standards.FourPostSim` |
+| `simulation.exec_name` | `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim` |
 | `simulation.build_dir` | `_3_StandardSim/Build/FourPostSim` |
 | `simulation.extra_args` | includes `-jacobian=internalNumerical` |
 | `procedure.heaveMagnitude` | `0.03` m |

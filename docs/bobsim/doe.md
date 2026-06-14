@@ -132,7 +132,7 @@ _4_OptSim/StandardSens/configs/vehicle_architecture.yaml
 It selects the vehicle template, sampling strategy, sample count or interval
 count, random seed, and sweep variables.
 
-Each variable maps a high-level design path to a parameter inside the generated
+Each variable maps a high-level design path to a parameter inside the variant
 Modelica record:
 
 | Field | Meaning |
@@ -191,7 +191,7 @@ make clean-all
 | :-- | :-- |
 | BobLib not found | Submodule missing; run `make init` |
 | Population mismatch | Sample count changed without cleaning OptSim build artifacts |
-| Selected architecture mismatch | Standard model imports a different generated record |
-| Compile failure | Variant generated an invalid or difficult Modelica record |
+| Selected architecture mismatch | Standard model imports a different baseline record or template |
+| Compile failure | Variant produced an invalid or difficult Modelica record |
 | Missing metrics CSV | Simulation failed or report wrapper did not finish |
 | Partial metrics CSV | Run crashed during write; rerun after inspecting the failure log |

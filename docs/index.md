@@ -185,7 +185,7 @@ for a wider view.
     <p class="sample-output-label">TransientEval Report</p>
     <p>
       Step-steer and sine-response workflow with gain, phase, lag, rise-time,
-      and overshoot metrics from the same generated vehicle model.
+      and overshoot metrics from the same Modelica vehicle model.
     </p>
     <div class="sample-output-links">
       <a href="/transient_eval_report_05d3fdda.pdf" target="_blank" rel="noreferrer">Open PDF report</a>
@@ -196,8 +196,8 @@ for a wider view.
 
 ## Minimal Worked Example
 
-The fastest proof path uses the example `vehicle.yml` in BobDyn/BobSim and runs
-the complete standard baseline:
+The fastest proof path uses the checked-in BobLib vehicle records and BobSim
+workflow configs to run the complete standard baseline:
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
@@ -222,7 +222,7 @@ BobDyn is built to eliminate black-box behavior through an explicit, inspectable
   Geometry, constraints, and force generation are implemented directly in Modelica.
 
 - **Configuration is human-readable**  
-  Vehicle definitions, test setups, and simulation parameters are defined in plain-text YAML and Modelica `.mo` files.
+  Vehicle records, test setups, and simulation parameters are defined in plain-text YAML and Modelica `.mo` files.
 
 - **Execution is visible and scriptable**  
   Simulation, extraction, analysis, and reporting workflows are implemented in Python and designed to be built upon, modified, or replaced.

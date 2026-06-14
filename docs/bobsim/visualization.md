@@ -6,7 +6,7 @@ title: Visualization
 # Visualization
 
 BobSim's core visualization path is currently OMEdit. Use OMEdit when you want
-to inspect the generated Modelica diagrams, enable animation, and verify vehicle
+to inspect the integrated Modelica diagrams, view animation, and verify vehicle
 motion through the standard Modelica toolchain.
 
 VisualSim still exists under `_1_VisualSim/`, but it is not an active primary
@@ -26,7 +26,7 @@ _1_VisualSim/
 | :-- | :-- |
 | `_1_VisualSim/run_visual.py` | MP4 rendering entry point |
 | `_1_VisualSim/viewer.py` | Interactive/viewer support code |
-| `_1_VisualSim/BobLib.Standards.TransientEval_run_5_visual.npz` | Checked-in transient visual signal sample |
+| `_1_VisualSim/sample_transient_visual.npz` | Example transient visual signal sample |
 | `_1_VisualSim/visual_templates/steady_state_eval_visual.yml` | SteadyStateEval visualization template |
 | `_1_VisualSim/visual_templates/transient_eval_visual.yml` | TransientEval visualization template |
 | `_1_VisualSim/visual_templates/fr_knc_visual.yml` | Front K&C visualization template |
@@ -53,7 +53,7 @@ Transient example:
 ```bash
 python _1_VisualSim/run_visual.py \
   _1_VisualSim/visual_templates/transient_eval_visual.yml \
-  _1_VisualSim/BobLib.Standards.TransientEval_run_5_visual.npz \
+  _1_VisualSim/sample_transient_visual.npz \
   --mp4 _1_VisualSim/results/transient_eval_test.mp4
 ```
 
@@ -62,7 +62,7 @@ Steady-state template example from the checked-in template comments:
 ```bash
 python _1_VisualSim/run_visual.py \
   _1_VisualSim/visual_templates/steady_state_eval_visual.yml \
-  ./_3_StandardSim/SteadyStateEval/results/raw_results/BobLib.Standards.SteadyStateEval_run_0/BobLib.Standards.SteadyStateEval_run_0_visual.npz \
+  ./_3_StandardSim/SteadyStateEval/results/raw_results/run_0/visual_signals.npz \
   --mp4 ./_1_VisualSim/results/steady_state_eval_test.mp4
 ```
 
@@ -116,10 +116,10 @@ VisualSim expects a `.npz` file with:
 - named signal arrays matching the template
 - visual point coordinates exported as separate x/y/z arrays
 
-The checked-in transient sample is:
+An example transient sample path is:
 
 ```text
-_1_VisualSim/BobLib.Standards.TransientEval_run_5_visual.npz
+_1_VisualSim/sample_transient_visual.npz
 ```
 
 Generated visual arrays usually come from Modelica visual output signals. If a

@@ -26,7 +26,7 @@ export default withMermaid(
 
     markdown: {
       defaultHighlightLang: "txt",
-      languageAlias: { modelica: "txt" },
+      languageAlias: { modelica: "txt", mo: "txt" },
       config: (md) => { md.use(mathjax3); },
     },
 
@@ -81,7 +81,7 @@ export default withMermaid(
               page("CLI Workflow",    "/boblib/cli-workflow"),
               page("OMEdit Workflow", "/boblib/omedit-workflow"),
               page("Package Map",     "/boblib/package-map"),
-              page("Generation",      "/boblib/generation"),
+              page("Static Templates", "/boblib/generation"),
               page("Entry Points",    "/boblib/entry-points"),
               page("Development",     "/boblib/development"),
               page("Troubleshooting", "/boblib/troubleshooting"),

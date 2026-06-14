@@ -18,8 +18,8 @@ documentation.
 ## Prerequisites
 
 - A full OpenModelica installation that includes OMEdit
-- `Modelica 3.2.3+maint.om` installed through the OpenModelica package manager
-  or by running `make modelica-deps`
+- Modelica Standard Library `4.1.0`
+- VehicleInterfaces `2.0.2`
 - The BobLib repository available on a local filesystem path without unusual
   permissions
 - On Linux, desktop/X11 or Wayland integration for Qt applications
@@ -39,20 +39,21 @@ when you need the GUI.
 3. Open:
 
    ```text
-   BobLib/package.mo
+   BobLibVehicleInterfaces/package.mo
    ```
 
-4. In the Libraries browser, expand `BobLib`.
+4. In the Libraries browser, expand `BobLibVehicleInterfaces`.
 5. Start with:
 
    ```text
-   BobLib.Standards.VehicleSim
-   BobLib.Standards.FourPostSim
-   BobLib.Vehicle.Vehicle_DWBCStabar_DWBCStabar
+   BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
+   BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
+   BobLibVehicleInterfaces.Chassis.Chassis_DWBCStabar_DWBCStabar
    ```
 
-6. If OMEdit reports a missing `Modelica` package, run `make modelica-deps`,
-   restart OMEdit, and reload `BobLib/package.mo`.
+6. If OMEdit reports a missing `Modelica` or `VehicleInterfaces` package,
+   install the missing library, restart OMEdit, and reload
+   `BobLibVehicleInterfaces/package.mo`.
 
 ## Run Locally In OMEdit
 
@@ -63,12 +64,12 @@ when you need the GUI.
    /tmp/BobLibOMEdit
    ```
 
-3. Open `BobLib/package.mo`.
+3. Open `BobLibVehicleInterfaces/package.mo`.
 4. Open one of the standard models:
 
    ```text
-   BobLib.Standards.VehicleSim
-   BobLib.Standards.FourPostSim
+   BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
+   BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
    ```
 
 5. Use `Check Model` as a lightweight package/model sanity check.
@@ -84,31 +85,24 @@ model's scratch directory and simulate again.
 
 ## Animation
 
-The public standard models default to animation off for cleaner and faster
-simulation:
+The public integrated standard models default to animation visible:
 
 ```text
-inner parameter Boolean enableAnimation = false
+inner parameter Boolean headless = false
 ```
 
-To view animations in OMEdit, set `enableAnimation = true` on the standard
-model you are simulating. The generated standards propagate that inner flag to
-the world and structural components, including fixed structural translations.
+Set `headless=true` on the standard model when you want a batch or CI run
+without MultiBody visualization geometry.
 
 ## Screenshot Targets
 
 Recommended screenshots for future documentation:
 
-- `docs/images/omedit-library-browser.png` - BobLib expanded in the Libraries
-  browser
-- `docs/images/omedit-vehicle-sim-diagram.png` - `BobLib.Standards.VehicleSim`
-  in Diagram View
-- `docs/images/omedit-vehicle-wrapper-diagram.png` - active generated vehicle
-  wrapper in Diagram View
-- `docs/images/omedit-four-post-sim-diagram.png` - `BobLib.Standards.FourPostSim`
-  in Diagram View
-- `docs/images/omedit-vehicle-record-parameters.png` - active vehicle record
-  parameter dialog
+- `docs/images/omedit-library-browser.png` - `BobLibVehicleInterfaces` expanded in the Libraries browser
+- `docs/images/omedit-vehicle-sim-diagram.png` - `VehicleSim` in Diagram View
+- `docs/images/omedit-chassis-diagram.png` - active chassis model in Diagram View
+- `docs/images/omedit-four-post-sim-diagram.png` - `FourPostSim` in Diagram View
+- `docs/images/omedit-vehicle-record-parameters.png` - active vehicle record parameter dialog
 
 Keep screenshots small enough for the repository and prefer PNG for crisp OMEdit
 UI captures.

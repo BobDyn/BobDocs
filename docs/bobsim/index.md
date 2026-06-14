@@ -15,35 +15,36 @@ behaves in a standard maneuver, which limit is active, how a parameter change
 moves a metric, or whether a design direction deserves deeper model work.
 
 Use [BobDyn/BobLib](/boblib/) when the question is about the low-level model
-itself: Modelica package structure, tire records, suspension assemblies,
-generated vehicle definitions, direct OMEdit inspection, or initialization
+itself: Modelica package structure, VehicleInterfaces integration, records,
+tire models, suspension assemblies, direct OMEdit inspection, or initialization
 debugging.
 
 ## Operating Model
 
 BobSim keeps the physical model and the analysis workflow separate.
 
-1. Edit the active vehicle definition in `vehicle.yml`.
+1. Select the checked-in BobLib Modelica records and standard entry point.
 2. Build the relevant BobLib standard model.
-3. Run a standard, envelope, or sensitivity workflow.
+3. Run a standard, envelope, or sensitivity workflow from YAML configs.
 4. Inspect the report, metrics CSV, plots, or aggregate table.
 
-The build targets copy `vehicle.yml` into BobLib's generation workspace before
-generating and compiling Modelica source.
+Vehicle data now belongs in BobLib Modelica records. BobSim workflow YAML owns
+case definitions, solver settings, runtime overrides, output extraction,
+plotting, and reporting.
 
 <div class="workflow-diagram">
 
 ```mermaid
 flowchart TB
-    vehicle["vehicle.yml<br/>BobSim active vehicle source"]
-    copy["BobLib Generation/vehicle.yml<br/>generation input"]
-    modelica["Generated BobLib<br/>Modelica package"]
+    records["BobLib Modelica records<br/>vehicle data and schemas"]
+    entry["BobLib standard entry point<br/>VehicleSim / FourPostSim"]
     executable["OpenModelica<br/>executable"]
+    workflow["BobSim workflow YAML<br/>cases and runtime overrides"]
     outputs["BobSim outputs<br/>reports, metrics, plots, sensitivities"]
 
-    vehicle --> copy
-    copy --> modelica
-    modelica --> executable
+    records --> entry
+    entry --> executable
+    workflow --> executable
     executable --> outputs
 ```
 
@@ -53,7 +54,6 @@ flowchart TB
 
 | Path | Role |
 | :-- | :-- |
-| `vehicle.yml` | Active vehicle source for BobSim workflows |
 | `makefile` | Public command language for setup, build, run, test, and cleanup |
 | `Dockerfile` | OpenModelica and Python environment |
 | `docker-compose.yml` | Workflow services used by the make targets |
@@ -83,7 +83,8 @@ make standard-eval-all
 ```
 
 That target builds missing Modelica executables, then runs SteadyStateEval,
-TransientEval, and FourPostEval against the repo-root `vehicle.yml`.
+TransientEval, and FourPostEval against the checked-in BobLib model records and
+BobSim workflow configs.
 
 ## Target Language
 
@@ -97,7 +98,7 @@ BobSim's make targets are intentionally compact and prefix-driven:
 | EnvelopeSim | `make envelope-ggv`, `make envelope-ymd`, `make envelope-all` | Generate reduced GGV and YMD envelope outputs |
 | OptSim | `make opt-standard`, `make opt-envelope`, `make opt-refined` | Run sensitivities and response-surface workflows |
 | Quality | `make lint`, `make typecheck`, `make test`, `make ci` | Run release checks |
-| Cleanup | `make clean-standard`, `make clean-envelope`, `make clean-opt`, `make clean-all` | Remove generated artifacts |
+| Cleanup | `make clean-standard`, `make clean-envelope`, `make clean-opt`, `make clean-all` | Remove build and result artifacts |
 
 Run `make help` for the exact target list in the current checkout.
 
@@ -105,7 +106,7 @@ Run `make help` for the exact target list in the current checkout.
 
 | Page | Use it for |
 | :-- | :-- |
-| [Configuration](/bobsim/configuration) | Active vehicle sync, workflow YAML, runtime flags, report and plot config |
+| [Configuration](/bobsim/configuration) | Workflow YAML, runtime flags, report and plot config |
 | [StandardSim](/bobsim/standard-sim) | SteadyStateEval, TransientEval, FourPostEval, runners, reports |
 | [Results](/bobsim/results) | Output paths, metrics CSVs, raw case artifacts, preservation |
 | [EnvelopeSim](/bobsim/envelope) | Optional GGV and YMD envelope calculations |
@@ -151,8 +152,8 @@ _2_EnvelopeSim/results/ymd_report_metrics.csv
 
 BobSim is built to make results traceable:
 
-- Vehicle inputs are plain YAML.
-- Generated Modelica sources are inspectable.
+- Vehicle inputs are checked-in Modelica records.
+- Workflow cases and runtime settings are plain YAML.
 - Simulation overrides are written as text files.
 - Metrics are exported as CSV.
 - Reports come from the same configs that ran the studies.
@@ -160,8 +161,8 @@ BobSim is built to make results traceable:
 - The command language is small enough to remember.
 
 The aim is that a public report metric can be traced back to the workflow
-config, the extracted signals, the generated Modelica executable, and the active
-vehicle definition.
+config, extracted signals, compiled Modelica executable, and active vehicle
+record.
 
 EnvelopeSim should be read in that same spirit: it is a separate, transparent
 implementation of common vehicle envelope calculations such as GGV and YMD

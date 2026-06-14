@@ -9,16 +9,24 @@ prev:
 # Troubleshooting
 
 Common BobLib problems usually come from package loading, OpenModelica library
-resolution, stale generated files, initialization changes, or missing Python
-dependencies.
+resolution, stale template selections, initialization changes, or missing Python
+test dependencies.
 
-## OMEdit Cannot Find `BobLib`
+## OMEdit Cannot Find `BobLibVehicleInterfaces`
 
-Open `BobLib/package.mo` directly with `File > Open Model/Library File(s)`.
-Loading the directory instead of the package file can confuse Modelica package
-discovery.
+Open `BobLibVehicleInterfaces/package.mo` directly with
+`File > Open Model/Library File(s)`. Loading the directory instead of the
+package file can confuse Modelica package discovery.
 
-## OMEdit Or `omc` Cannot Find `Modelica 3.2.3`
+During the transition, the older `BobLib/package.mo` may still load, but new
+development should target `BobLibVehicleInterfaces/package.mo`.
+
+## OMEdit Or `omc` Cannot Find Required Libraries
+
+The integrated package expects:
+
+- Modelica Standard Library `4.1.0`
+- VehicleInterfaces `2.0.2`
 
 Run:
 
@@ -26,71 +34,64 @@ Run:
 make modelica-deps
 ```
 
-Then restart OMEdit or reload the package in a fresh `omc` session.
+Then confirm VehicleInterfaces is installed through the OpenModelica package
+manager. Restart OMEdit or reload the package in a fresh `omc` session.
 
 For a manual check:
 
 ```txt
-loadModel(Modelica, {"3.2.3"});
+loadModel(Modelica, {"4.1.0"});
+loadModel(VehicleInterfaces, {"2.0.2"});
 getErrorString();
 ```
 
-## Generation Scripts Cannot Import `yaml`
+## Standard Template Looks Wrong
 
-Install PyYAML in the Python environment used to run the scripts:
-
-```bash
-python -m pip install PyYAML
-```
-
-Use the same virtual environment for generation and tests so Python
-dependencies stay consistent.
-
-## `Generation/vehicle.yml` Looks Stale
-
-In standalone BobLib, edit:
+Check which template or base model the front-facing entry point extends:
 
 ```text
-Generation/vehicle.yml
+BobLibVehicleInterfaces/Experiments/Standards/VehicleSim.mo
+BobLibVehicleInterfaces/Experiments/Standards/FourPostSim.mo
 ```
 
-Then run:
+The available standard templates live under:
 
-```bash
-python Generation/generate_vehicle_model.py
+```text
+BobLibVehicleInterfaces/Experiments/Standards/Templates/
 ```
 
-When BobLib is used inside BobSim, run the BobSim build target instead:
-
-```bash
-make standard-build
-```
-
-or:
-
-```bash
-make standard-build-four-post
-```
-
-Those targets copy BobSim's root `vehicle.yml` into BobLib's generation
-workspace before generating and compiling.
+If a class is missing from OMEdit or `omc`, confirm the relevant `package.order`
+file includes the record, subsystem model, axle assembly, or template model.
 
 ## Translation Counts Changed
 
-`make modelica-translation` pins equation counts for the public standards and
-key regression models. A count change is not automatically wrong, but it should
-be intentional.
+`make modelica-translation` pins equation counts for the legacy public standards
+and key regression models. A count change is not automatically wrong, but it
+should be intentional.
 
 If the structural change is expected:
 
-1. Review the generated Modelica diff.
+1. Review the Modelica diff.
 2. Confirm the relevant model still initializes and simulates.
 3. Update the expected count in `Tests/modelica_translation_checks.py`.
-4. Run `make ci`.
+4. Run `make test PYTHON=.venv/bin/python`.
+
+## Integrated Smoke Check Failed
+
+Run the integrated package check directly:
+
+```bash
+python -m pytest Tests/test_boblibvehicleinterfaces_modelica.py -q
+```
+
+If it fails at load time, check MSL and VehicleInterfaces versions first. If it
+fails during `checkModel`, inspect the failing class under
+`BobLibVehicleInterfaces` or `BobLibVehicleInterfacesTests`.
 
 ## Initialization Baseline Changed
 
-`make modelica-initialization` compares fixture initialization metrics against:
+`make modelica-initialization` compares legacy fixture initialization metrics
+against:
 
 ```text
 Tests/modelica_initialization_baseline.csv
@@ -109,23 +110,34 @@ signals. Start by running the failing pytest directly:
 python -m pytest Tests/test_modelica_regression.py -q
 ```
 
-Then inspect the corresponding Modelica fixture under `BobLib/Tests/`.
+Then inspect the corresponding Modelica fixture under `BobLib/Tests/` or the
+integrated fixture under `BobLibVehicleInterfacesTests/`.
 
 ## OMEdit Opens But Diagrams Are Incomplete
 
-Regenerate the active package, reload `BobLib/package.mo`, and check
-`getErrorString()` for missing package or class errors. If only the CLI package
-was installed on Linux, install the full OpenModelica GUI package set.
+Reload `BobLibVehicleInterfaces/package.mo` and check `getErrorString()` for
+missing package or class errors. If only the CLI package was installed on Linux,
+install the full OpenModelica GUI package set.
 
-If animation is unexpectedly missing, confirm the standard model has
-`enableAnimation = true` for the run you are viewing. The default is false for
-faster, cleaner simulation.
+If animation is unexpectedly heavy, set `headless=true` for the run. The public
+integrated examples default to `headless=false` so diagrams and animations are
+visible by default.
 
-## Generated Simulations Translate Slowly
+## Full-Vehicle Simulations Translate Slowly
 
 Full multibody vehicle models are large. Slow translation is expected,
 especially for `VehicleSim` and `FourPostSim`.
 
 Use the BobSim build targets for repeated workflow runs so compiled artifacts
-are reused when inputs have not changed. Use `make modelica-translation` when
-you specifically want the regression guardrail.
+are reused when inputs have not changed. Use `make modelica-translation` or the
+integrated pytest smoke check when you specifically want the regression
+guardrail.
+
+## Halfshaft Compliance Studies Run Slowly
+
+Halfshaft compliance and damping are valid study parameters. Increasing
+compliance detail can add faster torsional modes, so refine simulation settings
+when studying these effects: reduce the default step size or output interval,
+keep solver tolerance tight enough for the target dynamics, and confirm the
+adaptive solver is resolving the halfshaft transient instead of stepping across
+it.

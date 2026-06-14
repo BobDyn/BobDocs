@@ -8,7 +8,7 @@ title: EnvelopeSim
 EnvelopeSim provides an optional, separate implementation of common vehicle
 envelope calculations. GGV and YMD maps show up in vehicle dynamics workflows
 everywhere; this is BobSim's transparent implementation of those ideas, tied to
-the active vehicle definition.
+the active BobLib vehicle records.
 
 EnvelopeSim is not the gold standard, the key theory reference, or a replacement
 for the full Modelica maneuver simulations. It is intended to be sane, readable,
@@ -25,7 +25,7 @@ _2_EnvelopeSim/
 
 | Path | Role |
 | :-- | :-- |
-| `_2_EnvelopeSim/vehicle_yaml.py` | Shared active-vehicle input loader |
+| `_2_EnvelopeSim/vehicle_yaml.py` | Legacy/shared reduced vehicle input loader |
 | `_2_EnvelopeSim/GGV/ggv_config.yml` | GGV envelope config |
 | `_2_EnvelopeSim/GGV/ggv_generation.py` | GGV envelope workflow |
 | `_2_EnvelopeSim/YMD/ymd_config.yml` | YMD envelope config |
@@ -46,8 +46,8 @@ artifacts alongside a release baseline.
 
 ## Shared Vehicle Inputs
 
-EnvelopeSim builds a reduced scalar vehicle model from the same active
-`vehicle.yml` that drives generated BobLib models.
+EnvelopeSim builds a reduced scalar vehicle model from the active BobLib
+vehicle data and the latest useful standard-study metrics.
 
 It loads:
 
@@ -121,11 +121,11 @@ EnvelopeSim is useful for:
 - fast plausibility checks before expensive Modelica sweeps
 - comparing tire, aero, and mass assumptions
 - seeing limit trends across speed
-- producing compact optional artifacts tied to the active vehicle definition
+- producing compact optional artifacts tied to the active vehicle record
 - cross-checking whether StandardSim behavior aligns with reduced-order expectations
 
 Use StandardSim when the question depends on time-domain multibody behavior,
-controller behavior, suspension transient response, or generated model details.
+controller behavior, suspension transient response, or detailed model behavior.
 
 Use BobDyn/BobLib directly when the envelope result points to a model-level
 issue that needs inspection or debugging.

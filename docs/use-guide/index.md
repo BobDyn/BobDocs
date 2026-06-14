@@ -21,7 +21,7 @@ Use [BobDyn/BobSim](/bobsim/) for simulation workflows: cases, sweeps, metrics,
 plots, reports, envelopes, sensitivities, and result files.
 
 Use [BobDyn/BobLib](/boblib/) for the low-level Modelica model layer:
-suspension assemblies, generated records, tire models, direct OpenModelica
+suspension assemblies, Modelica records, tire models, direct OpenModelica
 debugging, and OMEdit diagram inspection.
 :::
 
@@ -30,7 +30,7 @@ debugging, and OMEdit diagram inspection.
 The normal BobSim loop is:
 
 1. Pick a workflow.
-2. Edit the workflow YAML or the active `vehicle.yml`.
+2. Edit the workflow YAML or the selected BobLib Modelica record.
 3. Build the required Modelica executable if the vehicle or model changed.
 4. Run the evaluation.
 5. Review the report and metrics CSV.
@@ -39,7 +39,7 @@ BobDyn keeps these layers separate:
 
 | Layer | Role |
 | :-- | :-- |
-| BobDyn/BobLib | Modelica vehicle library and generated active vehicle records |
+| BobDyn/BobLib | Modelica vehicle library, VehicleInterfaces integration, and vehicle records |
 | BobDyn/BobSim | High-fidelity analysis workflows, envelopes, sensitivities, reports |
 | BobDocs | Public documentation, examples, and reference material |
 
@@ -99,7 +99,7 @@ vehicle behavior across ramp-steer velocity isolines.
 It:
 
 - holds vehicle speed with the BobLib speed controller
-- runs `BobLib.Standards.VehicleSim` in open-loop ramp-steer mode
+- runs the integrated `VehicleSim` entry point in open-loop ramp-steer mode
 - terminates when the ramp-steer quasi-steady plateau is reached
 - extracts steering, lateral acceleration, yaw, roll, sideslip, tire loads, and handwheel torque
 - fits response curves against measured lateral acceleration
@@ -120,7 +120,7 @@ It:
 
 - runs step-steer cases
 - runs continuous sine cases
-- uses `BobLib.Standards.VehicleSim` with transient tire slip enabled
+- uses the integrated `VehicleSim` with transient tire slip enabled
 - computes step response metrics
 - computes frequency-response gain, phase, and equivalent lag from sine cases
 - writes a PDF report and metrics CSV
@@ -138,7 +138,7 @@ Use FourPostEval when you want suspension and chassis K&C-style metrics.
 
 It:
 
-- builds and runs `BobLib.Standards.FourPostSim`
+- builds and runs the integrated `FourPostSim`
 - sweeps heave and roll positions
 - extracts front and rear K&C output records
 - computes camber, toe, caster, KPI, trail, scrub, motion ratio, anti/jacking, roll stiffness, and LLTD metrics
