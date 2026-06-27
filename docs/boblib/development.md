@@ -112,7 +112,7 @@ Current coverage includes:
 - MF52 pure-slip force and moment sanity
 - bilinear aero interpolation
 - CFD aero map output
-- VCU request and torque limiting
+- VCU bus subscription/publishing and request handling
 - integrated `VehicleSim` and `FourPostSim` smoke translation
 - representative integrated chassis, tire, aero, and powertrain fixtures
 
@@ -148,18 +148,13 @@ Before committing vehicle architecture or template changes, check:
 - BobSim can build the standard entry points if the public executable names
   changed
 
-## Screenshot Targets
+## OMEdit Screenshots
 
-Recommended screenshots for future documentation:
-
-- `docs/images/omedit-library-browser.png` - `BobLibVehicleInterfaces` expanded in the Libraries browser
-- `docs/images/omedit-vehicle-sim-diagram.png` - integrated `VehicleSim` in Diagram View
-- `docs/images/omedit-chassis-diagram.png` - active chassis model in Diagram View
-- `docs/images/omedit-four-post-sim-diagram.png` - integrated `FourPostSim` in Diagram View
-- `docs/images/omedit-vehicle-record-parameters.png` - active vehicle record parameter dialog
-
-Keep screenshots small enough for the repository and prefer PNG for crisp OMEdit
-UI captures.
+The maintained GUI screenshots live in the [OMEdit Workflow](/boblib/omedit-workflow)
+page and are stored under `docs/public/images/omedit/`. Refresh them from a
+clean OMEdit session when package loading, tree traversal, diagram layout, or
+Simulation Setup defaults change. Keep screenshots small enough for the
+repository and prefer PNG for crisp OMEdit UI captures.
 
 ## Useful Work Areas
 

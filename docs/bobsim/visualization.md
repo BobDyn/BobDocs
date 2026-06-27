@@ -5,9 +5,15 @@ title: Visualization
 
 # Visualization
 
-BobSim's core visualization path is currently OMEdit. Use OMEdit when you want
-to inspect the integrated Modelica diagrams, view animation, and verify vehicle
-motion through the standard Modelica toolchain.
+BobSim's first visualization path is the app preview in `Setup`. Use it while
+editing architecture, hardpoints, mass properties, tires, aero, suspension, and
+powertrain inputs.
+
+![BobSim Geometry setup preview showing hardpoints, suspension links, and kinematic plot controls](/images/bobsim/app-setup-geometry.png)
+
+Use OMEdit when you want to inspect the integrated Modelica diagrams, view
+Modelica animation, and verify vehicle motion through the standard Modelica
+toolchain.
 
 VisualSim still exists under `_1_VisualSim/`, but it is not an active primary
 workflow right now. Treat it as experimental/offline tooling for rendering

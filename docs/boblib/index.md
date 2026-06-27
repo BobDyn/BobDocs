@@ -38,12 +38,15 @@ vehicle studies.
 - Built against Modelica Standard Library `4.1.0` and VehicleInterfaces `2.0.2`
 - Public subsystem packages follow the VehicleInterfaces chassis, driveline,
   powertrain, driver, road, atmosphere, and bus contracts
+- `controlBus` is the shared VehicleInterfaces signal namespace for
+  standardized cross-subsystem intent, telemetry, status, and limits
 - BobLib physics live inside those contracts rather than beside duplicate
   connector systems
 - Vehicle-level powertrain layout is explicit: battery, VCU, inverter, motor,
   and driveline are visible at the simulation assembly level
-- Aero has a BobLib interface and rigid mount, with ride-height and atmosphere
-  signals wired into the standard vehicle stack
+- Aero has a BobLib interface and rigid mount; ride heights arrive through
+  `controlBus.chassisBus`, while density and wind arrive through BobLib's
+  `AtmosphereBus`
 - Records are the durable Modelica parameter schemas and vehicle data
 - Python/YAML vehicle generation has been removed from the active model path
 - `Experiments.Standards.VehicleSim` and `Experiments.Standards.FourPostSim`
@@ -113,6 +116,7 @@ loads VehicleInterfaces `2.0.2`.
 | [CLI Workflow](/boblib/cli-workflow) | `omc` loading, make targets, direct simulation |
 | [OMEdit Workflow](/boblib/omedit-workflow) | Opening BobLib visually, diagram browsing, manual simulation |
 | [Package Map](/boblib/package-map) | Repository layout and Modelica package areas |
+| [Control Bus](/boblib/control-bus) | VehicleInterfaces bus wiring, telemetry ownership, and explicit connector boundaries |
 | [Static Templates](/boblib/generation) | Checked-in records, subsystem redeclares, and architecture templates |
 | [Entry Points](/boblib/entry-points) | `VehicleSim`, `FourPostSim`, maneuver modes, tire relaxation behavior |
 | [Development](/boblib/development) | Regression tests, architecture rules, checks before commit |

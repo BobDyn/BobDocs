@@ -5,30 +5,62 @@ title: Configuration
 
 # Configuration
 
-BobDyn/BobSim configuration is mostly plain YAML plus a small number of
-OpenModelica build scripts. BobLib owns the physical vehicle records and
-Modelica entry points; BobSim owns workflow cases, runtime overrides, output
-extraction, plotting, and reporting.
+BobDyn/BobSim configuration is mostly plain YAML plus generated Modelica
+definitions and a small number of OpenModelica build scripts. The app is the
+normal editor for vehicle setup and runnable workflow options; the files remain
+plain enough to inspect and version deliberately.
 
 ## Vehicle Source
 
-Vehicle data lives in checked-in BobLib Modelica records. In the integrated
-transition package, the default vehicle record is:
+The app manages vehicle setup as YAML, then writes the generated Modelica
+definition used by the standard workflows.
+
+Common app vehicle paths:
 
 ```text
-BobLibVehicleInterfaces.Records.VehicleDefn.DWBCStabar_DWBCStabarRecord
+_5_App/vehicle_configs/
+_5_App/vehicle_workspaces/<vehicle>/config/vehicle.yml
 ```
 
-The standard build targets compile the selected Modelica entry points:
+Use the `Setup` view to load, create, import, edit, save, and write the active
+vehicle. Use `Write to MBD` before opening `Simulation`; that is the step that
+updates the generated Modelica definition.
+
+![BobSim Setup view showing vehicle architecture inputs, Save Vehicle, Write to MBD, and Modelica stack status](/images/bobsim/app-setup-architecture.png)
+
+BobLib remains the physical model library and owns the standard entry-point
+templates. The standard build targets compile the selected Modelica entry
+points:
 
 ```bash
 make standard-build
 make standard-build-four-post
 ```
 
-When changing the vehicle, treat BobLib records, subsystem redeclares, and
-standard entry-point templates as durable inputs. BobSim workflow YAML should
-only carry case definitions and runtime overrides.
+When changing the vehicle from the app, save the vehicle YAML and write it to
+MBD. When changing model structure directly, work in BobLib and keep BobSim
+workflow YAML focused on case definitions and runtime overrides.
+
+## App Configs
+
+The app exposes supported workflow fields in the browser and stores reusable
+run configs under:
+
+```text
+_5_App/sim_configs/
+```
+
+Default app configs live in:
+
+```text
+_5_App/sim_configs/_defaults/
+```
+
+The app can load a default config, save a named config, apply edits to the
+active run, and then launch the backing workflow. Advanced options that are not
+exposed in the form can still be edited in the underlying YAML.
+
+![BobSim simulation configuration modal with saved config controls and Apply Edits action](/images/bobsim/app-simulation-config.png)
 
 ## Standard Workflow Configs
 

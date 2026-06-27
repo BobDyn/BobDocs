@@ -2,8 +2,8 @@
 layout: doc
 title: Static Vehicle Templates
 prev:
-  text: 'Package Map'
-  link: '/boblib/package-map'
+  text: 'Control Bus'
+  link: '/boblib/control-bus'
 next:
   text: 'Entry Points'
   link: '/boblib/entry-points'

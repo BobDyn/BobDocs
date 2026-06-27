@@ -6,8 +6,8 @@ title: Development
 # Development
 
 This page covers the practical operations around BobDyn/BobSim: cloning,
-environment setup, make targets, local Python, cleanup, quality checks, and
-common failure paths.
+app launch, environment setup, make targets, local Python, cleanup, quality
+checks, and common failure paths.
 
 ## Clone
 
@@ -33,6 +33,29 @@ _0_Utils/external/BobLib/
 
 Clone BobLib directly only when you want to work on the low-level Modelica model
 layer without the BobSim workflow wrapper.
+
+## App Launch
+
+The app is the normal local entry point for setup, simulation launch, and result
+review.
+
+From the BobSim root:
+
+```bash
+make app
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8765
+```
+
+![BobSim app Setup view after launch, showing guided setup tabs and vehicle preview](/images/bobsim/app-setup-architecture.png)
+
+The app runs in the Python environment that launched it. Install
+`requirements.txt` locally before using `make app`; install OpenModelica locally
+before building or running simulations from the app.
 
 ## Docker Environment
 
@@ -114,6 +137,7 @@ Setup and shell targets:
 | Target | Action |
 | :-- | :-- |
 | `make init` | Initialize/update git submodules |
+| `make app` | Launch the local BobSim browser app |
 | `make docker-build` | Build the Docker image |
 | `make docker-rebuild` | Rebuild the Docker image without cache |
 | `make shell` | Open the main BobSim shell |
@@ -127,6 +151,7 @@ StandardSim targets:
 | :-- | :-- |
 | `make standard-build` | Build the integrated `VehicleSim` entry point |
 | `make standard-build-four-post` | Build the integrated `FourPostSim` entry point |
+| `make standard-eval-ramp-steer` | Run RampSteerEval |
 | `make standard-eval-steady-state` | Run SteadyStateEval |
 | `make standard-eval-transient` | Run TransientEval |
 | `make standard-eval-four-post` | Run FourPostEval |
@@ -179,10 +204,21 @@ public make target language stays coherent.
 
 ## Recommended Loops
 
+For normal browser-based work:
+
+```bash
+make app
+```
+
+Then use `Setup`, `Simulation`, and `Results`.
+
+![BobSim app Simulation catalog used for normal browser-based workflow runs](/images/bobsim/app-simulation-catalog.png)
+
 For standard maneuver work:
 
 ```bash
 make standard-build
+make standard-eval-ramp-steer
 make standard-eval-steady-state
 make standard-eval-transient
 ```
@@ -246,12 +282,16 @@ Modelica Standard Library `4.1.0` and VehicleInterfaces `2.0.2`.
 
 `yaml` import fails
 
-Install BobSim requirements in the Python environment that is running the
+Install BobSim requirements in the Python environment that is running the app or
 workflow:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
+
+`omc` is missing from the app run log
+
+Install OpenModelica locally, or use the Docker-backed CLI workflow targets.
 
 `Simulation fails but no run directory remains`
 

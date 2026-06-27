@@ -23,7 +23,7 @@ through explicit subsystem redeclares.
 The visible vehicle-level assembly includes:
 
 - road and atmosphere models from VehicleInterfaces
-- driver environment and brakes from VehicleInterfaces
+- BobLib driver environment and brakes through VehicleInterfaces boundaries
 - BobLib chassis and suspension
 - BobLib aero interface and CFD aero map
 - BobLib battery pack
@@ -32,6 +32,17 @@ The visible vehicle-level assembly includes:
 - BobLib electric motor
 - BobLib rear final drive and differential
 - Modelica MultiBody world
+
+The assembly uses one shared VehicleInterfaces `controlBus`. Subsystems publish
+their owned measurements and commands on their domain buses: chassis ride
+heights feed aero through `chassisBus`, chassis/battery/motor measurements feed
+the VCU through their buses, the driver environment publishes driver intent,
+and the VCU publishes electric-drive and mechanical-brake requests for
+downstream subscribers. With the default regen blend, negative PI
+speed-control torque goes to the mechanical brake request. Because
+VehicleInterfaces 2.0.2 atmospheres have no control-bus connector, BobLib also
+adds a shared `AtmosphereBus`; atmosphere publishes density and wind there, and
+aero subscribes to compute relative airspeed locally.
 
 Current maneuver mode parameter:
 

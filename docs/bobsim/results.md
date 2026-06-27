@@ -10,17 +10,66 @@ public artifacts are reports, metrics CSVs, plots, animations, and sensitivity
 tables. Debug artifacts are per-case run directories, OpenModelica logs,
 override files, generated result CSVs, and compiled build artifacts.
 
+The app-facing path is `Results`: explore result CSVs, preview registered
+outputs, and save named result snapshots with the active vehicle and run config.
+
+## App Results
+
+Use the app's `Results` view after a simulation run.
+
+![BobSim Results view with result source browser, Explore tab, signal controls, and plot pane](/images/bobsim/app-results-explore.png)
+
+| Tab | Use it for |
+| :-- | :-- |
+| `Explore` | Plot discovered CSV signals with selectable x-axis and signal filters |
+| `Saved` | Review named result snapshots saved from the app |
+| `Processing` | Track lightweight processing definitions around result CSVs |
+
+Named app snapshots are written under:
+
+```text
+_5_App/saved_results/
+```
+
+Each saved snapshot can include:
+
+- `manifest.json`
+- the active vehicle YAML
+- the active run config YAML
+- copied report and metrics files
+
+Vehicle-scoped app workspaces live under:
+
+```text
+_5_App/vehicle_workspaces/
+```
+
 ## StandardSim Results
 
-StandardSim public outputs live under:
+StandardSim app-registered outputs live under:
+
+```text
+_3_StandardSim/generated_results/
+```
+
+CLI-oriented public outputs may also live under:
 
 ```text
 _3_StandardSim/results/
 ```
 
-Current report artifacts:
+Common report artifacts:
 
 ```text
+_3_StandardSim/generated_results/ramp_steer_eval_report.pdf
+_3_StandardSim/generated_results/ramp_steer_eval_report_metrics.csv
+_3_StandardSim/generated_results/steady_state_eval_report.pdf
+_3_StandardSim/generated_results/steady_state_eval_report_metrics.csv
+_3_StandardSim/generated_results/transient_eval_report.pdf
+_3_StandardSim/generated_results/transient_eval_report_metrics.csv
+_3_StandardSim/generated_results/four_post_eval_report.pdf
+_3_StandardSim/generated_results/four_post_eval_report_metrics.csv
+
 _3_StandardSim/results/steady_state_eval_report.pdf
 _3_StandardSim/results/steady_state_eval_report_metrics.csv
 _3_StandardSim/results/transient_eval_report.pdf
@@ -38,6 +87,7 @@ Representative metric groups:
 
 | Workflow | Examples |
 | :-- | :-- |
+| RampSteerEval | lateral acceleration range, steering gradients, yaw/roll trends, limit-point derivatives |
 | SteadyStateEval | lateral acceleration range, steering gradients, understeer gradient, roll gradient, handwheel torque range |
 | TransientEval | step response, gain/phase response, time lags, velocity trends, fit quality |
 | FourPostEval | camber/toe/caster/KPI gains, motion ratios, roll stiffness, jacking, LLTD |
@@ -125,7 +175,8 @@ _2_EnvelopeSim/Build/YMD/
 
 ## Visualization Results
 
-Core visualization currently happens through OMEdit, using the BobLib standard
+Vehicle setup visualization happens directly in the app preview. For Modelica
+animation and diagram-level inspection, use OMEdit with the BobLib standard
 models. Integrated models default to `headless=false`, so MultiBody animation
 geometry is visible unless you explicitly set `headless=true`.
 

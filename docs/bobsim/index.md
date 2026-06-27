@@ -10,6 +10,10 @@ takes BobDyn/BobLib Modelica vehicle models, builds OpenModelica executables,
 runs repeatable studies, extracts signals, computes metrics, renders plots, and
 writes public review artifacts.
 
+The normal entry point is the local BobSim app. Use it to configure the active
+vehicle, write the generated Modelica definition, launch StandardSim workflows,
+and inspect reports, metrics, logs, and saved result snapshots.
+
 Use BobDyn/BobSim when the question is about vehicle response: how the car
 behaves in a standard maneuver, which limit is active, how a parameter change
 moves a metric, or whether a design direction deserves deeper model work.
@@ -23,29 +27,41 @@ debugging.
 
 BobSim keeps the physical model and the analysis workflow separate.
 
-1. Select the checked-in BobLib Modelica records and standard entry point.
-2. Build the relevant BobLib standard model.
-3. Run a standard, envelope, or sensitivity workflow from YAML configs.
-4. Inspect the report, metrics CSV, plots, or aggregate table.
+The app path is:
 
-Vehicle data now belongs in BobLib Modelica records. BobSim workflow YAML owns
-case definitions, solver settings, runtime overrides, output extraction,
-plotting, and reporting.
+1. Choose or create a vehicle in `Setup`.
+2. Save the vehicle.
+3. Click `Write to MBD` to generate the Modelica vehicle definition.
+4. Open `Simulation`, configure a workflow, then build and run it.
+5. Open `Results` to inspect, plot, and save the outputs.
+
+The CLI path is the same workflow as commands: build the relevant standard
+model, run a standard/envelope/sensitivity workflow from YAML configs, then
+inspect the report, metrics CSV, plots, or aggregate table.
+
+Vehicle setup is managed through app vehicle YAML and the generated Modelica
+definition, while BobLib remains the physical model library. BobSim workflow
+YAML owns case definitions, solver settings, runtime overrides, output
+extraction, plotting, and reporting.
 
 <div class="workflow-diagram">
 
 ```mermaid
 flowchart TB
-    records["BobLib Modelica records<br/>vehicle data and schemas"]
+    records["BobLib model library<br/>generated vehicle definitions"]
     entry["BobLib standard entry point<br/>VehicleSim / FourPostSim"]
+    app["BobSim app<br/>Setup / Simulation / Results"]
     executable["OpenModelica<br/>executable"]
     workflow["BobSim workflow YAML<br/>cases and runtime overrides"]
     outputs["BobSim outputs<br/>reports, metrics, plots, sensitivities"]
 
     records --> entry
+    app --> records
+    app --> workflow
     entry --> executable
     workflow --> executable
     executable --> outputs
+    outputs --> app
 ```
 
 </div>
@@ -60,18 +76,45 @@ flowchart TB
 | `requirements.txt` | Python analysis/reporting dependencies |
 | `_0_Utils/` | Shared utilities, plotting, reporting, and the BobLib submodule |
 | `_0_Utils/external/BobLib/` | BobDyn/BobLib Modelica library checkout |
-| `_1_VisualSim/` | Experimental/offline visualization templates; core visualization currently happens in OMEdit |
+| `_1_VisualSim/` | Experimental/offline visualization templates; app preview and OMEdit cover normal visualization |
 | `_2_EnvelopeSim/` | Optional GGV and YMD envelope calculations implemented separately from the Modelica standard workflows |
-| `_3_StandardSim/` | SteadyStateEval, TransientEval, and FourPostEval |
+| `_3_StandardSim/` | RampSteerEval, SteadyStateEval, TransientEval, and FourPostEval |
 | `_4_OptSim/` | Sensitivity and response-surface workflows |
+| `_5_App/` | Local browser app for setup, simulation launch, result review, and saved app libraries |
 | `tests/` | Release-polish and workflow regression checks |
 
 ## Quick Start
+
+Launch the app:
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
 cd BobSim
 make init
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+make app
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8765
+```
+
+Use the app path first:
+
+```text
+Setup -> Save Vehicle -> Write to MBD -> Simulation -> Results
+```
+
+![BobSim app Setup view with guided steps, vehicle controls, and architecture preview](/images/bobsim/app-setup-architecture.png)
+
+For Docker-backed CLI workflows:
+
+```bash
 make docker-build
 make help
 ```
@@ -82,9 +125,9 @@ Run the high-fidelity baseline:
 make standard-eval-all
 ```
 
-That target builds missing Modelica executables, then runs SteadyStateEval,
-TransientEval, and FourPostEval against the checked-in BobLib model records and
-BobSim workflow configs.
+That target builds missing Modelica executables, then runs RampSteerEval,
+SteadyStateEval, TransientEval, and FourPostEval against the active BobLib
+model definitions and BobSim workflow configs.
 
 ## Target Language
 
@@ -92,6 +135,7 @@ BobSim's make targets are intentionally compact and prefix-driven:
 
 | Area | Primary commands | Purpose |
 | :-- | :-- | :-- |
+| App | `make app` | Launch the local browser workbench |
 | Docker | `make docker-build`, `make docker-rebuild` | Build the reproducible OpenModelica/Python environment |
 | Shells | `make shell`, `make shell-standard`, `make shell-envelope`, `make shell-opt` | Open interactive workflow contexts |
 | StandardSim | `make standard-build`, `make standard-eval-all` | Build and run high-fidelity Modelica evaluations |
@@ -106,8 +150,9 @@ Run `make help` for the exact target list in the current checkout.
 
 | Page | Use it for |
 | :-- | :-- |
+| [App](/bobsim/app) | Setup, Simulation, Results, saved vehicles, saved configs, and saved result snapshots |
 | [Configuration](/bobsim/configuration) | Workflow YAML, runtime flags, report and plot config |
-| [StandardSim](/bobsim/standard-sim) | SteadyStateEval, TransientEval, FourPostEval, runners, reports |
+| [StandardSim](/bobsim/standard-sim) | RampSteerEval, SteadyStateEval, TransientEval, FourPostEval, runners, reports |
 | [Results](/bobsim/results) | Output paths, metrics CSVs, raw case artifacts, preservation |
 | [EnvelopeSim](/bobsim/envelope) | Optional GGV and YMD envelope calculations |
 | [OptSim](/bobsim/doe) | Standard sensitivities, envelope sensitivities, refined response surfaces |
@@ -117,11 +162,25 @@ In-progress tooling:
 
 | Page | Use it for |
 | :-- | :-- |
-| [VisualSim](/bobsim/visualization) | Inactive/offline visualization tooling; core visualization currently happens in OMEdit |
+| [VisualSim](/bobsim/visualization) | Inactive/offline visualization tooling; app preview and OMEdit cover the normal visual paths |
 
 ## What To Run First
 
-For a release baseline:
+For a first user workflow:
+
+```bash
+make app
+```
+
+Then run through:
+
+```text
+Setup -> Save Vehicle -> Write to MBD -> Simulation -> Results
+```
+
+![BobSim app Simulation catalog with standard workflow cards](/images/bobsim/app-simulation-catalog.png)
+
+For a scripted release baseline:
 
 ```bash
 make standard-eval-all
@@ -131,6 +190,15 @@ make ci
 Expected standard outputs:
 
 ```text
+_3_StandardSim/generated_results/ramp_steer_eval_report.pdf
+_3_StandardSim/generated_results/ramp_steer_eval_report_metrics.csv
+_3_StandardSim/generated_results/steady_state_eval_report.pdf
+_3_StandardSim/generated_results/steady_state_eval_report_metrics.csv
+_3_StandardSim/generated_results/transient_eval_report.pdf
+_3_StandardSim/generated_results/transient_eval_report_metrics.csv
+_3_StandardSim/generated_results/four_post_eval_report.pdf
+_3_StandardSim/generated_results/four_post_eval_report_metrics.csv
+
 _3_StandardSim/results/steady_state_eval_report.pdf
 _3_StandardSim/results/steady_state_eval_report_metrics.csv
 _3_StandardSim/results/transient_eval_report.pdf
@@ -152,7 +220,8 @@ _2_EnvelopeSim/results/ymd_report_metrics.csv
 
 BobSim is built to make results traceable:
 
-- Vehicle inputs are checked-in Modelica records.
+- Vehicle inputs are saved as app vehicle configs and generated Modelica definitions.
+- App vehicle/config snapshots are stored alongside saved result bundles.
 - Workflow cases and runtime settings are plain YAML.
 - Simulation overrides are written as text files.
 - Metrics are exported as CSV.

@@ -32,24 +32,37 @@ Linux package note: installing only `omc` is enough for CLI work, but not for
 OMEdit. Install the full OpenModelica package set from the official repository
 when you need the GUI.
 
-## Open BobLib In OMEdit
+## Open BobLib From Scratch
 
-1. Start OMEdit.
-2. Select `File > Open Model/Library File(s)`.
-3. Open:
+1. Start OMEdit with no BobLib package loaded.
+2. Open the File menu with `Alt+F`, press `Down` until
+   `Open Model/Library File(s)` is highlighted, then press `Enter`.
+
+   ![OMEdit File menu with Open Model/Library File(s) highlighted](/images/omedit/open-library-menu.png)
+
+3. In the file chooser, browse to the BobLib repository if needed, select the
+   integrated package entry point, and open it:
 
    ```text
    BobLibVehicleInterfaces/package.mo
    ```
 
-4. In the Libraries browser, expand `BobLibVehicleInterfaces`.
-5. Start with:
+   ![OMEdit file chooser with BobLibVehicleInterfaces package.mo selected](/images/omedit/open-library-file-dialog.png)
+
+4. In the Libraries browser, expand:
+
+   ```text
+   BobLibVehicleInterfaces > Experiments > Standards
+   ```
+
+5. Start with one of the standard experiment models:
 
    ```text
    BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
    BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
-   BobLibVehicleInterfaces.Chassis.Chassis_DWBCStabar_DWBCStabar
    ```
+
+   ![OMEdit Libraries browser with VehicleSim selected](/images/omedit/library-vehicle-sim-traversal.png)
 
 6. If OMEdit reports a missing `Modelica` or `VehicleInterfaces` package,
    install the missing library, restart OMEdit, and reload
@@ -57,26 +70,31 @@ when you need the GUI.
 
 ## Run Locally In OMEdit
 
-1. Start OMEdit.
+1. Start OMEdit and load `BobLibVehicleInterfaces/package.mo`.
 2. Set a scratch working directory from `Tools > Options > General`, for example:
 
    ```text
    /tmp/BobLibOMEdit
    ```
 
-3. Open `BobLibVehicleInterfaces/package.mo`.
-4. Open one of the standard models:
+3. Open one of the standard models:
 
    ```text
    BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
    BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
    ```
 
-5. Use `Check Model` as a lightweight package/model sanity check.
-6. Open `Simulation Setup` to review start time, stop time, tolerance, solver,
-   output format, and simulation flags.
-7. Click `Simulate`.
-8. Inspect variables in the Plotting perspective after the run finishes.
+4. Use `Check Model` as a lightweight package/model sanity check.
+5. Open `Simulation Setup` from the model toolbar to review start time, stop
+   time, communication interval, solver method, tolerance, output format, and
+   simulation flags.
+
+   ![VehicleSim diagram in OMEdit with the Simulation Setup toolbar button highlighted](/images/omedit/vehicle-sim-diagram.png)
+
+   ![OMEdit Simulation Setup dialog for VehicleSim](/images/omedit/simulation-setup-dialog.png)
+
+6. Click `Simulate`.
+7. Inspect variables in the Plotting perspective after the run finishes.
 
 OMEdit creates a model-named subdirectory under its working directory for each
 simulation. That directory contains the translated model artifacts, executable,
@@ -94,15 +112,9 @@ inner parameter Boolean headless = false
 Set `headless=true` on the standard model when you want a batch or CI run
 without MultiBody visualization geometry.
 
-## Screenshot Targets
+## Maintained Screenshots
 
-Recommended screenshots for future documentation:
-
-- `docs/images/omedit-library-browser.png` - `BobLibVehicleInterfaces` expanded in the Libraries browser
-- `docs/images/omedit-vehicle-sim-diagram.png` - `VehicleSim` in Diagram View
-- `docs/images/omedit-chassis-diagram.png` - active chassis model in Diagram View
-- `docs/images/omedit-four-post-sim-diagram.png` - `FourPostSim` in Diagram View
-- `docs/images/omedit-vehicle-record-parameters.png` - active vehicle record parameter dialog
-
-Keep screenshots small enough for the repository and prefer PNG for crisp OMEdit
-UI captures.
+The OMEdit screenshots used on this page are stored under
+`docs/public/images/omedit/` and are served from `/images/omedit/` in the site.
+Refresh them from a clean OMEdit session when package loading, tree traversal,
+diagram layout, or Simulation Setup defaults change.

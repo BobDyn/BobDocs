@@ -5,8 +5,8 @@ prev:
   text: 'OMEdit Workflow'
   link: '/boblib/omedit-workflow'
 next:
-  text: 'Static Templates'
-  link: '/boblib/generation'
+  text: 'Control Bus'
+  link: '/boblib/control-bus'
 ---
 
 # Package Map

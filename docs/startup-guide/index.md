@@ -2,216 +2,36 @@
 layout: doc
 title: Startup Guide
 next:
-  text: 'Use Guide'
-  link: '/use-guide/'
+  text: 'BobLib Startup'
+  link: '/startup-guide/boblib'
 ---
 
 # Startup Guide
 
-Use this guide to get BobDyn's public simulation workflow running from a fresh
-BobDyn/BobSim checkout.
+BobDyn has two public entry points. Choose the one that matches the work you
+are starting.
 
-::: tip Fast path
-Use BobDyn/BobSim when you want the complete vehicle-analysis workspace:
-standard simulations, envelopes, sensitivities, reports, plots, and result
-artifacts. Use [BobDyn/BobLib](/boblib/) directly when you want to inspect or
-modify the underlying Modelica library.
-:::
+| Start here | Use it when | First outcome |
+| :-- | :-- | :-- |
+| [BobDyn/BobLib Startup](/startup-guide/boblib) | You want to inspect, edit, translate, or test the Modelica vehicle library directly | A local BobLib checkout that loads `BobLibVehicleInterfaces` in OpenModelica |
+| [BobDyn/BobSim Startup](/startup-guide/bobsim) | You want the complete simulation workspace for setup, cases, sweeps, reports, plots, metrics, and batch studies | The BobSim app launched with a vehicle saved, written to MBD, and ready to simulate |
 
-::: info Starting point
-In this guide, the BobDyn/BobSim root means the repository directory created by
-the clone step below. Start in that directory before running commands.
+## How The Pieces Fit
 
-BobDyn/BobSim vendors BobDyn/BobLib as a submodule at
-`_0_Utils/external/BobLib/`.
-:::
+BobDyn/BobLib owns the physical vehicle model: Modelica packages, records,
+VehicleInterfaces adapters, subsystem models, and OMEdit diagrams.
 
-## What You Need
+BobDyn/BobSim owns the analysis workflow around that model: app-guided setup,
+build orchestration, YAML cases, sweeps, signal extraction, metrics, plots, and
+reports.
 
-The recommended path is Docker. It gives you OpenModelica, the expected
-Modelica Standard Library, and BobSim's Python stack in one reproducible
-environment.
-
-Install these first:
-
-- Git
-- Docker and Docker Compose
-- Python 3 only if you plan to run the workflows outside Docker
-- OpenModelica only if you plan to run the workflows outside Docker
-
-## Step 1: Clone BobSim
-
-Clone with submodules:
-
-```bash
-git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
-cd BobSim
-```
-
-If the repository was cloned without submodules, initialize them from the
-BobSim root:
-
-```bash
-make init
-```
-
-## Step 2: Build The Environment
-
-Build the Docker image:
-
-```bash
-make docker-build
-```
-
-For a clean image rebuild:
-
-```bash
-make docker-rebuild
-```
-
-Open the main development shell:
-
-```bash
-make shell
-```
-
-The workflow-specific shells use the same naming pattern:
-
-```bash
-make shell-standard
-make shell-envelope
-make shell-opt
-```
-
-You can run the make targets from the host or from inside a shell. Outside
-Docker, the targets dispatch through Compose. Inside Docker, they run directly.
-
-## Step 3: Run The Minimal Worked Example
-
-Run the complete standard baseline:
-
-```bash
-make standard-eval-all
-```
-
-This is the first proof path for a fresh checkout. The target builds the
-required Modelica executables when they are missing, then runs SteadyStateEval,
-TransientEval, and FourPostEval against the checked-in BobLib records and
-BobSim workflow configs.
-
-Standard reports and metric CSVs are written under:
-
-```text
-_3_StandardSim/results/
-```
-
-The main artifacts are:
-
-```text
-_3_StandardSim/results/steady_state_eval_report.pdf
-_3_StandardSim/results/steady_state_eval_report_metrics.csv
-_3_StandardSim/results/transient_eval_report.pdf
-_3_StandardSim/results/transient_eval_report_metrics.csv
-_3_StandardSim/results/four_post_eval_report.pdf
-_3_StandardSim/results/four_post_eval_report_metrics.csv
-```
-
-## Step 4: Run Focused Standard Workflows
-
-The standard maneuver workflows use the integrated `VehicleSim` entry point:
-
-```bash
-make standard-build
-make standard-eval-steady-state
-make standard-eval-transient
-```
-
-The four-post/K&C workflow uses the integrated `FourPostSim` entry point:
-
-```bash
-make standard-build-four-post
-make standard-eval-four-post
-```
-
-Both build targets compile checked-in BobLib Modelica sources. The run targets
-also depend on the matching build targets, so they rebuild missing executables
-automatically.
-
-## Step 5: Run Release Checks
-
-Before sharing results or opening a PR, run:
-
-```bash
-make ci
-```
-
-That target runs:
-
-- `make lint`
-- `make typecheck`
-- `make test`
-
-BobSim's tests include repository-polish checks that guard the public command
-language and prevent stale workflow names from creeping back into the release
-surface.
-
-## Optional Workflows
-
-Envelope outputs:
-
-```bash
-make envelope-ggv
-make envelope-ymd
-make envelope-all
-```
-
-Sensitivity and response-surface workflows:
-
-```bash
-make opt-standard
-make opt-envelope
-make opt-refined
-```
-
-## Command Language
-
-BobSim's public make targets intentionally read like a small language:
-
-| Prefix | Meaning |
-| :-- | :-- |
-| `docker-*` | Build or rebuild the development image |
-| `shell-*` | Open a shell in a workflow context |
-| `standard-*` | Build or run high-fidelity Modelica evaluations |
-| `envelope-*` | Run reduced envelope analyses |
-| `opt-*` | Run sensitivity and response-surface workflows |
-| `clean-*` | Remove generated artifacts |
-
-Run `make help` for the current target list.
-
-## Common Problems
-
-`BobLib not found`
-
-Run `make init` from the BobSim root.
-
-`Executable not found` or `Init XML not found`
-
-Run `make standard-build` for VehicleSim workflows, or
-`make standard-build-four-post` for FourPostEval.
-
-`Modelica package cannot load`
-
-Use the Docker workflow first. For local OpenModelica installs, confirm that the
-Modelica Standard Library expected by BobLib is installed.
-
-`Simulation failed but no raw run directory remains`
-
-Set `execution.cleanup: false` in the workflow config and rerun the study.
+If you are not sure where to begin, start with BobSim. It includes BobLib as a
+submodule, launches from a local browser app, and exercises the standard
+vehicle entry points end to end. Move to BobLib directly when you need to
+change model structure, records, subsystem physics, or diagram annotations.
 
 ## Next Pages
 
-- [Use Guide](/use-guide/) for the normal workflow after setup
-- [BobDyn/BobSim overview](/bobsim/) for the command language and repo map
-- [StandardSim](/bobsim/standard-sim) for SteadyStateEval, TransientEval, and FourPostEval
-- [Configuration](/bobsim/configuration) for YAML and build details
-- [BobDyn/BobLib overview](/boblib/) for Modelica package development
+- [BobDyn/BobLib Startup](/startup-guide/boblib) for direct Modelica library work
+- [BobDyn/BobSim Startup](/startup-guide/bobsim) for full simulation workflows
+- [Use Guide](/use-guide/) for daily workflows after setup

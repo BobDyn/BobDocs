@@ -38,7 +38,7 @@ features:
       height: "26"
       wrap: true
     title: BobDyn/BobSim
-    details: A Python simulation runner that uses BobDyn/BobLib models to build executables, run studies, extract signals, generate plots, compute metrics, and produce reports.
+    details: A local browser app and Python workflow runner that uses BobDyn/BobLib models to set up vehicles, launch studies, extract signals, generate plots, compute metrics, and produce reports.
 
   - icon:
       src: /icons/bobdyn.svg
@@ -59,9 +59,10 @@ traced from full-vehicle behavior down to subsystem assumptions.
 This is central to the project philosophy: transparency starts with knowing
 where each piece of vehicle behavior lives in the model.
 
-Start with [BobDyn/BobSim](/bobsim/) for complete simulation workflows, case execution,
-metrics, plots, and reports. Go to [BobDyn/BobLib](/boblib/) when you want to inspect,
-modify, or debug the low-level vehicle models directly.
+Start with [BobDyn/BobSim](/bobsim/) for app-guided vehicle setup, simulation
+workflows, case execution, metrics, plots, and reports. Go to
+[BobDyn/BobLib](/boblib/) when you want to inspect, modify, or debug the
+low-level vehicle models directly.
 
 <div class="model-structure-diagram">
 
@@ -196,20 +197,38 @@ for a wider view.
 
 ## Minimal Worked Example
 
-The fastest proof path uses the checked-in BobLib vehicle records and BobSim
-workflow configs to run the complete standard baseline:
+The fastest user path launches the BobSim app:
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
 cd BobSim
 make init
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+make app
+```
+
+Then open `http://127.0.0.1:8765` and follow:
+
+```text
+Setup -> Save Vehicle -> Write to MBD -> Simulation -> Results
+```
+
+![BobSim app showing the guided Setup view with vehicle architecture controls and preview](/images/bobsim/app-setup-architecture.png)
+
+For a scripted release baseline:
+
+```bash
 make docker-build
 make standard-eval-all
 ```
 
 The `standard-eval-all` target builds the required Modelica executables when
-they are missing, then runs SteadyStateEval, TransientEval, and FourPostEval.
-The expected review artifacts are PDF reports and metrics CSVs under
+they are missing, then runs RampSteerEval, SteadyStateEval, TransientEval, and
+FourPostEval. The expected review artifacts are PDF reports and metrics CSVs
+under `_3_StandardSim/generated_results/` and, for CLI-oriented configs,
 `_3_StandardSim/results/`.
 
 ---

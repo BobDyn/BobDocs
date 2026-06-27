@@ -65,11 +65,35 @@ export default withMermaid(
 
       sidebar: {
         "/startup-guide/": [
-          page("Startup Guide", "/startup-guide/"),
+          page("Choose A Startup Path", "/startup-guide/"),
+          {
+            text: "BobDyn/BobLib",
+            items: [
+              page("Startup", "/startup-guide/boblib"),
+            ],
+          },
+          {
+            text: "BobDyn/BobSim",
+            items: [
+              page("Startup", "/startup-guide/bobsim"),
+            ],
+          },
         ],
 
         "/use-guide/": [
-          page("Use Guide", "/use-guide/"),
+          page("Choose A Use Path", "/use-guide/"),
+          {
+            text: "BobDyn/BobLib",
+            items: [
+              page("Use Guide", "/use-guide/boblib"),
+            ],
+          },
+          {
+            text: "BobDyn/BobSim",
+            items: [
+              page("Use Guide", "/use-guide/bobsim"),
+            ],
+          },
         ],
 
         "/boblib/": [
@@ -81,6 +105,7 @@ export default withMermaid(
               page("CLI Workflow",    "/boblib/cli-workflow"),
               page("OMEdit Workflow", "/boblib/omedit-workflow"),
               page("Package Map",     "/boblib/package-map"),
+              page("Control Bus",     "/boblib/control-bus"),
               page("Static Templates", "/boblib/generation"),
               page("Entry Points",    "/boblib/entry-points"),
               page("Development",     "/boblib/development"),
@@ -94,6 +119,7 @@ export default withMermaid(
             text: "BobDyn/BobSim",
             items: [
               page("Overview",       "/bobsim/"),
+              page("App",            "/bobsim/app"),
               page("Configuration",  "/bobsim/configuration"),
               page("StandardSim",    "/bobsim/standard-sim"),
               page("Results",        "/bobsim/results"),
