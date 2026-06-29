@@ -94,8 +94,8 @@ Typical shape:
 ```yaml
 simulation:
   backend: modelica
-  build_dir: _3_StandardSim/Build/VehicleSim
-  exec_name: BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
+  build_dir: _3_StandardSim/BuildBobLib/VehicleSim
+  exec_name: BobLib.Experiments.Standards.VehicleSim
 
   start_time: 0.0
   stop_time: 20.0
@@ -129,6 +129,9 @@ Useful keys:
 
 The current public StandardSim configs use `-jacobian=internalNumerical` for
 the OpenModelica runtime Jacobian path.
+
+On Windows, the generated executable may have an `.exe` suffix. BobSim accepts
+both the suffix and no-suffix executable names when checking build readiness.
 
 ## Compliance and Damping Studies
 
@@ -247,7 +250,8 @@ _3_StandardSim/build_four_post_sim.mos
 ```
 
 They load the BobLib submodule package, set OpenModelica command-line options,
-change into the build directory, and call `buildModel(...)`.
+ensure the target build directories exist, change into the build directory, and
+call `buildModel(...)`.
 
 Prefer make targets over direct `omc` calls:
 
@@ -255,6 +259,18 @@ Prefer make targets over direct `omc` calls:
 make standard-build
 make standard-build-four-post
 ```
+
+Current build outputs are written under:
+
+```text
+_3_StandardSim/BuildBobLib/VehicleSim/
+_3_StandardSim/BuildBobLib/FourPostSim/
+```
+
+The BobSim app also exposes an OpenModelica toolchain selector in the
+Simulation area. It auto-detects common installs, and lets you choose the
+`omc` executable plus the OpenModelica library directory when auto-detection is
+not enough.
 
 ## Envelope Configs
 

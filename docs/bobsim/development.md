@@ -37,7 +37,8 @@ layer without the BobSim workflow wrapper.
 ## App Launch
 
 The app is the normal local entry point for setup, simulation launch, and result
-review.
+review. For users, prefer the released BobSim desktop executable. For
+development, run the same app from a source checkout.
 
 From the BobSim root:
 
@@ -55,7 +56,51 @@ http://127.0.0.1:8765
 
 The app runs in the Python environment that launched it. Install
 `requirements.txt` locally before using `make app`; install OpenModelica locally
-before building or running simulations from the app.
+before building or running simulations from the app, or select a local
+OpenModelica install from the app's Simulation toolchain selector.
+
+Released desktop builds store generated user data in the per-user runtime
+workspace:
+
+| Platform | Default runtime root |
+| :-- | :-- |
+| Windows | `%LOCALAPPDATA%\BobDyn\BobSim` |
+| macOS | `~/Library/Application Support/BobDyn/BobSim` |
+| Linux | `${XDG_DATA_HOME:-~/.local/share}/BobDyn/BobSim` |
+
+Set `BOBSIM_HOME` to override that location. `BOBDYN_HOME` remains supported
+for older local installs.
+
+## Desktop Release Builds
+
+BobSim desktop artifacts are PyInstaller builds. They bundle the app frontend
+and Python backend, but intentionally do not bundle generated Modelica
+simulation executables, reports, app caches, or user workspaces.
+
+Build the current platform's executable/app bundle:
+
+```bash
+make deploy
+```
+
+Clean, build, and package a release artifact:
+
+```bash
+make deploy-release DEPLOY_VERSION=2026.06.28
+```
+
+Release assets are platform-native. A Linux machine creates the Linux archive,
+a Windows machine creates the Windows zip, and macOS creates the macOS zip.
+The repository's `Release Builds` GitHub Actions workflow builds all three
+when a `v*` tag is pushed and uploads them to the GitHub Release with
+`--clobber`.
+
+Deploy outputs are written under:
+
+```text
+_0_Utils/deploy/dist/BobSim/
+_0_Utils/deploy/dist/releases/
+```
 
 ## Docker Environment
 
@@ -138,6 +183,10 @@ Setup and shell targets:
 | :-- | :-- |
 | `make init` | Initialize/update git submodules |
 | `make app` | Launch the local BobSim browser app |
+| `make deploy` | Build the native desktop artifact for the current OS |
+| `make deploy-package` | Package the current deploy artifact for release |
+| `make deploy-release` | Clean, build, and package a release artifact |
+| `make deploy-clean` | Remove deploy outputs |
 | `make docker-build` | Build the Docker image |
 | `make docker-rebuild` | Rebuild the Docker image without cache |
 | `make shell` | Open the main BobSim shell |
@@ -291,7 +340,11 @@ python -m pip install -r requirements.txt
 
 `omc` is missing from the app run log
 
-Install OpenModelica locally, or use the Docker-backed CLI workflow targets.
+Open the app's OpenModelica toolchain selector and choose the `omc` executable
+plus the OpenModelica library directory. If auto-detection fails, common
+library defaults are `%APPDATA%\.openmodelica\libraries` on Windows and
+`~/.openmodelica/libraries` on macOS/Linux. For source-checkout CLI work, use
+the Docker-backed workflow targets when local OpenModelica is not available.
 
 `Simulation fails but no run directory remains`
 

@@ -40,14 +40,13 @@ git clone https://github.com/BobDyn/BobLib.git
 cd BobLib
 ```
 
-During the current integration window, the active package is:
+The active package is:
 
 ```text
-BobLibVehicleInterfaces/package.mo
+BobLib/package.mo
 ```
 
-The older `BobLib/package.mo` package remains in the repository until the final
-cleanup and rename.
+Regression and component fixtures live in `Tests/BobLibTest/package.mo`.
 
 ## Step 2: Confirm OpenModelica Libraries
 
@@ -76,23 +75,22 @@ If you are using a repository-local virtual environment, pass it explicitly:
 make test PYTHON=.venv/bin/python
 ```
 
-These checks keep the public Modelica packages, record coverage, and test
-manifests aligned while the integrated package is being prepared to replace the
-older package.
+These checks keep the public Modelica package, record coverage, and test
+manifests aligned.
 
 ## Step 4: Load BobLib In OMEdit
 
-Open the integrated package:
+Open the package:
 
 ```text
-BobLibVehicleInterfaces/package.mo
+BobLib/package.mo
 ```
 
 Start with the standard experiment entry points:
 
 ```text
-BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
-BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
+BobLib.Experiments.Standards.VehicleSim
+BobLib.Experiments.Standards.FourPostSim
 ```
 
 Use the [OMEdit Workflow](/boblib/omedit-workflow) page for the full visual
@@ -104,10 +102,10 @@ For daily BobLib work, the main public surfaces are:
 
 | Area | Use it for |
 | :-- | :-- |
-| `BobLibVehicleInterfaces.Experiments.Standards` | Complete vehicle entry points such as `VehicleSim` and `FourPostSim` |
-| `BobLibVehicleInterfaces.Records` | Vehicle data schemas and complete vehicle definitions |
-| `BobLibVehicleInterfaces.Chassis`, `Aero`, `ElectricDrives`, `PowerElectronics`, `Controllers`, `Drivelines`, `EnergyStorage` | Vehicle subsystem contracts and BobLib physics implementations |
-| `BobLibVehicleInterfaces.Utilities` | Shared mechanics, math, FMI, and helper functionality |
+| `BobLib.Experiments.Standards` | Complete vehicle entry points such as `VehicleSim` and `FourPostSim` |
+| `BobLib.Records` | Vehicle data schemas and complete vehicle definitions |
+| `BobLib.Chassis`, `Aero`, `ElectricDrives`, `PowerElectronics`, `Controllers`, `Drivelines`, `EnergyStorage` | Vehicle subsystem contracts and BobLib physics implementations |
+| `BobLib.Utilities` | Shared mechanics, math, FMI, and helper functionality |
 
 ## Next Pages
 

@@ -21,9 +21,8 @@ From the BobLib repository root:
 make test PYTHON=.venv/bin/python
 ```
 
-That target runs Python checks and all Modelica regression checks. During the
-transition it covers both the legacy `BobLib` package and the integrated
-`BobLibVehicleInterfaces` package.
+That target runs Python checks and all Modelica regression checks for BobLib
+and the `Tests/BobLibTest` fixtures.
 
 For narrower loops:
 
@@ -45,15 +44,15 @@ Tests/
 
 The focused Python tests cover:
 
-- vehicle test fixture coverage for the legacy package
+- package structure and Modelica smoke coverage
 - selected signal-level Modelica regressions through pytest
-- integrated-package OpenModelica smoke checks
+- BobLib/BobLibTest OpenModelica smoke checks
 
 Run:
 
 ```bash
 make test-python PYTHON=.venv/bin/python
-python -m pytest Tests/test_boblibvehicleinterfaces_modelica.py
+python -m pytest Tests/test_boblib_modelica.py
 ```
 
 ## Modelica Translation Checks
@@ -64,21 +63,18 @@ python -m pytest Tests/test_boblibvehicleinterfaces_modelica.py
 Tests/modelica_translation_checks.py
 ```
 
-It loads Modelica `4.1.0`, loads `BobLib/package.mo`, and runs `checkModel`
-for the legacy standards and fixtures. Equation counts are pinned for the
-legacy standards and key regression models so major structural changes remain
-visible while the transition package is developed.
+It loads Modelica `4.1.0`, VehicleInterfaces `2.0.2`, `BobLib/package.mo`,
+and `Tests/BobLibTest/package.mo`, then runs `checkModel` for standard entry
+points and fixtures.
 
-The integrated package smoke check lives in:
+The focused package smoke check lives in:
 
 ```text
-Tests/test_boblibvehicleinterfaces_modelica.py
+Tests/test_boblib_modelica.py
 ```
 
-It loads Modelica `4.1.0`, VehicleInterfaces `2.0.2`,
-`BobLibVehicleInterfaces/package.mo`, and `BobLibVehicleInterfacesTests/package.mo`,
-then runs `checkModel` on the integrated standard entry points and representative
-fixtures.
+It runs `checkModel` on BobLib standard entry points and representative
+fixtures, and includes a few source-level structure checks for the package.
 
 ## Initialization Checks
 
@@ -88,15 +84,15 @@ fixtures.
 Tests/modelica_initialization_checks.py
 ```
 
-It zero-time simulates every legacy `BobLib.Tests` fixture, extracts compact
-numeric initialization metrics, and compares them against:
+It zero-time simulates `BobLibTest` fixtures, extracts compact numeric
+initialization metrics, and compares them against:
 
 ```text
 Tests/modelica_initialization_baseline.csv
 ```
 
-The integrated package currently uses smoke translation and representative test
-fixtures while the replacement package is being finalized.
+Use initialization baseline changes as an explicit review signal for vehicle
+model or fixture behavior.
 
 ## Signal Regressions
 
@@ -104,7 +100,7 @@ fixtures while the replacement package is being finalized.
 
 ```text
 Tests/test_modelica_regression.py
-Tests/test_boblibvehicleinterfaces_modelica.py
+Tests/test_boblib_modelica.py
 ```
 
 Current coverage includes:
@@ -113,13 +109,13 @@ Current coverage includes:
 - bilinear aero interpolation
 - CFD aero map output
 - VCU bus subscription/publishing and request handling
-- integrated `VehicleSim` and `FourPostSim` smoke translation
-- representative integrated chassis, tire, aero, and powertrain fixtures
+- `VehicleSim`, `VehicleFMI`, and `FourPostSim` smoke translation
+- representative chassis, tire, aero, and powertrain fixtures
 
 ## Architecture Rules
 
-The integrated package should read as though it started from VehicleInterfaces
-and then built BobLib physics inside those contracts.
+BobLib should read as though it started from VehicleInterfaces and then built
+BobLib physics inside those contracts.
 
 - VehicleInterfaces extensions should live at the first level of each public
   root package.
@@ -131,7 +127,7 @@ and then built BobLib physics inside those contracts.
   dumping grounds.
 - Reusable mechanics and multibody helpers belong under `Utilities.Mechanics`.
 - Modelica records are the schemas and durable vehicle data.
-- Tests for the integrated package live in `BobLibVehicleInterfacesTests`, not
+- Tests for BobLib live in `Tests/BobLibTest`, not
   inside the production package.
 
 ## Before Committing
@@ -141,9 +137,9 @@ Before committing vehicle architecture or template changes, check:
 - `package.order` files include the records, subsystem models, templates, and
   tests expected for the package state
 - public entry points use the intended
-  `BobLibVehicleInterfaces.Experiments.Standards.*` models
+  `BobLib.Experiments.Standards.*` models
 - `make test PYTHON=.venv/bin/python` passes
-- OMEdit can load `BobLibVehicleInterfaces/package.mo` if the change touches
+- OMEdit can load `BobLib/package.mo` if the change touches
   package structure or diagram annotations
 - BobSim can build the standard entry points if the public executable names
   changed

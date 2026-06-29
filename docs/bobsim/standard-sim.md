@@ -30,7 +30,7 @@ _3_StandardSim/
 | `_3_StandardSim/SteadyStateEval/` | Settled target lateral-acceleration workflow |
 | `_3_StandardSim/TransientEval/` | Step and sine transient workflow |
 | `_3_StandardSim/FourPostEval/` | Heave and roll four-post workflow |
-| `_3_StandardSim/Build/` | OpenModelica executables and generated build artifacts |
+| `_3_StandardSim/BuildBobLib/` | OpenModelica executables and generated build artifacts |
 | `_3_StandardSim/results/` | Public reports and metrics CSVs |
 | `_3_StandardSim/generated_results/` | App-registered reports and metrics CSVs |
 
@@ -56,10 +56,12 @@ Each card opens a run modal with editable config fields, saved config controls,
 
 | Command | Builds | Output directory |
 | :-- | :-- | :-- |
-| `make standard-build` | `BobLibVehicleInterfaces.Experiments.Standards.VehicleSim` | `_3_StandardSim/Build/VehicleSim/` |
-| `make standard-build-four-post` | `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim` | `_3_StandardSim/Build/FourPostSim/` |
+| `make standard-build` | `BobLib.Experiments.Standards.VehicleSim` | `_3_StandardSim/BuildBobLib/VehicleSim/` |
+| `make standard-build-four-post` | `BobLib.Experiments.Standards.FourPostSim` | `_3_StandardSim/BuildBobLib/FourPostSim/` |
 
-Both targets compile the selected checked-in BobLib Modelica entry point.
+Both targets compile the active generated BobLib Modelica entry point. The
+build scripts create the target directories before `buildModel(...)`, and the
+app also ensures the directories exist before invoking OpenModelica.
 
 ## Run Targets
 
@@ -107,6 +109,9 @@ The runner expects these files to exist:
 
 If either file is missing, rerun the matching build target.
 
+On Windows the executable may be written with an `.exe` suffix. BobSim checks
+for both forms.
+
 ## RampSteerEval
 
 RampSteerEval characterizes open-loop steering ramp behavior using the unified
@@ -133,8 +138,8 @@ Current config highlights:
 
 | Key | Current role |
 | :-- | :-- |
-| `simulation.exec_name` | `BobLibVehicleInterfaces.Experiments.Standards.VehicleSim` |
-| `simulation.build_dir` | `_3_StandardSim/Build/VehicleSim` |
+| `simulation.exec_name` | `BobLib.Experiments.Standards.VehicleSim` |
+| `simulation.build_dir` | `_3_StandardSim/BuildBobLib/VehicleSim` |
 | `simulation.init_parameters.useMode` | `0`, open-loop ramp steer |
 | `simulation.extra_args` | includes `-jacobian=internalNumerical` |
 | `sweep.testVels` | `12.5`, `15.0`, `17.5`, `20.0` m/s |
@@ -166,7 +171,7 @@ Current config highlights:
 
 | Key | Current role |
 | :-- | :-- |
-| `simulation.exec_name` | `BobLibVehicleInterfaces.Experiments.Standards.VehicleSim` |
+| `simulation.exec_name` | `BobLib.Experiments.Standards.VehicleSim` |
 | `simulation.extra_args` | includes `-jacobian=internalNumerical` |
 | `test.testVel` | `15.0` and `20.0` m/s velocity groups |
 | `test.run_step` | enables representative step-steer cases |
@@ -196,14 +201,14 @@ time, overshoot, gain, phase, equivalent lag, and frequency-response trends.
 ## FourPostEval
 
 FourPostEval evaluates suspension and chassis response through heave and roll
-sweeps using `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim`.
+sweeps using `BobLib.Experiments.Standards.FourPostSim`.
 
 Current config highlights:
 
 | Key | Current role |
 | :-- | :-- |
-| `simulation.exec_name` | `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim` |
-| `simulation.build_dir` | `_3_StandardSim/Build/FourPostSim` |
+| `simulation.exec_name` | `BobLib.Experiments.Standards.FourPostSim` |
+| `simulation.build_dir` | `_3_StandardSim/BuildBobLib/FourPostSim` |
 | `simulation.extra_args` | includes `-jacobian=internalNumerical` |
 | `procedure.heaveMagnitude` | `0.03` m |
 | `procedure.rollMagnitude` | `0.035` rad |

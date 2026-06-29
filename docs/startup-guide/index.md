@@ -13,7 +13,7 @@ are starting.
 
 | Start here | Use it when | First outcome |
 | :-- | :-- | :-- |
-| [BobDyn/BobLib Startup](/startup-guide/boblib) | You want to inspect, edit, translate, or test the Modelica vehicle library directly | A local BobLib checkout that loads `BobLibVehicleInterfaces` in OpenModelica |
+| [BobDyn/BobLib Startup](/startup-guide/boblib) | You want to inspect, edit, translate, or test the Modelica vehicle library directly | A local BobLib checkout that loads `BobLib` in OpenModelica |
 | [BobDyn/BobSim Startup](/startup-guide/bobsim) | You want the complete simulation workspace for setup, cases, sweeps, reports, plots, metrics, and batch studies | The BobSim app launched with a vehicle saved, written to MBD, and ready to simulate |
 
 ## How The Pieces Fit

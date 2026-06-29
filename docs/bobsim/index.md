@@ -10,9 +10,11 @@ takes BobDyn/BobLib Modelica vehicle models, builds OpenModelica executables,
 runs repeatable studies, extracts signals, computes metrics, renders plots, and
 writes public review artifacts.
 
-The normal entry point is the local BobSim app. Use it to configure the active
-vehicle, write the generated Modelica definition, launch StandardSim workflows,
-and inspect reports, metrics, logs, and saved result snapshots.
+The normal entry point is the BobSim app. Use the released desktop executable
+for day-to-day work, or run the same app from a source checkout when developing.
+It configures the active vehicle, writes the generated Modelica definition,
+launches StandardSim workflows, and inspects reports, metrics, logs, and saved
+result snapshots.
 
 Use BobDyn/BobSim when the question is about vehicle response: how the car
 behaves in a standard maneuver, which limit is active, how a parameter change
@@ -85,7 +87,14 @@ flowchart TB
 
 ## Quick Start
 
-Launch the app:
+For normal use, download the BobSim desktop asset for your operating system
+from the [GitHub Release](https://github.com/BobDyn/BobSim/releases/latest),
+extract it, and run `BobSim`.
+
+The desktop app bundles the Python backend and browser frontend. OpenModelica
+and generated simulation executables stay local to the user's machine.
+
+For source-checkout development, launch the app with:
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
@@ -135,7 +144,8 @@ BobSim's make targets are intentionally compact and prefix-driven:
 
 | Area | Primary commands | Purpose |
 | :-- | :-- | :-- |
-| App | `make app` | Launch the local browser workbench |
+| App | `make app` | Launch the source-checkout browser workbench |
+| Deploy | `make deploy`, `make deploy-release` | Build the native BobSim desktop artifact for the current OS |
 | Docker | `make docker-build`, `make docker-rebuild` | Build the reproducible OpenModelica/Python environment |
 | Shells | `make shell`, `make shell-standard`, `make shell-envelope`, `make shell-opt` | Open interactive workflow contexts |
 | StandardSim | `make standard-build`, `make standard-eval-all` | Build and run high-fidelity Modelica evaluations |
@@ -166,11 +176,8 @@ In-progress tooling:
 
 ## What To Run First
 
-For a first user workflow:
-
-```bash
-make app
-```
+For a first user workflow, launch the downloaded `BobSim` executable or run
+`make app` from a source checkout.
 
 Then run through:
 

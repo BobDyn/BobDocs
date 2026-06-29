@@ -11,6 +11,12 @@ powertrain inputs.
 
 ![BobSim Geometry setup preview showing hardpoints, suspension links, and kinematic plot controls](/images/bobsim/app-setup-geometry.png)
 
+Tire setup has a dedicated preview path for `.tir` data. The `Load maps` tab
+renders pure longitudinal, pure lateral, combined longitudinal, and combined
+lateral tire force surfaces from the active tire evaluation.
+
+![BobSim Tires setup preview showing pure and combined slip tire load-map surfaces](/images/bobsim/app-setup-tires.png)
+
 Use OMEdit when you want to inspect the integrated Modelica diagrams, view
 Modelica animation, and verify vehicle motion through the standard Modelica
 toolchain.

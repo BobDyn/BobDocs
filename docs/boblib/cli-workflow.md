@@ -29,14 +29,12 @@ Important targets:
 | `make lint` | Run Ruff over the Python test harness |
 | `make test-python` | Run Python coverage and regression harness tests |
 | `make modelica-deps` | Install OpenModelica library dependencies |
-| `make modelica-translation` | Translate legacy standards and legacy `BobLib.Tests` fixtures |
-| `make modelica-initialization` | Initialize legacy fixtures and compare the baseline CSV |
-| `make modelica-regression` | Simulate signal-level regressions and smoke-check `BobLibVehicleInterfaces` |
+| `make modelica-translation` | Translate standard entry points and `BobLibTest` fixtures |
+| `make modelica-initialization` | Initialize `BobLibTest` fixtures and compare the baseline CSV |
+| `make modelica-regression` | Simulate signal-level regressions and smoke-check BobLib/BobLibTest |
 | `make test-modelica` | Run all Modelica checks |
 | `make test` | Run Python and Modelica checks |
 | `make ci` | Run the full local CI suite |
-
-During the transition, `make test` intentionally checks both packages.
 
 For public release confidence, run:
 
@@ -57,8 +55,8 @@ Then in the OpenModelica prompt:
 ```txt
 loadModel(Modelica, {"4.1.0"});
 loadModel(VehicleInterfaces, {"2.0.2"});
-loadFile("BobLibVehicleInterfaces/package.mo");
-loadFile("BobLibVehicleInterfacesTests/package.mo");
+loadFile("BobLib/package.mo");
+loadFile("Tests/BobLibTest/package.mo");
 getErrorString();
 ```
 
@@ -72,8 +70,8 @@ To translate and build the active maneuver simulation without running it:
 ```txt
 loadModel(Modelica, {"4.1.0"});
 loadModel(VehicleInterfaces, {"2.0.2"});
-loadFile("BobLibVehicleInterfaces/package.mo");
-buildModel(BobLibVehicleInterfaces.Experiments.Standards.VehicleSim);
+loadFile("BobLib/package.mo");
+buildModel(BobLib.Experiments.Standards.VehicleSim);
 getErrorString();
 ```
 
@@ -82,32 +80,32 @@ To simulate the checked-in active package as-is:
 ```txt
 loadModel(Modelica, {"4.1.0"});
 loadModel(VehicleInterfaces, {"2.0.2"});
-loadFile("BobLibVehicleInterfaces/package.mo");
-simulate(BobLibVehicleInterfaces.Experiments.Standards.VehicleSim);
+loadFile("BobLib/package.mo");
+simulate(BobLib.Experiments.Standards.VehicleSim);
 getErrorString();
 ```
 
 The same pattern works for:
 
 ```text
-BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
+BobLib.Experiments.Standards.FourPostSim
 ```
 
 ## Static Vehicle Templates
 
 Vehicle architectures are checked in as Modelica records, subsystem models,
-four-post adapters, and standard templates. The default integrated entry points
-are:
+four-post adapters, and standard templates. The default entry points are:
 
 ```text
-BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
-BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
+BobLib.Experiments.Standards.VehicleSim
+BobLib.Experiments.Standards.FourPostSim
 ```
 
 They extend or redeclare templates under:
 
 ```text
-BobLibVehicleInterfaces.Experiments.Standards.Templates
+BobLib.Experiments.Standards.Templates.Vehicle
+BobLib.Experiments.Standards.Templates.FourPost
 ```
 
 To switch the front-facing vehicle architecture, update `VehicleSim.mo` or
@@ -149,8 +147,8 @@ cat > "$RUN_DIR/build_vehicle_sim.mos" <<MOS
 OpenModelica.Scripting.cd("$RUN_DIR");
 loadModel(Modelica, {"4.1.0"});
 loadModel(VehicleInterfaces, {"2.0.2"});
-loadFile("$BOBLIB_ROOT/BobLibVehicleInterfaces/package.mo");
-buildModel(BobLibVehicleInterfaces.Experiments.Standards.VehicleSim);
+loadFile("$BOBLIB_ROOT/BobLib/package.mo");
+buildModel(BobLib.Experiments.Standards.VehicleSim);
 getErrorString();
 MOS
 ```
@@ -165,8 +163,8 @@ Run the generated executable from the same scratch directory:
 
 ```bash
 cd /tmp/BobLibVehicleSim
-./BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
+./BobLib.Experiments.Standards.VehicleSim
 ```
 
 For the four-post model, use a separate scratch directory and replace the model
-class with `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim`.
+class with `BobLib.Experiments.Standards.FourPostSim`.

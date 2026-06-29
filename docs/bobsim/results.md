@@ -119,8 +119,8 @@ when debugging a failed case.
 Typical retained paths:
 
 ```text
-_3_StandardSim/Build/VehicleSim/results/run_<id>/
-_3_StandardSim/Build/FourPostSim/results/run_<id>/
+_3_StandardSim/BuildBobLib/VehicleSim/results/run_<id>/
+_3_StandardSim/BuildBobLib/FourPostSim/results/run_<id>/
 ```
 
 ## Build Artifacts
@@ -128,23 +128,26 @@ _3_StandardSim/Build/FourPostSim/results/run_<id>/
 OpenModelica build outputs live under:
 
 ```text
-_3_StandardSim/Build/VehicleSim/
-_3_StandardSim/Build/FourPostSim/
+_3_StandardSim/BuildBobLib/VehicleSim/
+_3_StandardSim/BuildBobLib/FourPostSim/
 ```
 
 The two files the runner needs are:
 
 ```text
-BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
-BobLibVehicleInterfaces.Experiments.Standards.VehicleSim_init.xml
+BobLib.Experiments.Standards.VehicleSim
+BobLib.Experiments.Standards.VehicleSim_init.xml
 ```
 
 or:
 
 ```text
-BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
-BobLibVehicleInterfaces.Experiments.Standards.FourPostSim_init.xml
+BobLib.Experiments.Standards.FourPostSim
+BobLib.Experiments.Standards.FourPostSim_init.xml
 ```
+
+Windows builds may include an `.exe` suffix on the executable. The init XML
+keeps the same `<exec_name>_init.xml` naming.
 
 Generated C files, object files, makefiles, binary Jacobian data, logs, and
 runtime support files may also be present.

@@ -29,7 +29,9 @@ debugging, and OMEdit diagram inspection.
 
 ## Daily App Workflow
 
-Launch the app from the BobSim root:
+Launch the released desktop app by running `BobSim`.
+
+From a source checkout, launch the app from the BobSim root:
 
 ```bash
 make app
@@ -48,8 +50,9 @@ The normal BobSim loop is:
    Aero, and Powertrain.
 3. Click `Save Vehicle`.
 4. Click `Write to MBD`.
-5. Open `Simulation`, choose a workflow, configure it, then `Build + Run`.
-6. Open `Results` to review, plot, and save the active outputs.
+5. Verify the OpenModelica toolchain if Simulation asks for it.
+6. Open `Simulation`, choose a workflow, configure it, then `Build + Run`.
+7. Open `Results` to review, plot, and save the active outputs.
 
 The app keeps the public workflow visible: vehicle setup on the left rail,
 simulation launch in the middle, and result review after the run.
@@ -78,6 +81,12 @@ guided path, or jump directly with the parameter tabs.
 
 ![BobSim Geometry setup step with hardpoint editors and vehicle preview](/images/bobsim/app-setup-geometry.png)
 
+The Tires step has its own preview mode. Use the `Setup` tab for tire
+assignment and the `Load maps` tab to inspect the live pure/combined tire force
+surfaces.
+
+![BobSim Tires setup step with load-map controls and live pure and combined slip tire surface preview](/images/bobsim/app-setup-tires.png)
+
 When edits are ready:
 
 ```text
@@ -87,6 +96,10 @@ Save Vehicle -> Write to MBD -> Simulation
 `Write to MBD` generates the Modelica vehicle definition used by StandardSim.
 The top status strip shows whether BobLib is initialized, the vehicle
 definition is current, and the `VehicleSim` and `FourPostSim` builds are ready.
+
+The released desktop app stores generated vehicles, builds, configs, and
+results in the per-user BobSim runtime directory instead of inside the
+downloaded executable. Source checkouts use the repository working directory.
 
 ## Simulation View
 
@@ -113,6 +126,12 @@ If you change a run config in the modal, click `Apply Edits` before running.
 Use `Save Config` when the same run setup should be reused later.
 
 ![BobSim simulation configuration modal with run config controls and Build and Run button](/images/bobsim/app-simulation-config.png)
+
+Simulation requires a verified OpenModelica toolchain. BobSim auto-detects
+common installs and lets you manually select the `omc` executable plus the
+OpenModelica library directory when needed. The usual user library directories
+are `%APPDATA%\.openmodelica\libraries` on Windows and
+`~/.openmodelica/libraries` on macOS/Linux.
 
 ## Results View
 
@@ -256,8 +275,10 @@ If a simulation fails in the app:
 2. Check `Run Log`.
 3. Confirm the top status strip is green enough for the workflow you are
    running.
-4. Set `execution.cleanup: false` in the run config if you need raw artifacts.
-5. Rerun and inspect the retained run directory.
+4. Confirm the OpenModelica toolchain selector shows a verified `omc` and
+   library directory.
+5. Set `execution.cleanup: false` in the run config if you need raw artifacts.
+6. Rerun and inspect the retained run directory.
 
 If a simulation fails from the CLI:
 

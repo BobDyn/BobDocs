@@ -25,19 +25,19 @@ cd BobLib
 ```
 
 In the rest of the BobLib docs, "repository root" means this `BobLib`
-directory, which currently contains both packages during the transition:
+directory, which contains the production package, test package, Python harness,
+and helper make targets:
 
 ```text
 BobLib/package.mo
-BobLibVehicleInterfaces/package.mo
-BobLibVehicleInterfacesTests/package.mo
+Tests/BobLibTest/package.mo
 Tests/
 makefile
 msl_setup.mos
 ```
 
-`BobLibVehicleInterfaces` is the integrated replacement package. The older
-`BobLib` package remains available until the final rename.
+`BobLib/package.mo` is the production Modelica package. `Tests/BobLibTest` is
+the sibling Modelica package for regression and component fixtures.
 
 ## OpenModelica Prerequisites
 
@@ -65,7 +65,7 @@ make modelica-deps
 ```
 
 That target runs `omc msl_setup.mos`. VehicleInterfaces `2.0.2` must also be
-installed in the OpenModelica package manager for the integrated package checks.
+installed in the OpenModelica package manager for BobLib checks.
 
 Verify:
 
@@ -109,11 +109,11 @@ For a smaller first check:
 
 ```bash
 make modelica-translation PYTHON=.venv/bin/python
-python -m pytest Tests/test_boblibvehicleinterfaces_modelica.py
+python -m pytest Tests/test_boblib_modelica.py
 ```
 
-The full test target verifies the legacy package and the integrated
-`BobLibVehicleInterfaces` package during the transition.
+The full test target verifies BobLib standards plus the `Tests/BobLibTest`
+regression and component fixtures.
 
 ## BobSim Submodule Path
 

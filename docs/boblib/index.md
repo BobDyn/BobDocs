@@ -9,15 +9,13 @@ next:
 # BobDyn/BobLib
 
 BobDyn/BobLib is the low-level Modelica vehicle model layer for BobDyn. The
-current integration work moves BobLib onto the public
-`VehicleInterfaces 2.0.2` contract while retaining BobLib's detailed chassis,
-suspension, tire, aero, powertrain, and control physics.
+active package is `BobLib`: a standalone VehicleInterfaces-aligned library
+that retains BobLib's detailed chassis, suspension, tire, aero, powertrain, and
+control physics.
 
-::: info Transition package name
-During the replacement window, the integrated package lives in the BobLib
-repository as `BobLibVehicleInterfaces`. It is intended to replace the older
-`BobLib` package; until the final rename, documentation examples use the
-current `BobLibVehicleInterfaces.*` class names.
+::: info Current package name
+Current examples use `BobLib.*` class names. Modelica regression and component
+fixtures live in the sibling `Tests/BobLibTest` package.
 :::
 
 Use BobDyn/BobLib when you want to inspect, modify, translate, simulate, or
@@ -52,8 +50,8 @@ vehicle studies.
 - `Experiments.Standards.VehicleSim` and `Experiments.Standards.FourPostSim`
   are the front-facing simulation entry points
 - `headless=false` by default so OMEdit examples open with animation visible
-- Root tests cover both the legacy package and the integrated
-  `BobLibVehicleInterfaces` package during the transition
+- Root tests cover BobLib standards plus the `Tests/BobLibTest` regression and
+  component fixtures
 
 ## Operating Model
 
@@ -68,7 +66,8 @@ Vehicle selection is plain Modelica. The standard entry points extend checked-in
 templates under:
 
 ```text
-BobLibVehicleInterfaces.Experiments.Standards.Templates
+BobLib.Experiments.Standards.Templates.Vehicle
+BobLib.Experiments.Standards.Templates.FourPost
 ```
 
 Those templates expose the complete record and subsystem redeclare set so users
@@ -104,9 +103,8 @@ make test PYTHON=.venv/bin/python
 ```
 
 That target runs Python checks, OpenModelica translation checks, initialization
-baselines, signal-level regressions, and the `BobLibVehicleInterfaces` smoke
-checks. The Modelica checks load Modelica `4.1.0`; the integrated package also
-loads VehicleInterfaces `2.0.2`.
+baselines, signal-level regressions, and BobLib smoke checks. The Modelica
+checks load Modelica `4.1.0` and VehicleInterfaces `2.0.2`.
 
 ## Documentation Map
 
@@ -124,8 +122,7 @@ loads VehicleInterfaces `2.0.2`.
 
 ## Maturity Notes
 
-- The integrated package is the replacement direction for BobLib, but the old
-  `BobLib` package remains in the repository until the final cleanup/rename.
+- `BobLib` is the current standalone package root.
 - Public subsystem models should enter through the VehicleInterfaces-style
   top-level domains. Reusable physics can live deeper within each domain.
 - Public release confidence comes from the root CI harness plus BobSim's

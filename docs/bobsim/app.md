@@ -8,7 +8,16 @@ title: BobSim App
 The BobSim app is the primary user interface for local vehicle setup,
 simulation launch, result review, and saved run organization.
 
-Start it from the BobSim root:
+There are two normal launch paths.
+
+For the released desktop app, download the BobSim asset for your operating
+system from the [GitHub Release](https://github.com/BobDyn/BobSim/releases/latest),
+extract it, and run `BobSim`. The desktop app bundles the Python backend and
+browser frontend. It does not bundle
+OpenModelica or prebuilt simulation executables; those are selected and built
+locally on the user's machine.
+
+For a source checkout, start it from the BobSim root:
 
 ```bash
 make app
@@ -25,6 +34,24 @@ Use a direct command when you need a different host or port:
 ```bash
 python -m _5_App.app --host 127.0.0.1 --port 8766
 ```
+
+## Desktop Runtime Data
+
+The desktop app seeds a writable BobSim runtime workspace on first launch. User
+vehicles, generated Modelica definitions, local OpenModelica builds, saved
+configs, and saved results live there instead of inside the downloaded
+executable.
+
+Default runtime roots:
+
+| Platform | Default runtime root |
+| :-- | :-- |
+| Windows | `%LOCALAPPDATA%\BobDyn\BobSim` |
+| macOS | `~/Library/Application Support/BobDyn/BobSim` |
+| Linux | `${XDG_DATA_HOME:-~/.local/share}/BobDyn/BobSim` |
+
+Set `BOBSIM_HOME` to choose a different runtime root. `BOBDYN_HOME` is still
+honored for compatibility with earlier local builds.
 
 ## What The App Owns
 
@@ -67,6 +94,8 @@ short reference panel.
 
 ![BobSim Geometry setup step with hardpoint coordinate fields and live suspension preview](/images/bobsim/app-setup-geometry.png)
 
+![BobSim Tires setup step with tire load controls, .tir parameter editor, and live tire surface preview](/images/bobsim/app-setup-tires.png)
+
 Before running simulations:
 
 1. Click `Save Vehicle`.
@@ -105,6 +134,31 @@ from the card. The run log is the first place to look for OpenModelica,
 dependency, or simulation failures.
 
 ![BobSim Ramp Steer configuration modal with run setup fields and Build and Run action](/images/bobsim/app-simulation-config.png)
+
+## OpenModelica Toolchain
+
+Simulation is available after BobSim verifies an OpenModelica toolchain. The
+app auto-detects common installs, then exposes a toolchain selector when manual
+selection is needed.
+
+Select:
+
+| Field | Use |
+| :-- | :-- |
+| `omc` executable | The OpenModelica compiler executable, or its `bin` directory |
+| OpenModelica home | Optional install root; often inferred from `omc` |
+| Library directory | Directory containing packages such as `Modelica` and `VehicleInterfaces` |
+
+Common library defaults:
+
+| Platform | Typical library directory |
+| :-- | :-- |
+| Windows | `%APPDATA%\.openmodelica\libraries` |
+| macOS | `~/.openmodelica/libraries` |
+| Linux | `~/.openmodelica/libraries` |
+
+The selector verifies `omc --version` and checks that required libraries are
+present before Simulation unlocks.
 
 ## Results
 
@@ -159,8 +213,9 @@ Setup -> Save Vehicle -> Write to MBD -> Simulation -> Results
 
 `Simulation` is disabled
 
-Save the vehicle, then click `Write to MBD`. The Simulation view is locked
-until the saved vehicle definition is current.
+Save the vehicle, click `Write to MBD`, and verify the OpenModelica toolchain.
+Simulation is locked until the saved vehicle definition is current and the
+external toolchain is ready.
 
 `Write to MBD` is disabled
 
@@ -177,8 +232,9 @@ python -m pip install -r requirements.txt
 
 `omc: command not found`
 
-Install OpenModelica locally, or run scripted CLI workflows from the Docker
-environment.
+Open Simulation's OpenModelica toolchain selector and choose the `omc`
+executable plus the library directory. If you are using the source checkout,
+scripted CLI workflows can also run from the Docker environment.
 
 No output appears in `Review`
 

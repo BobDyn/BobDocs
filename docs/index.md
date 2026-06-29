@@ -197,7 +197,11 @@ for a wider view.
 
 ## Minimal Worked Example
 
-The fastest user path launches the BobSim app:
+The fastest user path downloads the BobSim desktop app from the
+[GitHub Release](https://github.com/BobDyn/BobSim/releases/latest), extracts
+it, and runs `BobSim`.
+
+For source-checkout development, launch the same app locally:
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git

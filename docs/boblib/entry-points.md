@@ -14,7 +14,7 @@ next:
 BobLib standard entry points are Modelica models intended for BobSim workflows
 and direct OpenModelica experiments.
 
-## `BobLibVehicleInterfaces.Experiments.Standards.VehicleSim`
+## `BobLib.Experiments.Standards.VehicleSim`
 
 `VehicleSim` is the main maneuver simulation wrapper. It follows the
 VehicleInterfaces demo-style stack while inserting BobLib's detailed physics
@@ -66,15 +66,15 @@ Common output variables include:
 - `rightSteerAngle`
 - `Fz_FL`, `Fz_FR`, `Fz_RL`, `Fz_RR`
 
-BobSim uses this entry point for SteadyStateEval and TransientEval once the
-integrated package replaces the legacy standard model.
+BobSim uses this entry point for RampSteer, SteadyStateEval, and TransientEval
+workflows.
 
 ## Tire Transients
 
-Integrated vehicle wrappers redeclare the MF52 tire slip model to:
+Vehicle wrappers can redeclare the MF52 tire slip model to:
 
 ```text
-BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlip
+BobLib.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlip
 ```
 
 for front-left, front-right, rear-left, and rear-right tires. The transient slip
@@ -88,7 +88,7 @@ pVehicle.pRrTireModel.relaxation
 The relaxation data is encoded in:
 
 ```text
-BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.RelaxationRecord
+BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.RelaxationRecord
 ```
 
 If the relaxation coefficients are not populated, the transient slip model
@@ -96,7 +96,7 @@ falls back to default longitudinal and lateral relaxation lengths.
 
 ## Animation And Batch Runs
 
-The integrated package uses:
+BobLib standard models use:
 
 ```text
 inner parameter Boolean headless = false
@@ -106,7 +106,7 @@ by default on the public simulation paths. This means OMEdit examples open with
 MultiBody animation geometry visible. Set `headless=true` for batch or CI runs
 where visualization geometry is not needed.
 
-## `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim`
+## `BobLib.Experiments.Standards.FourPostSim`
 
 `FourPostSim` isolates suspension/chassis response for heave and roll sweeps.
 It extends a static four-post architecture template and uses
@@ -118,5 +118,5 @@ Common output records:
 - `frKnC`
 - `rrKnC`
 
-BobSim uses this entry point for FourPostEval and downstream suspension metrics
-once the integrated package replaces the legacy standard model.
+BobSim uses this entry point for FourPostEval and downstream suspension
+metrics.

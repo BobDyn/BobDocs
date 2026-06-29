@@ -41,36 +41,36 @@ when you need the GUI.
    ![OMEdit File menu with Open Model/Library File(s) highlighted](/images/omedit/open-library-menu.png)
 
 3. In the file chooser, browse to the BobLib repository if needed, select the
-   integrated package entry point, and open it:
+   package entry point, and open it:
 
    ```text
-   BobLibVehicleInterfaces/package.mo
+   BobLib/package.mo
    ```
 
-   ![OMEdit file chooser with BobLibVehicleInterfaces package.mo selected](/images/omedit/open-library-file-dialog.png)
+   ![OMEdit file chooser with BobLib package.mo selected](/images/omedit/open-library-file-dialog.png)
 
 4. In the Libraries browser, expand:
 
    ```text
-   BobLibVehicleInterfaces > Experiments > Standards
+   BobLib > Experiments > Standards
    ```
 
 5. Start with one of the standard experiment models:
 
    ```text
-   BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
-   BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
+   BobLib.Experiments.Standards.VehicleSim
+   BobLib.Experiments.Standards.FourPostSim
    ```
 
    ![OMEdit Libraries browser with VehicleSim selected](/images/omedit/library-vehicle-sim-traversal.png)
 
 6. If OMEdit reports a missing `Modelica` or `VehicleInterfaces` package,
    install the missing library, restart OMEdit, and reload
-   `BobLibVehicleInterfaces/package.mo`.
+   `BobLib/package.mo`.
 
 ## Run Locally In OMEdit
 
-1. Start OMEdit and load `BobLibVehicleInterfaces/package.mo`.
+1. Start OMEdit and load `BobLib/package.mo`.
 2. Set a scratch working directory from `Tools > Options > General`, for example:
 
    ```text
@@ -80,8 +80,8 @@ when you need the GUI.
 3. Open one of the standard models:
 
    ```text
-   BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
-   BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
+   BobLib.Experiments.Standards.VehicleSim
+   BobLib.Experiments.Standards.FourPostSim
    ```
 
 4. Use `Check Model` as a lightweight package/model sanity check.
@@ -103,7 +103,7 @@ model's scratch directory and simulate again.
 
 ## Animation
 
-The public integrated standard models default to animation visible:
+The public standard models default to animation visible:
 
 ```text
 inner parameter Boolean headless = false

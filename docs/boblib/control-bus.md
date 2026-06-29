@@ -27,7 +27,7 @@ Typical vehicle-level wiring:
 
 ```txt
 VehicleInterfaces.Interfaces.ControlBus controlBus;
-BobLibVehicleInterfaces.Atmospheres.Interfaces.AtmosphereBus atmosphereBus;
+BobLib.Atmospheres.Interfaces.AtmosphereBus atmosphereBus;
 
 connect(controlBus, chassis.controlBus);
 connect(controlBus, brakes.controlBus);
@@ -68,12 +68,12 @@ The nested buses are the shared names that other standard subsystems can see:
 VehicleInterfaces 2.0.2 atmosphere interfaces do not include a control-bus
 connector. BobLib keeps the stock `controlBus` compatible with ordinary
 VehicleInterfaces subsystems and adds a sibling
-`BobLibVehicleInterfaces.Atmospheres.Interfaces.AtmosphereBus` for
+`BobLib.Atmospheres.Interfaces.AtmosphereBus` for
 atmosphere-owned measurements.
 
 ## Broadcast/Subscribe Rule
 
-The BobLibVehicleInterfaces convention is:
+The BobLib convention is:
 
 - the subsystem that owns a value publishes it on its VehicleInterfaces domain
   bus
@@ -197,7 +197,7 @@ as control telemetry. Raw frames and force paths should stay physical.
 
 ## BobLib Split
 
-For BobLibVehicleInterfaces, use this split:
+For BobLib, use this split:
 
 | Signal path | Use it for |
 | :-- | :-- |

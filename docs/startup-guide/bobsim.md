@@ -11,9 +11,9 @@ next:
 
 # BobDyn/BobSim Startup
 
-Use this guide to launch BobDyn/BobSim from the local browser app, choose or
-create a vehicle, write the generated Modelica vehicle definition, run the first
-simulation, and inspect the result artifacts.
+Use this guide to launch BobDyn/BobSim from the desktop app or local browser
+app, choose or create a vehicle, write the generated Modelica vehicle
+definition, run the first simulation, and inspect the result artifacts.
 
 ::: tip Start with the app
 The BobSim app is the recommended first path. It guides setup, shows the active
@@ -35,19 +35,35 @@ BobDyn/BobSim vendors BobDyn/BobLib as a submodule at
 
 Install these first:
 
-- Git
-- Python 3 with `venv` and `pip`
-- OpenModelica if you want to build or run simulations from the app
+- OpenModelica if you want to build or run simulations
+- Git and Python 3 with `venv` and `pip` if you are running from source
 - Docker and Docker Compose if you want the reproducible CLI workflow
 
-The app itself is a local Python web server. It can open and edit vehicle and
-run configs with Python dependencies installed. Building `VehicleSim` or
-`FourPostSim` from the app also requires `omc` to be available on the same
-shell path that launched the app.
+The released desktop app bundles the Python backend and browser frontend. It
+does not bundle OpenModelica or prebuilt simulation executables; those are
+selected and generated locally. The source checkout path runs the same app with
+your local Python environment.
 
-## Step 1: Clone BobSim
+## Step 1: Get BobSim
 
-Clone with submodules:
+For the released desktop app, download the BobSim asset for your operating
+system from the [GitHub Release](https://github.com/BobDyn/BobSim/releases/latest),
+extract it, and run `BobSim`.
+
+The app creates its runtime workspace in the normal per-user application data
+location:
+
+| Platform | Default runtime root |
+| :-- | :-- |
+| Windows | `%LOCALAPPDATA%\BobDyn\BobSim` |
+| macOS | `~/Library/Application Support/BobDyn/BobSim` |
+| Linux | `${XDG_DATA_HOME:-~/.local/share}/BobDyn/BobSim` |
+
+Set `BOBSIM_HOME` if you want to place generated vehicles, builds, configs,
+and results somewhere else.
+
+For development or scripted CLI work, clone with submodules:
+
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
@@ -61,7 +77,9 @@ BobSim root:
 make init
 ```
 
-## Step 2: Prepare The Local App Environment
+## Step 2: Prepare The Source App Environment
+
+Skip this step when you are using the released desktop app.
 
 Create and activate a local Python environment:
 
@@ -79,13 +97,15 @@ python -c "import yaml, scipy, pandas, matplotlib; print('python deps ok')"
 omc --version
 ```
 
-If `omc --version` fails, the app can still be used for setup work, but
-simulation builds and runs will fail until OpenModelica is installed and on
-`PATH`.
+If `omc --version` fails from the shell, the app can still be used for setup
+work. Simulation builds and runs will stay locked until OpenModelica is
+auto-detected or selected in the app.
 
 ## Step 3: Launch The App
 
-Start the browser app:
+For the released desktop app, run `BobSim`.
+
+For a source checkout, start the browser app:
 
 ```bash
 make app
@@ -140,13 +160,19 @@ step.
 
 ![BobSim Setup view on the Geometry step with hardpoint fields, axle toggles, and kinematic preview](/images/bobsim/app-setup-geometry.png)
 
+The Tires step includes `.tir` assignment/editing plus a live load-map preview
+that redraws from the active tire evaluation.
+
+![BobSim Setup view on the Tires step with tire load controls, .tir editor, and live pure and combined slip load-map preview](/images/bobsim/app-setup-tires.png)
+
 ## Step 5: Save And Write To MBD
 
 Before Simulation unlocks:
 
 1. Click `Save Vehicle`.
 2. Click `Write to MBD`.
-3. Watch the top status strip.
+3. Verify the OpenModelica toolchain if Simulation asks for it.
+4. Watch the top status strip.
 
 The status strip tracks:
 
@@ -158,7 +184,17 @@ The status strip tracks:
 | `FourPostSim` | The four-post build is ready, missing, or stale |
 
 If `Write to MBD` is disabled, hover it for the reason. The usual fixes are
-initializing BobLib, saving the vehicle first, or installing OpenModelica.
+initializing BobLib or saving the vehicle first.
+
+If `Simulation` is disabled because OpenModelica is not ready, open the
+toolchain selector from Simulation and choose the `omc` executable plus the
+OpenModelica library directory. Common library defaults are:
+
+| Platform | Typical library directory |
+| :-- | :-- |
+| Windows | `%APPDATA%\.openmodelica\libraries` |
+| macOS | `~/.openmodelica/libraries` |
+| Linux | `~/.openmodelica/libraries` |
 
 ![BobSim Setup view showing the Save Vehicle and Write to MBD actions and top Modelica stack status](/images/bobsim/app-setup-architecture.png)
 
@@ -294,8 +330,9 @@ saved vehicle definition is current in the generated Modelica stack.
 
 `omc: command not found`
 
-Install OpenModelica locally, or use the Docker CLI targets for scripted
-workflow runs.
+Use the OpenModelica toolchain selector in the app to choose the `omc`
+executable and library directory. For source-checkout CLI work, install
+OpenModelica locally or use the Docker CLI targets for scripted workflow runs.
 
 `Executable not found` or `Init XML not found`
 

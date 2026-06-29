@@ -12,18 +12,18 @@ Common BobLib problems usually come from package loading, OpenModelica library
 resolution, stale template selections, initialization changes, or missing Python
 test dependencies.
 
-## OMEdit Cannot Find `BobLibVehicleInterfaces`
+## OMEdit Cannot Find `BobLib`
 
-Open `BobLibVehicleInterfaces/package.mo` directly with
+Open `BobLib/package.mo` directly with
 `File > Open Model/Library File(s)`. Loading the directory instead of the
 package file can confuse Modelica package discovery.
 
-During the transition, the older `BobLib/package.mo` may still load, but new
-development should target `BobLibVehicleInterfaces/package.mo`.
+If OMEdit opened an old session or a generated build directory, close it and
+open the repository package file again from a clean session.
 
 ## OMEdit Or `omc` Cannot Find Required Libraries
 
-The integrated package expects:
+BobLib expects:
 
 - Modelica Standard Library `4.1.0`
 - VehicleInterfaces `2.0.2`
@@ -50,14 +50,14 @@ getErrorString();
 Check which template or base model the front-facing entry point extends:
 
 ```text
-BobLibVehicleInterfaces/Experiments/Standards/VehicleSim.mo
-BobLibVehicleInterfaces/Experiments/Standards/FourPostSim.mo
+BobLib/Experiments/Standards/VehicleSim.mo
+BobLib/Experiments/Standards/FourPostSim.mo
 ```
 
 The available standard templates live under:
 
 ```text
-BobLibVehicleInterfaces/Experiments/Standards/Templates/
+BobLib/Experiments/Standards/Templates/
 ```
 
 If a class is missing from OMEdit or `omc`, confirm the relevant `package.order`
@@ -65,9 +65,9 @@ file includes the record, subsystem model, axle assembly, or template model.
 
 ## Translation Counts Changed
 
-`make modelica-translation` pins equation counts for the legacy public standards
-and key regression models. A count change is not automatically wrong, but it
-should be intentional.
+`make modelica-translation` checks the standard entry points, key regressions,
+and `BobLibTest` fixtures. A structural change is not automatically wrong, but
+it should be intentional.
 
 If the structural change is expected:
 
@@ -76,22 +76,22 @@ If the structural change is expected:
 3. Update the expected count in `Tests/modelica_translation_checks.py`.
 4. Run `make test PYTHON=.venv/bin/python`.
 
-## Integrated Smoke Check Failed
+## BobLib Smoke Check Failed
 
-Run the integrated package check directly:
+Run the package smoke check directly:
 
 ```bash
-python -m pytest Tests/test_boblibvehicleinterfaces_modelica.py -q
+python -m pytest Tests/test_boblib_modelica.py -q
 ```
 
 If it fails at load time, check MSL and VehicleInterfaces versions first. If it
 fails during `checkModel`, inspect the failing class under
-`BobLibVehicleInterfaces` or `BobLibVehicleInterfacesTests`.
+`BobLib` or `BobLibTest`.
 
 ## Initialization Baseline Changed
 
-`make modelica-initialization` compares legacy fixture initialization metrics
-against:
+`make modelica-initialization` compares `BobLibTest` fixture initialization
+metrics against:
 
 ```text
 Tests/modelica_initialization_baseline.csv
@@ -110,18 +110,18 @@ signals. Start by running the failing pytest directly:
 python -m pytest Tests/test_modelica_regression.py -q
 ```
 
-Then inspect the corresponding Modelica fixture under `BobLib/Tests/` or the
-integrated fixture under `BobLibVehicleInterfacesTests/`.
+Then inspect the corresponding Modelica fixture under `BobLib/` or
+`Tests/BobLibTest/`.
 
 ## OMEdit Opens But Diagrams Are Incomplete
 
-Reload `BobLibVehicleInterfaces/package.mo` and check `getErrorString()` for
+Reload `BobLib/package.mo` and check `getErrorString()` for
 missing package or class errors. If only the CLI package was installed on Linux,
 install the full OpenModelica GUI package set.
 
 If animation is unexpectedly heavy, set `headless=true` for the run. The public
-integrated examples default to `headless=false` so diagrams and animations are
-visible by default.
+examples default to `headless=false` so diagrams and animations are visible by
+default.
 
 ## Full-Vehicle Simulations Translate Slowly
 
@@ -129,9 +129,9 @@ Full multibody vehicle models are large. Slow translation is expected,
 especially for `VehicleSim` and `FourPostSim`.
 
 Use the BobSim build targets for repeated workflow runs so compiled artifacts
-are reused when inputs have not changed. Use `make modelica-translation` or the
-integrated pytest smoke check when you specifically want the regression
-guardrail.
+are reused when inputs have not changed. Use `make modelica-translation` or
+`python -m pytest Tests/test_boblib_modelica.py` when you specifically want the
+regression guardrail.
 
 ## Halfshaft Compliance Studies Run Slowly
 

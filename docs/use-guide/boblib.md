@@ -27,7 +27,7 @@ checkout. If you are inside BobSim, the same library lives at
    on.
 2. Edit Modelica models or records in the package that owns that physics.
 3. Run the BobLib checks.
-4. Load the integrated package in OMEdit or translate it with OpenModelica.
+4. Load BobLib in OMEdit or translate it with OpenModelica.
 5. Hand the model back to BobSim when you need full workflow runs, plots,
    metrics, or reports.
 
@@ -35,15 +35,14 @@ checkout. If you are inside BobSim, the same library lives at
 
 | Model or package | Use it for |
 | :-- | :-- |
-| `BobLibVehicleInterfaces.Experiments.Standards.VehicleSim` | Primary full-vehicle simulation entry point |
-| `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim` | Four-post and K&C-style simulation entry point |
-| `BobLibVehicleInterfaces.Experiments.Standards.Templates` | Explicit redeclare reference models for standard architectures |
-| `BobLibVehicleInterfaces.Records.VehicleDefn` | Complete vehicle records assembled from domain-owned records |
-| `BobLibVehicleInterfaces.Records.VehicleRecord` | Domain-level record schemas and parameter ownership |
+| `BobLib.Experiments.Standards.VehicleSim` | Primary full-vehicle simulation entry point |
+| `BobLib.Experiments.Standards.FourPostSim` | Four-post and K&C-style simulation entry point |
+| `BobLib.Experiments.Standards.Templates` | Explicit redeclare reference models for standard architectures |
+| `BobLib.Records.VehicleDefn` | Complete vehicle records assembled from domain-owned records |
+| `BobLib.Records.VehicleRecord` | Domain-level record schemas and parameter ownership |
 
-During the transition, documentation examples use `BobLibVehicleInterfaces.*`
-class names. The older `BobLib` package remains only until the final cleanup and
-rename.
+Regression and component fixtures live in the sibling `Tests/BobLibTest`
+Modelica package.
 
 ## Run Checks
 
@@ -65,17 +64,17 @@ aligned.
 
 ## Work Visually In OMEdit
 
-Load the integrated package:
+Load BobLib:
 
 ```text
-BobLibVehicleInterfaces/package.mo
+BobLib/package.mo
 ```
 
 Then open:
 
 ```text
-BobLibVehicleInterfaces.Experiments.Standards.VehicleSim
-BobLibVehicleInterfaces.Experiments.Standards.FourPostSim
+BobLib.Experiments.Standards.VehicleSim
+BobLib.Experiments.Standards.FourPostSim
 ```
 
 Use [OMEdit Workflow](/boblib/omedit-workflow) for the screenshot-guided path
