@@ -22,6 +22,8 @@ export default withMermaid(
 
     cleanUrls: true,
 
+    appearance: "force-dark",
+
     head: [["link", { rel: "icon", href: "/bobdyn.png" }]],
 
     markdown: {
