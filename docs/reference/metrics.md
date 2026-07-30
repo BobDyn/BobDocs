@@ -5,16 +5,16 @@ title: Vehicle Performance Metrics
 
 # Vehicle Performance Metrics
 
-Vehicle metrics are ways to characterize a physical system. They are not a
-single universal score, and they are not meaningful without the maneuver,
-operating region, signal definitions, and extraction method that produced them.
+Vehicle metrics characterize a physical system. None of them is a universal
+score, and none is meaningful without the maneuver, operating region, signal
+definitions, and extraction method that produced it.
 
-BobSim exports a practical set of metrics today. Those exported metrics are
-listed on this page, but they are not the end-all reference for vehicle
-characterization. Other metrics can be equally valid when they answer a clear
-engineering question and remain tied to the original vehicle response.
+BobSim exports a practical set of metrics today, listed below, but this isn't
+the end-all reference for vehicle characterization — other metrics are
+equally valid when they answer a clear engineering question and stay tied to
+the vehicle response they came from.
 
-The right question is not "which metric is best?" The right question is:
+The right question isn't "which metric is best?" It's:
 
 - what vehicle behavior is being characterized
 - what maneuver or data region supports the metric
@@ -35,8 +35,8 @@ A useful vehicle metric should define:
 | Units and sign convention | The physical direction and scaling of the reported value |
 | Coverage | Where the data supports the claim and where it does not |
 
-The same number can mean different things if the maneuver or extraction method
-changes. A steering gradient from a ramp-steer path is not automatically the
+The same number can mean different things depending on maneuver or extraction
+method — a steering gradient from a ramp-steer path isn't automatically the
 same as a trim steering gradient from a YMD map.
 
 ## Current BobSim Metric Families
@@ -189,8 +189,8 @@ Useful related metrics people may compute:
 ## Envelope And Limit Metrics
 
 Envelope metrics describe capability limits from reduced-order calculations.
-They are useful when they remain tied to the physical system and are not treated
-as a replacement for high-fidelity response validation.
+They're useful as long as they stay tied to the physical system rather than
+replacing high-fidelity response validation.
 
 ### GGV Metrics
 
