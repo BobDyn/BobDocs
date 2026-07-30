@@ -1,20 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+import type { Chart as ChartType } from "chart.js";
+import { loadChart, buildResponseChartConfig } from "../composables/responseChart";
 
-const canvasRef = ref(null);
+const canvasRef = ref<HTMLCanvasElement | null>(null);
 const isRunning = ref(false);
-let chart = null;
-let animTimer = null;
+let chart: ChartType | null = null;
+let animTimer: ReturnType<typeof setInterval> | undefined;
 let frame = 0;
-let responseData = [];
-
-const COLORS = {
-    brand: "#4ea1ff",
-    brandFill: "rgba(78, 161, 255, 0.08)",
-    muted: "#7f8796",
-    text: "#c9cdd4",
-    grid: "#242a38",
-};
+let responseData: number[] = [];
 
 function simulate() {
     const dt = 0.04,
@@ -54,8 +48,8 @@ function pause() {
 function resetAnim() {
     pause();
     frame = 0;
-    chart.data.datasets[1].data = [];
-    chart.update("none");
+    chart!.data.datasets[1].data = [];
+    chart!.update("none");
 }
 
 function tick() {
@@ -65,79 +59,28 @@ function tick() {
     }
     const end = Math.min(frame + 5, responseData.length);
     for (let i = frame; i < end; i++) {
-        chart.data.datasets[1].data.push(responseData[i]);
+        chart!.data.datasets[1].data.push(responseData[i]);
     }
     frame = end;
-    chart.update("none");
+    chart!.update("none");
 }
 
 onMounted(async () => {
-    const { Chart, registerables } = await import("chart.js");
-    Chart.register(...registerables);
+    const Chart = await loadChart();
 
     const { times, positions } = simulate();
     responseData = positions;
 
-    chart = new Chart(canvasRef.value, {
-        type: "line",
-        data: {
-            labels: times,
-            datasets: [
-                {
-                    label: "Setpoint",
-                    data: times.map(() => 1.0),
-                    borderColor: COLORS.muted,
-                    borderDash: [6, 4],
-                    borderWidth: 1.5,
-                    pointRadius: 0,
-                    tension: 0,
-                },
-                {
-                    label: "Response",
-                    data: [],
-                    borderColor: COLORS.brand,
-                    backgroundColor: COLORS.brandFill,
-                    fill: true,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    tension: 0,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-            plugins: {
-                legend: {
-                    labels: { color: COLORS.text, boxWidth: 28, boxHeight: 2 },
-                },
-                tooltip: { enabled: false },
-            },
-            scales: {
-                x: {
-                    ticks: { color: COLORS.muted, maxTicksLimit: 8 },
-                    grid: { color: COLORS.grid },
-                    title: {
-                        display: true,
-                        text: "Time (s)",
-                        color: COLORS.muted,
-                    },
-                },
-                y: {
-                    ticks: { color: COLORS.muted },
-                    grid: { color: COLORS.grid },
-                    title: {
-                        display: true,
-                        text: "Output",
-                        color: COLORS.muted,
-                    },
-                    min: -0.5,
-                    max: 2.0,
-                },
-            },
-        },
-    });
+    chart = new Chart(
+        canvasRef.value!,
+        buildResponseChartConfig({
+            times,
+            setpoint: times.map(() => 1.0),
+            response: [],
+            yMin: -0.5,
+            yMax: 2.0,
+        }),
+    );
 });
 
 onUnmounted(() => {

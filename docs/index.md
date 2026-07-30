@@ -15,7 +15,7 @@ hero:
       text: Use Guide
       link: /use-guide/
     - theme: alt
-      text: VehDyn Overview
+      text: VDyn Overview
       link: /reference/vehicle-dynamics
     - theme: alt
       text: FSAE Bridge

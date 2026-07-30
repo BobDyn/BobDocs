@@ -92,9 +92,9 @@ Most of the work happens in the `docs/` folder. Files end in `.md` (Markdown).
 
 ### 3. Add to the Navigation (If needed)
 
-If you created a *new* file, add a single entry to `docs/.vitepress/config.ts` — just a page title and URL path. The `##` section headings in your file are picked up automatically; you don't need to list them manually.
+If you created a *new* file, add a single entry to the `sidebar` section of `docs/.vitepress/config.ts` — a page title and URL path. The build will fail with a clear error if you forget, so you can't accidentally ship an unreachable page.
 
-If you're editing an *existing* file, renaming or adding `##` headings is all you need — the sidebar updates on the next build with no config change required.
+Editing `##` and `###` headings in an *existing* file needs no config change — those populate the right-hand "On this page" outline automatically. They do not affect the left-hand sidebar, which only lists whole pages.
 
 ### 4. Check for Errors
 
@@ -122,7 +122,7 @@ Then, go to the [GitHub repository](https://github.com/BobDyn/BobDocs) and click
 
 ### Sidebars & "On this page"
 
-The right-hand "On this page" menu is automatic! It pulls from your `##` and `###` headings. The left-hand sidebar order determines the "Next" and "Previous" buttons at the bottom of the page.
+The right-hand "On this page" menu is automatic — it pulls from your `##` and `###` headings. The left-hand sidebar is the manually curated list in `config.ts`. The "Next"/"Previous" buttons at the bottom of a page default to your neighbors in that sidebar list, but you can override either one by setting `prev`/`next` in the page's frontmatter — most guide pages do this to control the exact wording.
 
 ### Custom Components
 

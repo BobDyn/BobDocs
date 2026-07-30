@@ -13,73 +13,73 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
-const props = defineProps<{ src: string; maxHeight?: string }>()
+const props = defineProps<{ src: string; maxHeight?: string }>();
 
-const PDF_WORKER_SRC = '/pdf.worker.min.js'
+const PDF_WORKER_SRC = "/pdf.worker.min.js";
 
-const containerRef = ref<HTMLElement | null>(null)
-const loading = ref(true)
-const error = ref('')
-const pageCount = ref(0)
+const containerRef = ref<HTMLElement | null>(null);
+const loading = ref(true);
+const error = ref("");
+const pageCount = ref(0);
 
-const canvases: HTMLCanvasElement[] = []
-let token = 0
+const canvases: HTMLCanvasElement[] = [];
+let token = 0;
 
 function setCanvas(el: unknown, index: number) {
-    if (el instanceof HTMLCanvasElement) canvases[index] = el
+    if (el instanceof HTMLCanvasElement) canvases[index] = el;
 }
 
 async function render() {
-    if (typeof window === 'undefined' || !containerRef.value) return
-    const myToken = ++token
-    loading.value = true
-    error.value = ''
-    pageCount.value = 0
+    if (typeof window === "undefined" || !containerRef.value) return;
+    const myToken = ++token;
+    loading.value = true;
+    error.value = "";
+    pageCount.value = 0;
 
     try {
-        const { getDocument, GlobalWorkerOptions } = await import('pdfjs-dist')
-        GlobalWorkerOptions.workerSrc = PDF_WORKER_SRC
+        const { getDocument, GlobalWorkerOptions } = await import("pdfjs-dist");
+        GlobalWorkerOptions.workerSrc = PDF_WORKER_SRC;
 
-        const pdf = await getDocument({ url: props.src }).promise
-        if (myToken !== token) return
+        const pdf = await getDocument({ url: props.src }).promise;
+        if (myToken !== token) return;
 
-        pageCount.value = pdf.numPages
-        loading.value = false
+        pageCount.value = pdf.numPages;
+        loading.value = false;
 
-        await new Promise<void>((r) => requestAnimationFrame(() => r()))
-        if (myToken !== token) return
+        await new Promise<void>((r) => requestAnimationFrame(() => r()));
+        if (myToken !== token) return;
 
-        const width = containerRef.value?.clientWidth || 640
+        const width = containerRef.value?.clientWidth || 640;
 
         for (let i = 1; i <= pdf.numPages; i++) {
-            if (myToken !== token) return
-            const page = await pdf.getPage(i)
-            const viewport = page.getViewport({ scale: 1 })
-            const scale = width / viewport.width
-            const dpr = Math.min(window.devicePixelRatio || 1, 2)
-            const scaled = page.getViewport({ scale: scale * dpr })
+            if (myToken !== token) return;
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 1 });
+            const scale = width / viewport.width;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const scaled = page.getViewport({ scale: scale * dpr });
 
-            const canvas = canvases[i - 1]
-            if (!canvas) continue
-            canvas.width = scaled.width
-            canvas.height = scaled.height
-            canvas.style.width = `${Math.floor(scale * viewport.width)}px`
-            canvas.style.height = `${Math.floor(scale * viewport.height)}px`
+            const canvas = canvases[i - 1];
+            if (!canvas) continue;
+            canvas.width = scaled.width;
+            canvas.height = scaled.height;
+            canvas.style.width = `${Math.floor(scale * viewport.width)}px`;
+            canvas.style.height = `${Math.floor(scale * viewport.height)}px`;
 
-            await page.render({ canvasContext: canvas.getContext('2d')!, canvas, viewport: scaled }).promise
+            await page.render({ canvasContext: canvas.getContext("2d")!, canvas, viewport: scaled }).promise;
         }
     } catch (e) {
-        if (myToken !== token) return
-        error.value = e instanceof Error ? e.message : 'Unable to load PDF.'
-        loading.value = false
+        if (myToken !== token) return;
+        error.value = e instanceof Error ? e.message : "Unable to load PDF.";
+        loading.value = false;
     }
 }
 
-onMounted(() => void render())
-onBeforeUnmount(() => { token++ })
-watch(() => props.src, () => void render())
+onMounted(() => void render());
+onBeforeUnmount(() => { token++; });
+watch(() => props.src, () => void render());
 </script>
 
 <style scoped>

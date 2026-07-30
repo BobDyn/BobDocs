@@ -1,4 +1,6 @@
 /// <reference types="node" />
+import { readdirSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitepress";
 import mathjax3 from "markdown-it-mathjax3";
 import { withMermaid } from "vitepress-plugin-mermaid";
@@ -12,6 +14,135 @@ function page(title: string, urlPath: string) {
   return { text: title, link: urlPath };
 }
 
+type SidebarEntry = { text: string; link?: string; items?: SidebarEntry[] };
+
+function collectLinks(entries: SidebarEntry[]): string[] {
+  return entries.flatMap((entry) => [
+    ...(entry.link ? [entry.link] : []),
+    ...(entry.items ? collectLinks(entry.items) : []),
+  ]);
+}
+
+// Fails the build if a page under docs/<dirName>/ isn't wired into its
+// sidebar section below, so a forgotten sidebar entry can't ship as a
+// silently unreachable page.
+function assertSidebarCoversDir(dirName: string, entries: SidebarEntry[]) {
+  const dirPath = fileURLToPath(new URL(`../${dirName}`, import.meta.url));
+  const expectedLinks = readdirSync(dirPath)
+    .filter((file) => file.endsWith(".md"))
+    .map((file) =>
+      file === "index.md"
+        ? `/${dirName}/`
+        : `/${dirName}/${file.replace(/\.md$/, "")}`,
+    );
+
+  const actualLinks = new Set(collectLinks(entries));
+  const missing = expectedLinks.filter((link) => !actualLinks.has(link));
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Sidebar for "/${dirName}/" is missing: ${missing.join(", ")}. ` +
+        `Add each page to the sidebar in docs/.vitepress/config.ts.`,
+    );
+  }
+}
+
+const sidebar = {
+  "/startup-guide/": [
+    page("Choose A Startup Path", "/startup-guide/"),
+    {
+      text: "BobDyn/BobLib",
+      items: [
+        page("Startup", "/startup-guide/boblib"),
+      ],
+    },
+    {
+      text: "BobDyn/BobSim",
+      items: [
+        page("Startup", "/startup-guide/bobsim"),
+      ],
+    },
+  ],
+
+  "/use-guide/": [
+    page("Choose A Use Path", "/use-guide/"),
+    {
+      text: "BobDyn/BobLib",
+      items: [
+        page("Use Guide", "/use-guide/boblib"),
+      ],
+    },
+    {
+      text: "BobDyn/BobSim",
+      items: [
+        page("Use Guide", "/use-guide/bobsim"),
+      ],
+    },
+  ],
+
+  "/boblib/": [
+    {
+      text: "BobDyn/BobLib",
+      items: [
+        page("Overview",        "/boblib/"),
+        page("Setup",           "/boblib/setup"),
+        page("CLI Workflow",    "/boblib/cli-workflow"),
+        page("OMEdit Workflow", "/boblib/omedit-workflow"),
+        page("Package Map",     "/boblib/package-map"),
+        page("Control Bus",     "/boblib/control-bus"),
+        page("Static Templates", "/boblib/generation"),
+        page("Entry Points",    "/boblib/entry-points"),
+        page("Development",     "/boblib/development"),
+        page("Troubleshooting", "/boblib/troubleshooting"),
+      ],
+    },
+  ],
+
+  "/bobsim/": [
+    {
+      text: "BobDyn/BobSim",
+      items: [
+        page("Overview",       "/bobsim/"),
+        page("App",            "/bobsim/app"),
+        page("Configuration",  "/bobsim/configuration"),
+        page("StandardSim",    "/bobsim/standard-sim"),
+        page("Archive",        "/bobsim/results"),
+        page("EnvelopeSim",    "/bobsim/envelope"),
+        page("OptSim / DOE",   "/bobsim/doe"),
+        page("Development",    "/bobsim/development"),
+      ],
+    },
+    {
+      text: "In Progress",
+      items: [
+        page("VisualSim",      "/bobsim/visualization"),
+      ],
+    },
+  ],
+
+  "/reference/": [
+    {
+      text: "Reference",
+      items: [
+        page("Vehicle Dynamics",            "/reference/vehicle-dynamics"),
+        page("FSAE Bridge",                 "/reference/fsae-bridge"),
+        page("Vehicle Performance Metrics", "/reference/metrics"),
+        page("Engineering Knowledge Base",   "/reference/field-notes"),
+      ],
+    },
+  ],
+
+  "/contributing": [
+    page("Contributing", "/contributing"),
+  ],
+};
+
+assertSidebarCoversDir("startup-guide", sidebar["/startup-guide/"]);
+assertSidebarCoversDir("use-guide", sidebar["/use-guide/"]);
+assertSidebarCoversDir("boblib", sidebar["/boblib/"]);
+assertSidebarCoversDir("bobsim", sidebar["/bobsim/"]);
+assertSidebarCoversDir("reference", sidebar["/reference/"]);
+
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
@@ -24,7 +155,35 @@ export default withMermaid(
 
     appearance: "force-dark",
 
-    head: [["link", { rel: "icon", href: "/bobdyn.png" }]],
+    lastUpdated: true,
+
+    sitemap: { hostname: "https://bobdyn.com" },
+
+    head: [
+      ["link", { rel: "icon", href: "/bobdyn.png" }],
+      ["meta", { property: "og:type", content: "website" }],
+      ["meta", { property: "og:site_name", content: "BobDyn" }],
+      ["meta", { property: "og:title", content: "BobDyn" }],
+      [
+        "meta",
+        {
+          property: "og:description",
+          content: "A high-fidelity, open-source vehicle simulation framework",
+        },
+      ],
+      ["meta", { property: "og:url", content: "https://bobdyn.com/" }],
+      ["meta", { property: "og:image", content: "https://bobdyn.com/bobdyn.png" }],
+      ["meta", { name: "twitter:card", content: "summary" }],
+      ["meta", { name: "twitter:title", content: "BobDyn" }],
+      [
+        "meta",
+        {
+          name: "twitter:description",
+          content: "A high-fidelity, open-source vehicle simulation framework",
+        },
+      ],
+      ["meta", { name: "twitter:image", content: "https://bobdyn.com/bobdyn.png" }],
+    ],
 
     markdown: {
       defaultHighlightLang: "txt",
@@ -65,95 +224,7 @@ export default withMermaid(
         { text: "Contributing", link: "/contributing" },
       ],
 
-      sidebar: {
-        "/startup-guide/": [
-          page("Choose A Startup Path", "/startup-guide/"),
-          {
-            text: "BobDyn/BobLib",
-            items: [
-              page("Startup", "/startup-guide/boblib"),
-            ],
-          },
-          {
-            text: "BobDyn/BobSim",
-            items: [
-              page("Startup", "/startup-guide/bobsim"),
-            ],
-          },
-        ],
-
-        "/use-guide/": [
-          page("Choose A Use Path", "/use-guide/"),
-          {
-            text: "BobDyn/BobLib",
-            items: [
-              page("Use Guide", "/use-guide/boblib"),
-            ],
-          },
-          {
-            text: "BobDyn/BobSim",
-            items: [
-              page("Use Guide", "/use-guide/bobsim"),
-            ],
-          },
-        ],
-
-        "/boblib/": [
-          {
-            text: "BobDyn/BobLib",
-            items: [
-              page("Overview",        "/boblib/"),
-              page("Setup",           "/boblib/setup"),
-              page("CLI Workflow",    "/boblib/cli-workflow"),
-              page("OMEdit Workflow", "/boblib/omedit-workflow"),
-              page("Package Map",     "/boblib/package-map"),
-              page("Control Bus",     "/boblib/control-bus"),
-              page("Static Templates", "/boblib/generation"),
-              page("Entry Points",    "/boblib/entry-points"),
-              page("Development",     "/boblib/development"),
-              page("Troubleshooting", "/boblib/troubleshooting"),
-            ],
-          },
-        ],
-
-        "/bobsim/": [
-          {
-            text: "BobDyn/BobSim",
-            items: [
-              page("Overview",       "/bobsim/"),
-              page("App",            "/bobsim/app"),
-              page("Configuration",  "/bobsim/configuration"),
-              page("StandardSim",    "/bobsim/standard-sim"),
-              page("Results",        "/bobsim/results"),
-              page("EnvelopeSim",    "/bobsim/envelope"),
-              page("OptSim / DOE",   "/bobsim/doe"),
-              page("Development",    "/bobsim/development"),
-            ],
-          },
-          {
-            text: "In Progress",
-            items: [
-              page("VisualSim",      "/bobsim/visualization"),
-            ],
-          },
-        ],
-
-        "/reference/": [
-          {
-            text: "Reference",
-            items: [
-              page("Vehicle Dynamics",            "/reference/vehicle-dynamics"),
-              page("FSAE Bridge",                 "/reference/fsae-bridge"),
-              page("Vehicle Performance Metrics", "/reference/metrics"),
-              page("Engineering Knowledge Base",   "/reference/field-notes"),
-            ],
-          },
-        ],
-
-        "/contributing": [
-          page("Contributing", "/contributing"),
-        ],
-      },
+      sidebar,
 
       socialLinks: [{ icon: "github", link: "https://github.com/BobDyn" }],
 

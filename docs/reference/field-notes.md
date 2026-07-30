@@ -5,20 +5,15 @@ title: Engineering Knowledge Base
 
 # Engineering Knowledge Base
 
-This page is a public reference-style compilation of technical knowledge from
-coursework, projects, labs, and independent engineering work.
+A public reference-style compilation of technical knowledge from coursework,
+projects, labs, and independent engineering work — not a transcript of private
+notes or course material, but a curated set of core definitions, governing
+relationships, assumptions, and engineering interpretation across a broad set
+of topics.
 
-It is not a transcript of private notes, homework submissions, lectures, or
-course material. The underlying body of work is much larger than what appears
-here, and not every topic, derivation, example, or project has been included.
-Instead, this page collects information deemed key to the respective areas:
-core definitions, governing relationships, assumptions, and engineering
-interpretation.
-
-The result is a tailored overview meant to provide exposure across a broad set
-of topics. It is closer to an encyclopedic survey than a single cohesive
-textbook chapter: useful for orientation, recall, and cross-domain connection,
-but not a complete replacement for full course notes or dedicated references.
+Read it as an encyclopedic survey, not a textbook chapter: useful for
+orientation, recall, and cross-domain connection, but not a substitute for
+full course notes or dedicated references.
 
 ## Mathematical Foundations
 

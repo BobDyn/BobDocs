@@ -5,7 +5,7 @@ import vueParser from "vue-eslint-parser";
 
 export default [
   {
-    ignores: ["docs/.vitepress/cache/**", "node_modules/**"],
+    ignores: ["docs/.vitepress/cache/**", "docs/.vitepress/dist/**", "node_modules/**"],
   },
   {
     files: ["**/*.ts"],
