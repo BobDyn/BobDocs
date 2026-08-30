@@ -106,6 +106,7 @@ const sidebar = {
         page("App",            "/bobsim/app"),
         page("Configuration",  "/bobsim/configuration"),
         page("StandardSim",    "/bobsim/standard-sim"),
+        page("LotusShark Import", "/bobsim/lotus-shark-import"),
         page("Archive",        "/bobsim/results"),
         page("EnvelopeSim",    "/bobsim/envelope"),
         page("OptSim / DOE",   "/bobsim/doe"),
