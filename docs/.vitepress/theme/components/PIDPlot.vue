@@ -85,6 +85,7 @@ watch([Kp, Ki, Kd], updateChart);
                     min="0"
                     max="25"
                     step="0.5"
+                    :aria-label="`Proportional gain Kp, currently ${Kp}`"
                 />
             </label>
             <label>
@@ -95,6 +96,7 @@ watch([Kp, Ki, Kd], updateChart);
                     min="0"
                     max="10"
                     step="0.25"
+                    :aria-label="`Integral gain Ki, currently ${Ki}`"
                 />
             </label>
             <label>
@@ -105,11 +107,16 @@ watch([Kp, Ki, Kd], updateChart);
                     min="0"
                     max="10"
                     step="0.25"
+                    :aria-label="`Derivative gain Kd, currently ${Kd}`"
                 />
             </label>
         </div>
         <div class="chart-area">
-            <canvas ref="canvasRef" />
+            <canvas
+                ref="canvasRef"
+                role="img"
+                aria-label="PID controller response plot: position over time versus setpoint"
+            />
         </div>
         <p class="hint">
             Try setting K<sub>i</sub> = 0 to see steady-state error, or K<sub
