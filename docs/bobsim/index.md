@@ -163,6 +163,7 @@ Run `make help` for the exact target list in the current checkout.
 | [App](/bobsim/app) | Setup, Simulation, Archive, saved vehicles, saved configs, and local run packages |
 | [Configuration](/bobsim/configuration) | Workflow YAML, runtime flags, report and plot config |
 | [StandardSim](/bobsim/standard-sim) | RampSteerEval, SteadyStateEval, TransientEval, FourPostEval, runners, reports |
+| [LotusShark Import](/bobsim/lotus-shark-import) | Importing Lotus SHARK suspension geometry, the vertical datum check, and the kinematic overlay report |
 | [Archive](/bobsim/results) | Local run packages, metrics CSVs, raw case artifacts, preservation |
 | [EnvelopeSim](/bobsim/envelope) | Optional GGV and YMD envelope calculations |
 | [OptSim](/bobsim/doe) | Standard sensitivities, envelope sensitivities, refined response surfaces |
