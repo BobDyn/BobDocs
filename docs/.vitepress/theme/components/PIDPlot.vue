@@ -77,9 +77,10 @@ watch([Kp, Ki, Kd], updateChart);
 <template>
     <div class="plot-container">
         <div class="sliders">
-            <label>
+            <label for="pid-kp">
                 <span class="label-text">K<sub>p</sub> = {{ Kp }}</span>
                 <input
+                    id="pid-kp"
                     type="range"
                     v-model.number="Kp"
                     min="0"
@@ -88,9 +89,10 @@ watch([Kp, Ki, Kd], updateChart);
                     :aria-label="`Proportional gain Kp, currently ${Kp}`"
                 />
             </label>
-            <label>
+            <label for="pid-ki">
                 <span class="label-text">K<sub>i</sub> = {{ Ki }}</span>
                 <input
+                    id="pid-ki"
                     type="range"
                     v-model.number="Ki"
                     min="0"
@@ -99,9 +101,10 @@ watch([Kp, Ki, Kd], updateChart);
                     :aria-label="`Integral gain Ki, currently ${Ki}`"
                 />
             </label>
-            <label>
+            <label for="pid-kd">
                 <span class="label-text">K<sub>d</sub> = {{ Kd }}</span>
                 <input
+                    id="pid-kd"
                     type="range"
                     v-model.number="Kd"
                     min="0"
