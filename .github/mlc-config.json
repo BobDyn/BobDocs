@@ -1,9 +1,8 @@
 {
-  "baseUrl": "https://bobdyn.com",
   "ignorePatterns": [
     { "pattern": "^http://localhost" },
     { "pattern": "^https://localhost" },
-    { "pattern": "^/images/" }
+    { "pattern": "^/" }
   ],
   "retryOn429": true,
   "retryCount": 3,
