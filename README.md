@@ -18,9 +18,10 @@ The old `docs/documentation/` tree has been removed. The public docs now live di
 - `docs/use-guide/index.md` - day-to-day BobSim usage
 - `docs/boblib/index.md` - BobLib overview
 - `docs/bobsim/index.md` - BobSim overview
-- `docs/reference/index.md` - reference landing page
+- `docs/reference/vehicle-dynamics.md` - vehicle dynamics reference
 - `docs/reference/metrics.md` - vehicle performance metrics
-- `docs/reference/control-theory.md` - control theory reference
+- `docs/reference/fsae-bridge.md` - FSAE bridge reference
+- `docs/reference/field-notes.md` - field notes
 - `docs/.vitepress/config.ts` - site navigation, sidebar, and markdown configuration
 
 ## Tech Stack
