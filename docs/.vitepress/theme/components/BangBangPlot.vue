@@ -103,7 +103,11 @@ onUnmounted(() => {
             </button>
         </div>
         <div class="chart-area">
-            <canvas ref="canvasRef" />
+            <canvas
+                ref="canvasRef"
+                role="img"
+                aria-label="Bang-bang controller response plot: position over time versus setpoint"
+            />
         </div>
     </div>
 </template>

@@ -2,6 +2,7 @@ import tsParser from "@typescript-eslint/parser";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import vuePlugin from "eslint-plugin-vue";
 import vueParser from "vue-eslint-parser";
+import vueA11yPlugin from "eslint-plugin-vuejs-accessibility";
 
 export default [
   {
@@ -30,10 +31,12 @@ export default [
     plugins: {
       vue: vuePlugin,
       "@typescript-eslint": tsPlugin,
+      "vuejs-accessibility": vueA11yPlugin,
     },
     rules: {
       ...vuePlugin.configs["flat/recommended"].rules,
       ...tsPlugin.configs.recommended.rules,
+      ...vueA11yPlugin.configs.recommended.rules,
     },
   },
 ];

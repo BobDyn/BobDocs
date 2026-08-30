@@ -8,6 +8,8 @@
             :key="n"
             :ref="(el) => setCanvas(el, n - 1)"
             class="pdf-page"
+            role="img"
+            :aria-label="`PDF page ${n} of ${pageCount} from ${props.src}`"
         />
     </div>
 </template>
