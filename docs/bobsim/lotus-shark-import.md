@@ -78,8 +78,11 @@ catches geometry edited after the datum was last verified.
 
 The overlay report plots the imported ("variant") car's suspension kinematic
 curves against the tracked baseline car, for both front and rear axles, across
-bump and roll sweeps — the same curve set as the app's own kinematics view
-(camber, toe, roll centre, instant centres, and related metrics).
+bump, roll, and (front axle only) steer sweeps — the same curve set as the
+app's own kinematics view (camber, toe, roll centre, instant centres, and
+related metrics). Steer curves are plotted against the solved road-wheel
+steer angle rather than commanded rack travel; the rear axle has no steer
+panels, since it isn't steered.
 
 ```bash
 make shark-overlay SHARK=<shark.shk>
