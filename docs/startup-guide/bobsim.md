@@ -11,76 +11,113 @@ next:
 
 # BobDyn/BobSim Startup
 
-Use this guide to launch BobDyn/BobSim from the desktop app or local browser
-app, choose or create a vehicle, write the generated Modelica vehicle
-definition, run the first simulation, and inspect the result artifacts.
+By the end of this page you will have the BobSim app open, a vehicle saved,
+that vehicle written into the Modelica stack, one simulation run, and a PDF
+report to look at.
 
-::: tip Start with the app
-The BobSim app is the recommended first path. It guides setup, shows the active
-Modelica stack status, launches StandardSim workflows, previews reports and
-metrics, and keeps saved result snapshots together.
+Budget about 30 minutes the first time. Most of it is installing OpenModelica.
 
-The command-line targets still exist and are listed after the app workflow.
+## How BobSim Works
+
+BobSim never simulates anything itself. It turns your vehicle numbers into
+Modelica code, hands that to OpenModelica to compile, runs the compiled
+program, and collects what comes back.
+
+```mermaid
+flowchart LR
+    setup["1. Setup view<br/>you edit vehicle numbers"]
+    write["2. Write to MBD<br/>numbers become Modelica records"]
+    build["3. Build<br/>OpenModelica compiles a simulator"]
+    run["4. Simulation view<br/>the simulator runs your cases"]
+    archive["5. Archive view<br/>PDF report, metrics CSV, signals"]
+
+    setup --> write --> build --> run --> archive
+```
+
+That chain is why the app locks each step until the one before it is done. The
+three buttons in the left rail map onto it directly:
+
+| View | What it is for |
+| :-- | :-- |
+| `Setup` | Define the vehicle: architecture, geometry, mass, suspension, tires, aero, powertrain |
+| `Simulation` | Configure and launch a study against the current vehicle |
+| `Archive` | Download reports, metrics, and signal data from finished runs |
+
+::: tip Use the app first
+The app is the recommended path. It guides setup, shows what the Modelica stack
+is missing, and keeps runs and their results keyed together.
+
+The CLI targets do the same work for scripting and CI. They are covered in
+[The CLI Path](#the-cli-path) near the bottom.
 :::
 
-::: info Starting point
-In this guide, the BobDyn/BobSim root means the repository directory created by
-the clone step below. Start in that directory before running commands.
+## Install What BobSim Needs
 
-BobDyn/BobSim vendors BobDyn/BobLib as a submodule at
-`_0_Utils/external/BobLib/`.
+### OpenModelica And Two Libraries
+
+Required to build or run any simulation. Setup work happens without it, but
+`Simulation` stays locked.
+
+Install [OpenModelica](https://openmodelica.org/download/), then add the two
+libraries BobLib is compiled against. Open the OpenModelica shell (`omc`) or
+OMEdit and run:
+
+```text
+installPackage(Modelica, "4.1.0", exactMatch=true);
+installPackage(VehicleInterfaces, "2.0.2", exactMatch=true);
+```
+
+::: warning The versions are exact
+The BobLib build scripts call `loadModel(Modelica, {"4.1.0"})` and
+`loadModel(VehicleInterfaces, {"2.0.2"})`. Any other version fails the build,
+and the app's toolchain check reports the library as missing.
 :::
 
-## What You Need
+### Python 3.11 And Git
 
-Install these first:
+Only needed for the source checkout. The released desktop app bundles its own
+Python. BobSim is developed and tested on Python 3.11.
 
-- OpenModelica if you want to build or run simulations
-- Git and Python 3 with `venv` and `pip` if you are running from source
-- Docker and Docker Compose if you want the reproducible CLI workflow
+### Docker And Docker Compose
 
-The released desktop app bundles the Python backend and embedded frontend. It
-does not bundle OpenModelica or prebuilt simulation executables; those are
-selected and generated locally. The source checkout path runs the same app with
-your local Python environment.
+Only needed for the containerized CLI workflow. Every `make` simulation target
+runs inside the container by default. You can opt out per target with `RUN=`,
+which is what CI does. See [The CLI Path](#the-cli-path).
 
 ## Step 1: Get BobSim
 
-For the released desktop app, download the BobSim asset for your operating
-system from the [GitHub Release](https://github.com/BobDyn/BobSim/releases/latest),
-extract it, and run `BobSim`.
+Choose one.
 
-The app creates its runtime workspace in the normal per-user application data
-location:
+### Released Desktop App
 
-| Platform | Default runtime root |
-| :-- | :-- |
-| Windows | `%LOCALAPPDATA%\BobDyn\BobSim` |
-| macOS | `~/Library/Application Support/BobDyn/BobSim` |
-| Linux | `${XDG_DATA_HOME:-~/.local/share}/BobDyn/BobSim` |
+Download the asset for your operating system from the
+[GitHub Release](https://github.com/BobDyn/BobSim/releases/latest), extract it,
+and run `BobSim` (`BobSim.exe` on Windows). Assets are named
+`BobSim-<version>-<platform>` and ship as `.zip` on Windows and macOS,
+`.tar.gz` on Linux.
 
-Set `BOBSIM_HOME` if you want to place generated vehicles, builds, configs,
-and results somewhere else.
+The desktop app starts the same local server the source checkout does, picks a
+free port automatically, and opens it in an embedded window. If that window is
+unavailable it falls back to your default browser.
 
-For development or scripted CLI work, clone with submodules:
+### Source Checkout
+
+Clone with submodules. BobSim vendors BobDyn/BobLib at
+`_0_Utils/external/BobLib/`.
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
 cd BobSim
 ```
 
-If the repository was cloned without submodules, initialize them from the
-BobSim root:
+If you already cloned without `--recurse-submodules`, run this from the BobSim
+root:
 
 ```bash
 make init
 ```
 
-## Step 2: Prepare The Source App Environment
-
-Skip this step when you are using the released desktop app.
-
-Create and activate a local Python environment:
+Then create a Python environment and install the dependencies:
 
 ```bash
 python -m venv .venv
@@ -89,57 +126,90 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-Verify the two things the app needs most often:
+On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` instead.
+
+Check that both halves are in place:
 
 ```bash
 python -c "import yaml, scipy, pandas, matplotlib; print('python deps ok')"
 omc --version
 ```
 
-If `omc --version` fails from the shell, the app can still be used for setup
-work. Simulation builds and runs will stay locked until OpenModelica is
-auto-detected or selected in the app.
+`omc --version` failing is not fatal. You can still do setup work; the app will
+ask you to locate OpenModelica before it unlocks `Simulation`.
 
-## Step 3: Launch The App
+::: info Where commands run
+Everything in this guide runs from the BobSim repository root, the directory
+the clone step created.
+:::
 
-For the released desktop app, run `BobSim`.
+## Step 2: Launch The App
 
-For a source checkout, start the browser app:
+Released desktop app: run `BobSim`.
+
+Source checkout:
 
 ```bash
 make app
 ```
 
-Open:
+The terminal prints:
 
 ```text
-http://127.0.0.1:8765
+BobSim app running at http://127.0.0.1:8765
 ```
 
-Use the direct Python command when you need a different port:
+Open that address. Stop the app with `Ctrl+C` in the same terminal.
+
+To use a different port:
 
 ```bash
 python -m _5_App.app --port 8766
 ```
 
-Stop the app with `Ctrl+C` in the terminal that launched it.
+## Step 3: Point BobSim At OpenModelica
+
+Click `OpenModelica` in the top bar to open the toolchain dialog.
+
+`Auto` searches the usual install locations and fills both fields for you.
+Start there. If auto-detection comes up empty, set them by hand:
+
+- **omc executable**: `omc.exe` on Windows, `omc` elsewhere
+- **library directory**: where `installPackage` put Modelica and
+  VehicleInterfaces
+
+| Platform | Typical library directory |
+| :-- | :-- |
+| Windows | `%APPDATA%\.openmodelica\libraries` |
+| macOS | `~/.openmodelica/libraries` |
+| Linux | `~/.openmodelica/libraries` |
+
+Click `Save`. BobSim checks that the executable runs and that both required
+libraries are present, and names the missing one if not.
+
+You can skip this step for now and come back to it before Step 7.
 
 ## Step 4: Choose A Vehicle
 
-The first screen opens a vehicle setup dialog.
+The first screen is the vehicle dialog.
 
 ![BobSim vehicle chooser dialog with saved vehicle, template creation, import, and continue-active options](/images/bobsim/app-vehicle-chooser.png)
 
-Choose one path:
-
 | Path | Use it when |
 | :-- | :-- |
-| `Load Vehicle` | You already saved a vehicle under `_5_App/vehicle_configs/` |
-| `Create Vehicle` | You want a new vehicle from a checked-in architecture template |
-| `Import YAML` | You have an external vehicle YAML file |
-| `Continue Active File` | You want to keep working from the current active vehicle data |
+| `Load Vehicle` | You already saved a vehicle in this app |
+| `Create Vehicle` | You want a fresh vehicle from a checked-in architecture template |
+| `Import YAML` | You have a vehicle YAML file from somewhere else |
+| `Continue Active File` | You want to keep working from the repo's active `vehicle.yml` |
 
-After the vehicle opens, use the Setup view to work through:
+For a first run, pick `Create Vehicle`: choose a template, type a name, and
+click the button. Templates are named `<front>_<rear>` by suspension
+architecture, for example `DWBC_DWBCRecord`.
+
+## Step 5: Work Through Setup
+
+Setup has eight steps. The tabs across the top are numbered, and `Next` and
+`Previous` walk them in order:
 
 1. Architecture
 2. Geometry
@@ -150,72 +220,52 @@ After the vehicle opens, use the Setup view to work through:
 7. Aero
 8. Powertrain
 
-The left pane is the editor. The right pane is the live preview. Use
-`Next`/`Previous` to move through the setup steps, and use the `?` reference
-button when you want the app's quick "why/view/check" hints for the active
-step.
+The left pane is the editor, the right pane is a live preview of whatever the
+current step affects. The `?` button beside the editor title opens the app's
+own notes for that step: what it is for, what the preview shows, and what to
+sanity-check before moving on.
 
 ![BobSim Setup view on the Architecture step with editable architecture fields and assembly preview](/images/bobsim/app-setup-architecture.png)
 
 ![BobSim Setup view on the Geometry step with hardpoint fields, axle toggles, and kinematic preview](/images/bobsim/app-setup-geometry.png)
 
-The Tires step includes `.tir` assignment/editing plus a live load-map preview
-that redraws from the active tire evaluation.
+The Tires step also takes `.tir` files and redraws its pure and combined slip
+load maps from the active tire as you edit.
 
 ![BobSim Setup view on the Tires step with tire load controls, .tir editor, and live pure and combined slip load-map preview](/images/bobsim/app-setup-tires.png)
 
-## Step 5: Save And Write To MBD
+You do not have to finish all eight steps before simulating. A template is
+already internally consistent, so you can run it as-is the first time.
 
-Before Simulation unlocks:
+## Step 6: Save And Write To MBD
+
+Two buttons at the bottom of the left rail, in this order:
 
 1. Click `Save Vehicle`.
 2. Click `Write to MBD`.
-3. Verify the OpenModelica toolchain if Simulation asks for it.
-4. Watch the top status strip.
 
-The status strip tracks:
+The status strip in the top bar tracks the chain from
+[How BobSim Works](#how-bobsim-works):
 
 | Status | Meaning |
 | :-- | :-- |
 | `BobLib` | The BobLib submodule is present |
-| `Vehicle Definition` | The saved vehicle has been written to the generated Modelica stack |
-| `VehicleSim` | The StandardSim vehicle build is ready, missing, or stale |
+| `Vehicle Definition` | The saved vehicle has been written to the Modelica stack |
+| `VehicleSim` | The RampSteer/SteadyState/Transient build is ready, missing, or stale |
 | `FourPostSim` | The four-post build is ready, missing, or stale |
 
-If `Write to MBD` is disabled, hover it for the reason. The usual fixes are
-initializing BobLib or saving the vehicle first.
+If `Write to MBD` is greyed out, hover it. The button states its own reason,
+and the fix is usually one of:
 
-If `Simulation` is disabled because OpenModelica is not ready, open the
-toolchain selector from Simulation and choose the `omc` executable plus the
-OpenModelica library directory. Common library defaults are:
+- *Initialize the BobLib submodule first* — run `make init`
+- *Save this vehicle config before writing to MBD* — click `Save Vehicle`
+- *Vehicle definition is already current in MBD* — nothing to do, move on
 
-| Platform | Typical library directory |
-| :-- | :-- |
-| Windows | `%APPDATA%\.openmodelica\libraries` |
-| macOS | `~/.openmodelica/libraries` |
-| Linux | `~/.openmodelica/libraries` |
+## Step 7: Run Your First Simulation
 
-![BobSim Setup view showing the Save Vehicle and Write to MBD actions and top Modelica stack status](/images/bobsim/app-setup-architecture.png)
-
-## Step 6: Run The First Simulation
-
-Open the `Simulation` view.
+Open `Simulation`.
 
 ![BobSim Simulation view with Ramp Steer, Steady State, Transient, and Four Post workflow cards](/images/bobsim/app-simulation-catalog.png)
-
-For a first proof run:
-
-1. Select `Ramp Steer`.
-2. Click `Configure`.
-3. Review the editable run fields.
-4. Click `Apply Edits` if you changed anything.
-5. Click `Build + Run`.
-6. Open `Run Log` while the job is running.
-7. Click `Review` when outputs exist, or open `Archive`.
-
-![BobSim Ramp Steer simulation configuration modal with Build and Run action, config controls, and run log tab](/images/bobsim/app-simulation-config.png)
-
-The other standard cards follow the same pattern:
 
 | Card | Use it for |
 | :-- | :-- |
@@ -224,74 +274,95 @@ The other standard cards follow the same pattern:
 | `Transient` | Step and sine steering response |
 | `Four Post` | Heave, roll, and vertical-force suspension procedures |
 
-The app registers standard reports and metric CSVs under
-`_3_StandardSim/generated_results/`. Some CLI configs and older checkouts may
-write comparable public artifacts under `_3_StandardSim/results/`.
+Each card explains what the run does, which parameters matter, and what it
+produces. For a first proof run, take `Ramp Steer`:
 
-## Step 7: Review Archived Outputs
+1. Click `Configure`.
+2. Read the run fields. Change nothing yet.
+3. Click `Build + Run RampSteerEval`.
+4. Switch to the `Run Log` tab and watch.
+5. Click `Review` when it finishes.
 
-Open the `Archive` view after a run, or click `Review` from the Simulation
-workflow card.
+The first build is slow: OpenModelica is compiling the whole vehicle model.
+Later runs reuse it unless the vehicle definition changed, which is what the
+`VehicleSim` and `FourPostSim` status lights are telling you.
+
+If you edit a config field, the run button becomes `Apply + Build + Run`.
+Either click `Apply Edits` first, or let the run button apply them for you.
+
+![BobSim Ramp Steer simulation configuration modal with Build and Run action, config controls, and run log tab](/images/bobsim/app-simulation-config.png)
+
+## Step 8: Review The Results
+
+Open `Archive`, or click `Review` on the workflow card.
 
 ![BobSim Archive view with local runs, downloadable files, and PDF preview](/images/bobsim/app-results-explore.png)
 
-Each successful Simulation workflow creates a local archive package. Use it to
-download:
+Every successful run becomes an archive package you can download:
 
-- the generated PDF report
+- the generated PDF report, previewable in the browser
 - the metrics CSV
-- a `signals.zip` archive organized by run
-- a run description manifest
+- `signals.zip`, holding one folder per run with `signals.csv`,
+  `overrides.txt`, `run.log`, and `description.json`
+- `run-description.json`, the manifest for the whole package
 
-The PDF report includes the configured report pages. FourPostEval omits raw
-time-series appendix pages by default so the K&C report stays focused. The
-signal archive stores per-run `signals.csv`, `overrides.txt`, `run.log`, and
-`description.json` files when available.
+FourPostEval leaves raw time-series appendix pages out of its PDF by default
+(`raw_time_series_appendix: false`) so the K&C report stays readable.
 
-Use `Delete` in Archive when a local run package should be removed from both
-the global archive and the vehicle workspace.
+`Delete` removes a package from both the global archive and the vehicle
+workspace.
 
-Archive packages are copied under:
+## Where BobSim Puts Your Files
 
-```text
-_5_App/saved_results/
-```
+Everything the app generates lives under `_5_App/user_data/`:
 
-Vehicle-specific workspaces live under:
+| Path | Contents |
+| :-- | :-- |
+| `_5_App/user_data/config/vehicles/` | Saved vehicles, one YAML per vehicle |
+| `_5_App/user_data/config/simulations/` | Saved simulation configs |
+| `_5_App/user_data/config/app/` | App settings, including the OpenModelica toolchain choice |
+| `_5_App/user_data/results/saved/` | Archive packages |
+| `_5_App/user_data/workspaces/vehicles/<vehicle>/` | Per-vehicle builds, results, and processing |
+| `_5_App/user_data/cache/` | Modelica build cache |
 
-```text
-_5_App/vehicle_workspaces/
-```
+Reports and metric CSVs from the standard studies are written to
+`_3_StandardSim/generated_results/` before the app copies them into an archive
+package.
 
-## CLI Path
+The released desktop app keeps that same tree inside a per-user runtime root
+instead of the repository:
 
-Use the CLI when you want scripted runs, CI, or Docker-managed reproducibility.
+| Platform | Runtime root |
+| :-- | :-- |
+| Windows | `%LOCALAPPDATA%\BobDyn\BobSim` |
+| macOS | `~/Library/Application Support/BobDyn/BobSim` |
+| Linux | `${XDG_DATA_HOME:-~/.local/share}/BobDyn/BobSim` |
 
-Build the Docker image:
+Set `BOBSIM_HOME` to put it somewhere else. A source checkout ignores all of
+this and works inside the repository directory.
+
+## The CLI Path
+
+Use the CLI for scripted runs, CI, and reproducible builds. The simulation
+targets run inside Docker, so build the image once:
 
 ```bash
 make docker-build
 ```
 
-Show the current target list:
+List every target with a description:
 
 ```bash
 make help
 ```
 
-Run the complete StandardSim baseline:
+Run the whole StandardSim baseline, building what is missing first:
 
 ```bash
 make standard-eval-all
 ```
 
-Run release checks:
-
-```bash
-make ci
-```
-
-Common focused targets:
+Or one study at a time:
 
 ```bash
 make standard-build
@@ -303,7 +374,7 @@ make standard-build-four-post
 make standard-eval-four-post
 ```
 
-Optional envelope and sensitivity workflows:
+Envelope and sensitivity workflows:
 
 ```bash
 make envelope-all
@@ -312,52 +383,90 @@ make opt-envelope
 make opt-refined
 ```
 
+Lint, typecheck, and tests:
+
+```bash
+make ci
+```
+
+::: tip Skipping Docker
+`RUN=` empties the Docker prefix and runs a target directly in your current
+environment. GitHub Actions uses exactly this for the fast gate:
+
+```bash
+make lint RUN=
+make typecheck RUN=
+make test RUN=
+```
+
+The simulation targets run this way too, but then they need a working `omc` on
+the host.
+:::
+
 ## Common Problems
 
-`No module named yaml`
+### No module named yaml
 
-Install the Python requirements in the environment that launches the app:
+The app is running in an environment without the dependencies. Install them
+into the same interpreter that launches it:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-`BobLib submodule missing`
-
-Run:
+### BobLib submodule missing
 
 ```bash
 make init
 ```
 
-`Simulation is locked`
+### Simulation is locked
 
-Save the vehicle, then click `Write to MBD`. Simulation stays locked until the
-saved vehicle definition is current in the generated Modelica stack.
+Hover the locked control; it names the reason. In order, the app wants the
+vehicle saved, then written to MBD, then a verified OpenModelica toolchain.
 
-`omc: command not found`
+### omc: command not found
 
-Use the OpenModelica toolchain selector in the app to choose the `omc`
-executable and library directory. For source-checkout CLI work, install
-OpenModelica locally or use the Docker CLI targets for scripted workflow runs.
+Open the `OpenModelica` dialog in the top bar and click `Auto`, or set the
+`omc` path by hand. For CLI work, install OpenModelica locally or use the
+Docker targets, which bring their own.
 
-`Executable not found` or `Init XML not found`
+### Toolchain saved but a library is reported missing
 
-Build from the app with `Build + Run`, or use:
+Confirm the exact versions are installed, from
+[OpenModelica And Two Libraries](#openmodelica-and-two-libraries):
+
+```text
+installPackage(Modelica, "4.1.0", exactMatch=true);
+installPackage(VehicleInterfaces, "2.0.2", exactMatch=true);
+```
+
+### Executable not found, or Init XML not found
+
+Nothing has been compiled yet. Use `Build + Run` in the app, or:
 
 ```bash
 make standard-build
 make standard-build-four-post
 ```
 
-`Simulation failed but no raw run directory remains`
+### A run failed and you want the raw directory
 
-Set `execution.cleanup: false` in the run config, rerun the study, then inspect
-the retained run directory and job log.
+It is already there. All four shipped configs set `execution.cleanup: false`,
+so run directories are kept under the build directory:
+
+```text
+_3_StandardSim/BuildBobLib/VehicleSim/results/run_<id>/
+_3_StandardSim/BuildBobLib/FourPostSim/results/run_<id>/
+```
+
+Each holds `run.log`, `overrides.txt`, the raw result CSV, and a manifest. If
+the directory is gone, something set `execution.cleanup: true` in that config;
+set it back to `false` and rerun.
 
 ## Next Pages
 
-- [BobSim App](/bobsim/app) for a tour of Setup, Simulation, and Archive
+- [BobSim App](/bobsim/app) for a full tour of Setup, Simulation, and Archive
 - [BobSim Use Guide](/use-guide/bobsim) for the normal workflow after setup
 - [BobDyn/BobSim overview](/bobsim/) for the repo map and CLI target language
 - [StandardSim](/bobsim/standard-sim) for the high-fidelity evaluation details
