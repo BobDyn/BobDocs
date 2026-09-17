@@ -69,7 +69,7 @@ The vehicle chooser supports:
 
 | Action | What it does |
 | :-- | :-- |
-| `Load Vehicle` | Loads a saved vehicle from `_5_App/vehicle_configs/` |
+| `Load Vehicle` | Loads a saved vehicle from `_5_App/user_data/config/vehicles/` |
 | `Create Vehicle` | Starts from a checked-in architecture template |
 | `Import YAML` | Imports a vehicle YAML file |
 | `Continue Active File` | Keeps the currently active vehicle data |
@@ -151,13 +151,13 @@ time-series appendix pages by default, and the retained per-run data lives in
 `signals.zip`. Saved app archive packages live under:
 
 ```text
-_5_App/saved_results/
+_5_App/user_data/results/saved/
 ```
 
 Vehicle-specific app workspaces live under:
 
 ```text
-_5_App/vehicle_workspaces/
+_5_App/user_data/workspaces/vehicles/
 ```
 
 Use `Delete` in Archive to remove a local run from both the saved archive and

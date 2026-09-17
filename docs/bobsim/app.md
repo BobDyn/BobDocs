@@ -79,7 +79,7 @@ targets; it gives the normal setup and run path a guided browser surface.
 
 | Option | Source |
 | :-- | :-- |
-| `Load Vehicle` | Saved vehicles in `_5_App/vehicle_configs/` |
+| `Load Vehicle` | Saved vehicles in `_5_App/user_data/config/vehicles/` |
 | `Create Vehicle` | Architecture templates from `_0_Utils/vehicle_templates/` |
 | `Import YAML` | A user-selected `.yml` or `.yaml` file |
 | `Continue Active File` | The currently active vehicle data |
@@ -205,10 +205,13 @@ removes both the global saved package and the mirrored vehicle workspace copy.
 | :-- | :-- |
 | `_5_App/static/` | Browser UI assets |
 | `_5_App/app.py` | Local Python web server and API |
-| `_5_App/vehicle_configs/` | Saved app vehicle YAML files |
-| `_5_App/sim_configs/` | Default and saved app run configs |
-| `_5_App/vehicle_workspaces/` | Per-vehicle generated config and result workspaces |
-| `_5_App/saved_results/` | Local archive packages saved from the app |
+| `_5_App/sim_configs/_defaults/` | Checked-in default run configs |
+| `_5_App/user_data/config/vehicles/` | Saved app vehicle YAML files |
+| `_5_App/user_data/config/simulations/` | Saved app run configs |
+| `_5_App/user_data/config/app/` | App settings, including the OpenModelica toolchain choice |
+| `_5_App/user_data/workspaces/vehicles/` | Per-vehicle generated config and result workspaces |
+| `_5_App/user_data/results/saved/` | Local archive packages saved from the app |
+| `_5_App/user_data/cache/` | Modelica build cache |
 | `_3_StandardSim/generated_results/` | Standard outputs registered by the app |
 
 Older CLI outputs remain available on disk, but the alpha app UI focuses on

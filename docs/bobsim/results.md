@@ -48,13 +48,13 @@ runs/
 Saved app archive packages are written under:
 
 ```text
-_5_App/saved_results/
+_5_App/user_data/results/saved/
 ```
 
 Vehicle-scoped app workspaces live under:
 
 ```text
-_5_App/vehicle_workspaces/
+_5_App/user_data/workspaces/vehicles/
 ```
 
 Use `Delete` from an Archive card or selected run detail to remove a local run.
