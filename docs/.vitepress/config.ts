@@ -194,7 +194,7 @@ export default withMermaid(
 
     mermaid: {
       htmlLabels: false,
-      fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Ubuntu, sans-serif",
+      fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif",
       themeVariables: {
         fontSize: "15px",
       },
