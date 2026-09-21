@@ -222,16 +222,14 @@ The fastest user path downloads the BobSim desktop app from the
 [GitHub Release](https://github.com/BobDyn/BobSim/releases/latest), extracts
 it, and runs `BobSim`.
 
-For source-checkout development, launch the same app locally:
+For source-checkout development, run the same app in Docker. You need Git,
+Make, and Docker. The BobSim image contains OpenModelica and Python:
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
 cd BobSim
 make init
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+make docker-build
 make app
 ```
 
@@ -246,7 +244,6 @@ Setup -> Save Vehicle -> Write to MBD -> Simulation -> Archive
 For a scripted release baseline:
 
 ```bash
-make docker-build
 make standard-eval-all
 ```
 

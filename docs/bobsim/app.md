@@ -27,14 +27,21 @@ extract, and run `BobSim`. It bundles the Python backend and the UI. It does
 **Source checkout** — from the BobSim repository root:
 
 ```bash
+make docker-build
 make app
 ```
 
-Then open `http://127.0.0.1:8765`. To pick a different host or port:
+Then open `http://127.0.0.1:8765`. The app runs in Docker and uses the image's
+OpenModelica, so it needs no local Python or OpenModelica. To pick a different
+port:
 
 ```bash
-python -m _5_App.app --host 127.0.0.1 --port 8766
+make app APP_PORT=8766
 ```
+
+To run the app on your machine instead, use `make app RUN=`. That needs a
+Python environment with `requirements.txt` installed, and a local
+OpenModelica to simulate.
 
 ## Setup
 
@@ -116,7 +123,11 @@ Full field reference: [Configuration](/bobsim/configuration).
 
 ## OpenModelica toolchain
 
-Simulation unlocks only after BobSim verifies an OpenModelica install. It
+Simulation unlocks only after BobSim verifies an OpenModelica install. In
+Docker (`make app`) the app finds the image's `/usr/bin/omc` and
+`/root/.openmodelica/libraries` on its own, and there is nothing to set.
+
+The desktop release and `make app RUN=` use a local OpenModelica. The app
 auto-detects common locations and shows a selector when it cannot. You need two
 things:
 
@@ -159,7 +170,7 @@ In a source checkout that root is `_5_App/user_data/`:
 
 | Path | Contents |
 | :-- | :-- |
-| `user_data/config/app/` | App settings, including the OpenModelica selection |
+| `user_data/config/app/` | App settings. The OpenModelica selection is in `openmodelica.docker.json` for the app in Docker and `openmodelica.json` otherwise. |
 | `user_data/config/vehicles/` | Vehicles you saved from Setup |
 | `user_data/config/simulations/` | Run configs you saved from a workflow modal |
 | `user_data/results/saved/` | Archive packages |
@@ -202,8 +213,9 @@ make standard-eval-four-post
 | :-- | :-- |
 | Simulation tab is disabled | Save the vehicle, click `Write to MBD`, and verify the OpenModelica toolchain. All three are required. |
 | `Write to MBD` is disabled | Hover it for the reason — usually a missing BobLib submodule, unsaved edits, or no active vehicle. |
-| `No module named yaml` | `python -m pip install -r requirements.txt` in the environment that launches the app. |
-| `omc: command not found` | Set the `omc` executable and library directory in the toolchain selector. From a source checkout you can also run scripted workflows in Docker. |
+| `No module named yaml` | Only with `make app RUN=`: `python -m pip install -r requirements.txt` in the environment that launches the app. |
+| `omc: command not found` | Only outside Docker: set the `omc` executable and library directory in the toolchain selector, or use `make app`, which runs in Docker. |
+| The page does not load | Open `http://127.0.0.1:8765`, not the `0.0.0.0` address the container prints. If the port is taken, use `make app APP_PORT=8766`. |
 | Nothing appears in Archive | Open `Run Log` — a failed build or run leaves the message there. Then check the workflow's report and metrics output paths match what the active config writes. |
 
 ## See also
