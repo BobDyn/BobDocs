@@ -46,13 +46,17 @@ flowchart LR
 </details>
 
 That chain is why the app locks each step until the one before it is done. The
-three buttons in the left rail map onto it directly:
+left rail has four views:
 
 | View | What it is for |
 | :-- | :-- |
 | `Setup` | Define the vehicle: architecture, geometry, mass, suspension, tires, aero, powertrain |
 | `Simulation` | Configure and launch a study against the current vehicle |
+| `Replay` | Play back a captured run in 3D: suspension geometry, tire loads, and grip |
 | `Archive` | Download reports, metrics, and signal data from finished runs |
+
+`Replay` is not part of the chain. It draws scenes that you capture separately.
+See [Replay A Captured Run](#replay-a-captured-run).
 
 ::: tip Use the app first
 The app is the recommended path. It guides setup, shows what the Modelica stack
@@ -79,9 +83,10 @@ installPackage(VehicleInterfaces, "2.0.2", exactMatch=true);
 ```
 
 ::: warning The versions are exact
-The BobLib build scripts call `loadModel(Modelica, {"4.1.0"})` and
-`loadModel(VehicleInterfaces, {"2.0.2"})`. Any other version fails the build,
-and the app's toolchain check reports the library as missing.
+The BobSim build scripts in `_3_StandardSim/` call
+`loadModel(Modelica, {"4.1.0"})` and `loadModel(VehicleInterfaces, {"2.0.2"})`.
+Any other version fails the build. The app's toolchain check only looks for
+the library folders, so it does not catch a wrong version.
 :::
 
 ### Python 3.11 And Git
@@ -103,13 +108,17 @@ Choose one.
 
 Download the asset for your operating system from the
 [GitHub Release](https://github.com/BobDyn/BobSim/releases/latest), extract it,
-and run `BobSim` (`BobSim.exe` on Windows). Assets are named
-`BobSim-<version>-<platform>` and ship as `.zip` on Windows and macOS,
-`.tar.gz` on Linux.
+and run `BobSim.exe` on Windows, `BobSim.app` on macOS, or `BobSim` on Linux.
+
+Assets are named `BobSim-<version>-<os>-<arch>`, for example
+`BobSim-<version>-windows-x86_64.zip`. They ship as `.zip` on Windows and
+macOS and as `.tar.gz` on Linux. Each asset has a `.sha256` checksum file next
+to it. The macOS asset is built for Apple Silicon (`arm64`).
 
 The desktop app starts the same local server the source checkout does, picks a
 free port automatically, and opens it in an embedded window. If that window is
-unavailable it falls back to your default browser.
+unavailable it falls back to your default browser. On Linux the embedded window
+needs GTK (`gi`) or PyQt6-WebEngine.
 
 ### Source Checkout
 
@@ -180,13 +189,23 @@ python -m _5_App.app --port 8766
 
 ## Step 3: Point BobSim At OpenModelica
 
-Click `OpenModelica` in the top bar to open the toolchain dialog.
+Click `OpenModelica` in the top bar to open the `Toolchain` dialog.
 
-`Auto` searches the usual install locations and fills both fields for you.
-Start there. If auto-detection comes up empty, set them by hand:
+BobSim looks for OpenModelica on its own every time it checks status. It
+searches the usual install locations and these environment variables:
+
+| Variable | Sets |
+| :-- | :-- |
+| `BOBSIM_OMC`, or `OMC` | The `omc` executable |
+| `BOBSIM_OPENMODELICA_HOME`, or `OPENMODELICAHOME` | The OpenModelica install directory |
+| `BOBSIM_OPENMODELICA_LIBRARY` | The library directory |
+
+If the dialog already shows an `omc` and a `Libraries` path, you do not need to
+do anything. If detection finds nothing, set the two fields by hand. The dialog
+lists the candidate paths it found:
 
 - **omc executable**: `omc.exe` on Windows, `omc` elsewhere
-- **library directory**: where `installPackage` put Modelica and
+- **Library directory**: where `installPackage` put Modelica and
   VehicleInterfaces
 
 | Platform | Typical library directory |
@@ -196,7 +215,8 @@ Start there. If auto-detection comes up empty, set them by hand:
 | Linux | `~/.openmodelica/libraries` |
 
 Click `Save`. BobSim checks that the executable runs and that both required
-libraries are present, and names the missing one if not.
+libraries are present, and names the missing one if not. `Auto` clears your
+manual paths and goes back to automatic detection.
 
 You can skip this step for now and come back to it before Step 7.
 
@@ -313,9 +333,11 @@ Every successful run becomes an archive package you can download:
 
 - the generated PDF report, previewable in the browser
 - the metrics CSV
-- `signals.zip`, holding one folder per run with `signals.csv`,
-  `overrides.txt`, `run.log`, and `description.json`
-- `run-description.json`, the manifest for the whole package
+- `signals.zip`, holding a `manifest.json` and one folder per run with
+  `signals.csv`, `overrides.txt`, `run.log`, and `description.json`
+- `run-description.json`, which describes the run
+- `vehicle.yml` and `config.yml`, snapshots of the vehicle and study config
+  that produced the run
 
 FourPostEval leaves raw time-series appendix pages out of its PDF by default
 (`raw_time_series_appendix: false`) so the K&C report stays readable.
@@ -331,10 +353,19 @@ Everything the app generates lives under `_5_App/user_data/`:
 | :-- | :-- |
 | `_5_App/user_data/config/vehicles/` | Saved vehicles, one YAML per vehicle |
 | `_5_App/user_data/config/simulations/` | Saved simulation configs |
+| `_5_App/user_data/config/active/` | The app's editable copies of the study configs |
+| `_5_App/user_data/config/defaults/` | Original copies of the EnvelopeSim and OptSim configs |
 | `_5_App/user_data/config/app/` | App settings, including the OpenModelica toolchain choice |
 | `_5_App/user_data/results/saved/` | Archive packages |
 | `_5_App/user_data/workspaces/vehicles/<vehicle>/` | Per-vehicle builds, results, and processing |
-| `_5_App/user_data/cache/` | Modelica build cache |
+| `_5_App/user_data/cache/modelica/` | Modelica build cache |
+
+::: warning The CLI reads the app's config copies
+When you edit a study config in the app, BobSim writes the change to
+`_5_App/user_data/config/active/`. After that, the `make standard-eval-*`
+targets read that copy, not the checked-in file under `_3_StandardSim/`. Set
+`BOBSIM_SEED_CONFIGS=1` to force the checked-in file.
+:::
 
 Reports and metric CSVs from the standard studies are written to
 `_3_StandardSim/generated_results/` before the app copies them into an archive
@@ -351,6 +382,33 @@ instead of the repository:
 
 Set `BOBSIM_HOME` to put it somewhere else. A source checkout ignores all of
 this and works inside the repository directory.
+
+## Replay A Captured Run
+
+The `Replay` view plays back a run in 3D. A normal simulation run does not feed
+it, because a normal run keeps only the signals its metrics need. Until you
+capture a scene, `Replay` shows "No captured runs yet".
+
+To see `Replay` work without OpenModelica, write the synthetic demo scene. Then
+start the app and open `Replay`:
+
+```bash
+make visual-demo
+make app
+```
+
+To capture a real run, BobSim runs one study again and records the suspension
+geometry:
+
+```bash
+make visual-rig
+make visual-maneuver VISUAL_MANEUVER=transient
+```
+
+`visual-rig` captures the four-post rig. `visual-maneuver` takes `transient`,
+`ramp_steer`, or `steady_state`. Scenes are written to `_1_VisualSim/results/`.
+In the view, `Controls` shows the camera keys and `Export video` saves a
+recording.
 
 ## The CLI Path
 
@@ -414,6 +472,21 @@ The simulation targets run this way too, but then they need a working `omc` on
 the host.
 :::
 
+The Docker image uses OpenModelica 1.26.3 and Python 3.11. It builds on x86_64
+and on ARM64 hosts, including Apple Silicon. To open a shell inside the
+container, run `make shell`.
+
+To check that the BobLib records match the active `vehicle.yml` without the
+app:
+
+```bash
+make sync-vehicle
+make sync-vehicle-write
+```
+
+`make sync-vehicle` reports stale records and exits with an error if it finds
+any. `make sync-vehicle-write` regenerates them.
+
 ## Common Problems
 
 ### No module named yaml
@@ -444,13 +517,20 @@ Docker targets, which bring their own.
 
 ### Toolchain saved but a library is reported missing
 
-Confirm the exact versions are installed, from
+The library directory does not contain that library at all. Check that
+`Library directory` points at the folder `installPackage` wrote to. Then
+install the exact versions from
 [OpenModelica And Two Libraries](#openmodelica-and-two-libraries):
 
 ```text
 installPackage(Modelica, "4.1.0", exactMatch=true);
 installPackage(VehicleInterfaces, "2.0.2", exactMatch=true);
 ```
+
+### The toolchain check passes but the build cannot load a library
+
+The library is installed, but not at the exact version. The toolchain check
+does not compare versions. Install the exact versions above.
 
 ### Executable not found, or Init XML not found
 
@@ -471,13 +551,26 @@ _3_StandardSim/BuildBobLib/VehicleSim/results/run_<id>/
 _3_StandardSim/BuildBobLib/FourPostSim/results/run_<id>/
 ```
 
+If `results/` is not writable, BobSim writes to `runs/` in the same build
+directory instead.
+
 Each holds `run.log`, `overrides.txt`, the raw result CSV, and a manifest. If
-the directory is gone, something set `execution.cleanup: true` in that config;
-set it back to `false` and rerun.
+the directory is gone, something set `execution.cleanup: true`. Check the app's
+copy in `_5_App/user_data/config/active/` first, then the checked-in config.
+Set it back to `false` and rerun.
+
+### You want to start the app from a clean state
+
+This deletes saved vehicles, configs, toolchain settings, workspaces, the
+build cache, and archive packages in `_5_App/user_data/`:
+
+```bash
+make clean-app
+```
 
 ## Next Pages
 
-- [BobSim App](/bobsim/app) for a full tour of Setup, Simulation, and Archive
+- [BobSim App](/bobsim/app) for a full tour of the app views
 - [BobSim Use Guide](/use-guide/bobsim) for the normal workflow after setup
 - [BobDyn/BobSim overview](/bobsim/) for the repo map and CLI target language
 - [StandardSim](/bobsim/standard-sim) for the high-fidelity evaluation details
