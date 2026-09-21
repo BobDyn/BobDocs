@@ -105,16 +105,14 @@ extract it, and run `BobSim`.
 The desktop app bundles the Python backend and embedded frontend. OpenModelica
 and generated simulation executables stay local to the user's machine.
 
-For source-checkout development, launch the app with:
+For source-checkout development, run the app in Docker. You need Git, Make,
+and Docker. The BobSim image contains OpenModelica and Python:
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
 cd BobSim
 make init
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+make docker-build
 make app
 ```
 
@@ -132,10 +130,9 @@ Setup -> Save Vehicle -> Write to MBD -> Simulation -> Archive
 
 ![BobSim app Setup view with guided steps, vehicle controls, and architecture preview](/images/bobsim/app-setup-architecture.png)
 
-For Docker-backed CLI workflows:
+The CLI workflows run in the same image:
 
 ```bash
-make docker-build
 make help
 ```
 
