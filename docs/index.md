@@ -108,6 +108,27 @@ flowchart TB
 
 </div>
 
+<details class="diagram-text">
+<summary>Text version</summary>
+
+- Vehicle Model
+  - Unactuated Vehicle: mass, inertia, reference frames
+    - Chassis Assembly
+      - Driver & Frame: sprung mass, compliance
+      - Suspension System
+        - Front Axle and Rear Axle
+          - Axle Structure: mounts, hardpoints, wheel centers
+            - Steering System
+            - Wheel & Tire Model: mass, inertia, compliance
+              - Contact & Wheel Dynamics
+              - Tire Force & Slip Behavior
+          - Linkages & Shocks: rods, bellcranks, springs, dampers, masses
+          - Stabars
+    - Aerodynamic Loads
+  - Powertrain Interface
+
+</details>
+
 ---
 
 ## A physical model for vehicle characterization

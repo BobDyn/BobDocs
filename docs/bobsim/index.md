@@ -68,6 +68,17 @@ flowchart TB
 
 </div>
 
+<details class="diagram-text">
+<summary>Text version</summary>
+
+1. The BobSim app (Setup / Simulation / Archive) drives the BobLib model library (generated vehicle definitions) and the BobSim workflow YAML (cases and runtime overrides).
+2. The model library feeds the BobLib standard entry point: VehicleSim or FourPostSim.
+3. The entry point and the workflow YAML feed the OpenModelica executable.
+4. The executable writes BobSim outputs: reports, metrics, plots, sensitivities.
+5. The outputs go back to the app.
+
+</details>
+
 ## Repository Layout
 
 | Path | Role |
