@@ -346,15 +346,15 @@ it, because a normal run keeps only the signals its metrics need. Until you
 capture a scene, `Replay` shows "No captured runs yet".
 
 To see `Replay` work, write the synthetic demo scene. It needs no simulation.
-Then start the app and open `Replay`:
+Then start the app and open `Replay`. Both run in Docker:
 
 ```bash
 make visual-demo
 make app
 ```
 
-To capture a real run, BobSim runs one study again in Docker and records the
-suspension geometry:
+To capture a real run, BobSim runs one study again and records the suspension
+geometry. Every step runs in Docker:
 
 ```bash
 make visual-rig
@@ -365,13 +365,6 @@ make visual-maneuver VISUAL_MANEUVER=transient
 `ramp_steer`, or `steady_state`. Scenes are written to `_1_VisualSim/results/`.
 In the view, `Controls` shows the camera keys and `Export video` saves a
 recording.
-
-::: info These targets need Python on your machine
-The simulation step of `visual-rig` and `visual-maneuver` runs in Docker. The
-scene generation and conversion steps, and all of `visual-demo`, run on your
-machine. They need Python 3.11 with `requirements.txt` installed, as in
-[Run The App Without Docker](#run-the-app-without-docker).
-:::
 
 ## Run The App Without Docker
 
@@ -499,8 +492,7 @@ Docker the toolchain is always present. On the host, see
 
 ### No module named yaml
 
-You are running the app or a `visual-*` target on the host without the
-dependencies. Install them into the same interpreter:
+You are running the app on the host with `RUN=`, without the dependencies. Install them into the same interpreter:
 
 ```bash
 python -m pip install -r requirements.txt
