@@ -2,7 +2,6 @@
 import { readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitepress";
-import mathjax3 from "markdown-it-mathjax3";
 import { withMermaid } from "vitepress-plugin-mermaid";
 
 // ---------------------------------------------------------------------------
@@ -189,7 +188,7 @@ export default withMermaid(
     markdown: {
       defaultHighlightLang: "txt",
       languageAlias: { modelica: "txt", mo: "txt" },
-      config: (md) => { md.use(mathjax3); },
+      math: true,
     },
 
     mermaid: {

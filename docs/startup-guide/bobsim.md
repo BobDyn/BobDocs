@@ -34,6 +34,17 @@ flowchart LR
     setup --> write --> build --> run --> archive
 ```
 
+<details class="diagram-text">
+<summary>Text version</summary>
+
+1. Setup view: you edit vehicle numbers.
+2. Write to MBD: the numbers become Modelica records.
+3. Build: OpenModelica compiles a simulator.
+4. Simulation view: the simulator runs your cases.
+5. Archive view: PDF report, metrics CSV, signals.
+
+</details>
+
 That chain is why the app locks each step until the one before it is done. The
 three buttons in the left rail map onto it directly:
 
