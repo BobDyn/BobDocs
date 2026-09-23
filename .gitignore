@@ -29,4 +29,5 @@ docs/.vitepress/dist
 *.sln
 *.sw?
 
-*.claude/
+.claude/*
+!.claude/skills/
