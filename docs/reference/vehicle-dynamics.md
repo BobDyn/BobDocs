@@ -5,23 +5,38 @@ title: Vehicle Dynamics
 
 # Vehicle Dynamics
 
-Vehicle dynamics is the study of a coupled, nonlinear dynamic system: states,
-constraints, force laws, compliance, actuation, and feedback acting together.
-Classical tools like bicycle models, roll centers, and linear tire stiffness
-are useful shorthand for that system, not the system itself. They stay useful
-as long as you know which assumptions they're hiding.
+This page explains the physical model behind BobDyn. A vehicle is a coupled,
+nonlinear dynamic system: states, constraints, force laws, compliance,
+actuation, and feedback act together. Bicycle models, roll centers, and linear
+tire stiffness are reduced views of that system. They stay useful when you
+know which assumptions they hide.
 
-A metric name does not create a vehicle's response. Forces, moments, inertias,
-constraints, and time do. BobDyn keeps raw signals next to the reduced metrics
-derived from them so those physical connections stay visible.
+A metric name does not create a vehicle's response. Forces, moments,
+inertias, constraints, and time do. BobDyn keeps raw signals next to the
+metrics derived from them, so the physical connection stays visible.
 
-You don't need to hand-derive the equations below to use the ideas on this
-page. They're here to show the hierarchy: familiar engineering techniques are
-reduced models of the real vehicle physics, and knowing the reduction keeps the
-assumptions visible.
+The page assumes calculus, ODEs, and basic controls language. You do not need
+to derive the equations to use the ideas. For what an FSAE team can claim from
+simulation, tests, and telemetry, see [FSAE Bridge](/reference/fsae-bridge).
 
-The full physical vehicle isn't naturally a state-space model. A high-fidelity
-multibody vehicle is a differential-algebraic equation (DAE):
+## Models and reductions
+
+A high-fidelity multibody vehicle is a differential-algebraic equation (DAE),
+not a state-space model. Its algebraic part holds what an explicit ODE hides:
+constraints, reaction forces, contact conditions, tire force laws, and
+actuator relations. Motion and force are solved together, subject to the
+constraints.
+
+A state-space model is a reduced form. It comes from projecting the
+constrained system onto independent coordinates, trimming it around an
+operating point, or linearizing it. Bicycle models, understeer gradients,
+yaw-rate gains, frequency response functions, and control-oriented handling
+metrics all live at this level. They are valid reduced views of the DAE when
+you remember what the reduction removed.
+
+::: details The DAE and state-space forms
+
+The general form:
 
 $$
 F(\dot{x}, x, z, u, p, t) = 0
@@ -32,10 +47,9 @@ y = g(x, z, u, p, t)
 $$
 
 $x$ holds dynamic states, $z$ holds algebraic variables, $u$ holds driver or
-actuator inputs, $p$ holds design parameters, and $y$ is measured behavior. The
-algebraic variables are the things an explicit ODE hides: constraints, reaction
-forces, contact conditions, tire force laws, actuator relations. A constrained
-multibody system is normally written in second-order form:
+actuator inputs, $p$ holds design parameters, and $y$ is measured behavior.
+
+A constrained multibody system is normally written in second-order form:
 
 $$
 M(q, p)\ddot{q} + \Phi_q(q, p, t)^T \lambda =
@@ -49,13 +63,9 @@ $$
 $q$ are generalized coordinates, $M$ is the mass matrix, $\Phi$ are kinematic
 constraints, $\Phi_q$ is the constraint Jacobian, $\lambda$ are constraint
 reaction multipliers, and $Q$ collects applied, inertial, tire, aero, spring,
-damper, actuator, and contact forces. Motion and force are solved together,
-subject to constraints — that's the natural language of high-fidelity vehicle
-dynamics.
+damper, actuator, and contact forces.
 
-State-space models are the reduced form: the constrained system simplified,
-projected onto independent coordinates, trimmed around an operating point, or
-linearized:
+The reduced state-space form:
 
 $$
 \dot{x}_r = f_r(x_r, u, p, t)
@@ -75,24 +85,15 @@ $$
 \delta y = C\delta x_r + D\delta u
 $$
 
-Bicycle models, understeer gradients, yaw-rate gains, frequency response
-functions, and control-oriented handling metrics all live here — legitimate
-reduced views of the larger DAE, well-founded as long as you remember what was
-reduced to get them.
+:::
 
-This page assumes calculus, ODEs, and basic controls language, but the goal
-isn't mathematical density — it's a clear physical model. For an FSAE-specific
-application, see [FSAE Bridge](/reference/fsae-bridge): that page covers what a
-team can responsibly claim about the system using simulation, controlled
-tests, and competition telemetry.
-
-## Geometry Is Not The Goal
+## Geometry and response
 
 Suspension geometry matters because it changes tire states, contact patch
-loads, force paths, motion ratios, and compliance — a diagram label matters
-only insofar as it predicts those effects.
+loads, force paths, motion ratios, and compliance. A diagram label matters
+only as far as it predicts those effects.
 
-The design target is vehicle response, not geometry that looks good on paper:
+The design target is vehicle response:
 
 - steady-state balance
 - transient yaw response
@@ -102,50 +103,48 @@ The design target is vehicle response, not geometry that looks good on paper:
 - tire force availability
 - robustness to speed, ride height, load, and uncertainty
 
-"What is the roll center height?" is the wrong question. "How does this system
-transmit forces and moments, and what response does that produce?" is the
-right one. Geometry shapes the dynamic system — it isn't the whole dynamic
-system. Good geometry work still ties every metric back to the loads, motions,
-and response it's meant to predict.
+So ask "how does this system transmit forces and moments, and what response
+does that produce?", not "what is the roll center height?". Geometry shapes
+the dynamic system, but it is not all of it. Tie every geometry metric back to
+the loads, motions, and response it is meant to predict.
 
-## Roll Centers
+## Roll centers
 
-Roll centers are useful visualizations, not physical parts or force
-application points.
+Roll centers are visualizations, not physical parts or force application
+points.
 
-The classic construction — pinned supports, two four-bar linkages — is a
-planar approximation good for fast reasoning about roll gradient, spring and
-damper deflection, and rough geometric load transfer. It's still an
-approximation.
+The classic construction uses pinned supports and two four-bar linkages. It is
+a planar approximation. It is good for fast reasoning about roll gradient,
+spring and damper deflection, and rough geometric load transfer.
 
-Instant centers are more fundamental within that approximation: they describe
-a linkage's instantaneous motion. For one corner of the car, load transmission
-from unsprung to sprung mass can be approximated as a virtual link from the
-contact patch toward an instant center. In a full spatial view, the corner
-instead has an instantaneous screw axis — it both rotates about and
-translates along a virtual axis. That mental model is usually more useful for
-design work than roll center height alone.
+Instant centers are more fundamental within that approximation. They describe
+a linkage's instantaneous motion. For one corner, you can approximate load
+transmission from unsprung to sprung mass as a virtual link from the contact
+patch toward an instant center. In a full spatial view, the corner has an
+instantaneous screw axis: it rotates about and translates along a virtual
+axis. That model is usually more useful for design than roll center height
+alone.
 
-The strongest quantification is force-based: apply a force, measure the
+The strongest quantification is force-based. Apply a force, then measure the
 support reaction, the jacking response, and the change in contact patch load.
-That's the response the vehicle actually sees. The roll center is a model
-coordinate; the force response is the physics it's trying to summarize.
+That is the response the vehicle sees. The roll center is a model coordinate
+that tries to summarize it.
 
-## Jacking And Anti-Geometry
+## Jacking and anti-geometry
 
 Anti-dive, anti-squat, and anti-roll describe how geometry changes load
-transmission between unsprung and sprung mass. The useful question: when a
-force enters the tire contact patch, how much of that path creates a vertical
-reaction on the frame?
+transmission between unsprung and sprung mass. The question is: when a force
+enters the tire contact patch, how much of it creates a vertical reaction on
+the frame?
 
-Draw the front-view and side-view instant centers and connect them — that line
-is the virtual axis for the corner. The corner doesn't simply "push through a
-roll center"; it has both an instantaneous motion structure and a force
-transmission structure.
+Draw the front-view and side-view instant centers and connect them. That line
+is the virtual axis for the corner. The corner has both an instantaneous
+motion structure and a force transmission structure. It does not "push
+through a roll center".
 
 Anti-geometry is geometric resistance to sprung-mass attitude change. A useful
-reference scale is the jacking force that would fully resist the corresponding
-attitude moment. For a longitudinal case:
+reference is the jacking force that would fully resist the attitude moment.
+For a longitudinal case:
 
 $$
 F_{\text{jack, 100\%}} = F_x \frac{h_{\text{cg}}}{L}
@@ -157,15 +156,18 @@ $$
 F_{\text{jack, 100\%}} = F_y \frac{h_{\text{cg}}}{T}
 $$
 
-where $h_{\text{cg}}$ is CG height, $L$ is wheelbase, and $T$ is track width.
-100% anti-dive doesn't mean the car found a special point in space — it means
-the suspension load path matches the jacking response needed to resist the
-attitude moment. The exact value still depends on force distribution, sign
-convention, suspension force lines, and the case being analyzed. If an instant
-center points "the wrong way" relative to a textbook diagram, the physics
-hasn't broken — the diagram was only ever a special case.
+$h_{\text{cg}}$ is CG height, $L$ is wheelbase, and $T$ is track width. 100%
+anti-dive means the suspension load path matches the jacking response needed
+to resist the attitude moment. It is not a special point in space. The exact
+value still depends on force distribution, sign convention, suspension force
+lines, and the case under analysis. An instant center that points "the wrong
+way" compared to a textbook diagram does not break the physics. The diagram
+was a special case.
 
-## Load Transfer
+FourPostEval reports anti percentages on this scale. See
+[Suspension, kinematics, and compliance](/reference/metrics#suspension-kinematics-and-compliance).
+
+## Load transfer
 
 Load transfer starts from force and moment balance for the whole vehicle:
 
@@ -177,9 +179,9 @@ $$
 \sum M_G = I_G \alpha + \omega \times I_G \omega
 $$
 
-These aren't optional. Springs, bars, dampers, geometry, and chassis stiffness
-change how the required loads are distributed and how fast they appear — they
-don't remove the balance requirement itself.
+Springs, bars, dampers, geometry, and chassis stiffness change how the
+required loads are distributed and how fast they appear. They do not remove
+the balance requirement.
 
 In lateral steady-state analysis, lateral load transfer distribution is:
 
@@ -188,31 +190,29 @@ LLTD = \frac{\Delta F_{z,\text{front}}}
 {\Delta F_{z,\text{front}} + \Delta F_{z,\text{rear}}}
 $$
 
-Total lateral load transfer is set mostly by mass, CG height, track width, and
-lateral acceleration; springs and bars mainly shift the front/rear
-distribution of that transfer, not the total.
+Mass, CG height, track width, and lateral acceleration set most of the total
+lateral load transfer. Springs and bars mainly shift its front/rear
+distribution, not the total.
 
-The fuller picture is compliance: model the chassis as three torsional springs
-in series — front roll stiffness, chassis torsional stiffness, rear roll
-stiffness. The middle spring matters: if the chassis twists, front and rear no
-longer see the same roll input, and the nominal rigid-frame LLTD becomes less
-achievable and more dynamic. In a very stiff chassis, front/rear roll
-stiffness dominates the elastic distribution; as torsional stiffness drops,
-the axles decouple and the real vehicle drifts from the intended rigid-frame
-behavior.
+For the fuller picture, model the chassis as three torsional springs in
+series: front roll stiffness, chassis torsional stiffness, and rear roll
+stiffness. If the chassis twists, front and rear no longer see the same roll
+input. The nominal rigid-frame LLTD then becomes harder to achieve and more
+dynamic. In a very stiff chassis, front/rear roll stiffness sets the elastic
+distribution. As torsional stiffness drops, the axles decouple and the car
+drifts from the intended rigid-frame behavior.
 
-A reasonable check is whether achievable LLTD stays within a tolerance band of
-the nominal target (a 1% band is a common first cutoff) — but the more
-reliable answer is dynamic: change torsional rigidity, run the response, and
-look at the steady-state and transient metrics that matter.
+One check is whether achievable LLTD stays within a tolerance band of the
+nominal target. A 1% band is a common first cutoff. The more reliable check is
+dynamic: change torsional rigidity, run the response, and compare the
+steady-state and transient metrics you care about.
 
 ## Damping
 
-Springs and bars shape where load transfer wants to settle. Dampers shape how
-fast it gets there — one of the most important distinctions in transient
-vehicle dynamics. Dampers govern how quickly tire loads build, how quickly yaw
-moment appears, how much contact patch load overshoot occurs, and how the car
-feels during turn-in, release, braking, and combined maneuvers.
+Springs and bars shape where load transfer settles. Dampers shape how fast it
+gets there. Dampers set how quickly tire loads build, how quickly yaw moment
+appears, how much contact patch load overshoot occurs, and how the car feels
+during turn-in, release, braking, and combined maneuvers.
 
 In simple form:
 
@@ -220,150 +220,32 @@ $$
 F_d = c v_d
 $$
 
-where $F_d$ is damper force, $c$ is the damping coefficient, and $v_d$ is
-damper velocity. Real dampers aren't linear, but this captures the core
-behavior: force reacts to velocity, not displacement.
+$F_d$ is damper force, $c$ is the damping coefficient, and $v_d$ is damper
+velocity. Real dampers are not linear, but the core behavior holds: force
+reacts to velocity, not displacement.
 
-So damping isn't just ride tuning — it's a transient load-transfer tool. More
+So damping is a transient load-transfer tool as well as a ride tool. More
 front damping can make front tire loads build sooner and shift the early yaw
-moment; more rear damping can stabilize the rear faster, or resist motion in
-ways that change phase and driver confidence. High-speed compression damping
-needs care too: excessive high-speed force punishes sprung-mass NVH and adds
-contact patch load variation. That variation is expensive because tires are
-load-sensitive — added normal load doesn't buy proportional force capacity, so
+moment. More rear damping can settle the rear faster, or resist motion in
+ways that change phase and driver confidence.
+
+Excessive high-speed compression force hurts sprung-mass NVH and adds contact
+patch load variation. That variation costs grip because tires are
+load-sensitive. Added normal load does not buy proportional force capacity, so
 oscillating normal load usually wastes grip.
 
 ## Tires
 
-Tires are nonlinear force laws, not scalar friction coefficients — $\mu$ isn't
-constant. A tire force model is better understood as a map:
-
-$$
-\mu = \mu(F_z, \alpha, \kappa, \gamma, T, p, \text{history}, \text{wear})
-$$
-
-where $F_z$ is normal load, $\alpha$ is slip angle, $\kappa$ is slip ratio,
-$\gamma$ is camber, $T$ is temperature, and $p$ is pressure.
-
-Slip angle and slip ratio aren't literal rubber-deformation measurements —
-they're practical coordinates that correlate with deformation and force
-buildup. A simplified slip angle:
-
-$$
-\alpha \approx \tan^{-1}\left(\frac{-V_y}{|V_x|}\right)
-$$
-
-A simplified slip ratio:
-
-$$
-\kappa \approx \frac{R \omega - V_x}{\max(|V_x|, \epsilon)}
-$$
-
-In the small-slip region, force buildup is roughly linear:
-
-$$
-F_y \approx C_\alpha \alpha
-$$
-
-That's spring-like: the tire deforms, and force grows with a deformation-like
-input. As slip increases, the rate of buildup drops off, and the tire
-eventually plateaus or falls to a lower force level — linear region (mostly
-static-friction-like), transition region (mixed static/sliding), saturated
-region (sliding-dominated). Real tire behavior adds adhesion, hysteresis,
-tread deformation, carcass behavior, pressure, temperature, compound, road
-surface, and wear on top of this, but the simple model explains why a tire
-feels linear, then nonlinear, then saturated.
-
-Combined slip matters because a tire can't independently spend all of its
-longitudinal and lateral capacity: imposing both slip ratio and slip angle
-together changes the deformation pattern and the total force available. It's
-one deforming structure producing a coupled force and moment response, not two
-independent force generators sharing a patch of ground.
-
-## Pneumatic Trail And Scrub
-
-Tires also shift their effective point of force application. Pneumatic trail
-and scrub are moment arms created by tire deformation, not extra forces.
-
-Pneumatic trail is usually the fore-aft offset of the lateral force resultant,
-and it's a primary source of aligning moment:
-
-$$
-M_z \approx -F_y t_p + M_{z,res}
-$$
-
-where $t_p$ is pneumatic trail and $M_{z,res}$ is the residual aligning moment
-not captured by the offset picture (sign convention depends on the tire
-coordinate system). Mechanical trail, pneumatic trail, scrub, caster, KPI, and
-compliance together decide how that tire moment becomes steering torque and
-upright load.
-
-Pneumatic scrub is the lateral-direction version: the effective force
-application point moves sideways as the patch deforms. Under braking, drive,
-and combined slip, that shift changes how longitudinal and lateral forces feed
-moments back into the wheel, upright, steering system, and suspension.
-
-Many empirical tire models output forces and moments about a common tire
-origin instead, where trail and scrub show up as fitted internal quantities —
-the applied result is still a force-and-moment system either way. A
-force-only tire match can reproduce lateral acceleration while still missing
-steering torque, compliance loading, and the feel-fade near saturation: as the
-tire nears its limit, pneumatic trail can collapse while lateral force stays
-high, which is exactly what the driver and suspension feel.
-
-## Relaxation, Pressure, Temperature, And Wear
-
-Tire force doesn't appear instantly. Relaxation length is a distance-domain
-time constant, roughly the distance a tire must roll to build 63.2% of its
-steady-state force after a slip input. At vehicle speed $V$, that converts to
-an approximate time constant:
-
-$$
-\tau \approx \frac{\sigma}{V}
-$$
-
-A first-order relaxation model in distance:
-
-$$
-\frac{dF_y}{ds} =
-\frac{F_{y,ss}(\alpha) - F_y}{\sigma}
-$$
-
-where $s$ is distance traveled and $\sigma$ is relaxation length, which also
-relates to structural stiffness:
-
-$$
-\sigma \sim \frac{C_\alpha}{k_y}
-$$
-
-where $C_\alpha$ is cornering stiffness and $k_y$ is lateral shear stiffness.
-Higher pressure tends to stretch and stiffen the tire structure, reducing
-deformation and often speeding up force buildup — but check against data
-rather than assuming.
-
-Temperature can change peak force, stiffness, relaxation behavior, and wear
-behavior all at once; the only honest way to know is to look at tire data. For
-FSAE teams, TTC data and published Magic Formula fits from experienced fitting
-groups (Stackpole Engineering Services is a common one) are the practical
-resource. Wear can help or hurt capability depending on the tire, compound,
-surface, and operating window — test at multiple life points, and track
-lifetime power output as a way to correlate drive-day usage with controlled
-force-and-moment testing over time.
-
-## Empirical Tire Models
-
-Magic Formula and Pacejka-style models are empirical force laws, not physics —
-and that's fine, because tires are complicated and the point is to reproduce
-measured behavior across the operating region you care about.
-
-The discipline is knowing the valid range: normal load, camber, pressure,
-temperature, slip angle, slip ratio, surface condition, tire age and wear
-state. Outside that range, a beautiful fit becomes a beautiful lie.
+A tire is a nonlinear force law, not a scalar friction coefficient. Its force
+depends on normal load, slip angle, slip ratio, camber, temperature, pressure,
+history, and wear. It also builds force with a lag and moves its effective
+point of force application. For the full explanation, see
+[Tire Behavior](/reference/tires).
 
 ## Aero
 
-Aero is platform-sensitive force generation. The easy part is speed-squared
-scaling:
+Aero is platform-sensitive force generation. Speed-squared scaling is the easy
+part:
 
 $$
 q = \frac{1}{2} \rho V^2
@@ -373,14 +255,14 @@ $$
 F_{\text{aero}} = q S C(\text{platform})
 $$
 
-The hard part is knowing $C(\text{platform})$. For a race car, "platform" can
-include corner ride heights, pitch, roll, yaw, body slip, roadwheel angle,
-wheel wake, ground proximity, and upstream boundary conditions. Downstream
-flow control is often the difference in an effective package, so geometric
-inaccuracy, surface quality, mounting error, and boundary-condition mismatch
-all become real sources of uncertainty.
+The hard part is $C(\text{platform})$. For a race car, platform can include
+corner ride heights, pitch, roll, yaw, body slip, roadwheel angle, wheel wake,
+ground proximity, and upstream boundary conditions. Downstream flow control
+often decides whether a package works. Geometric inaccuracy, surface quality,
+mounting error, and boundary-condition mismatch are all real sources of
+uncertainty.
 
-A common approach: compute steady-state CFD force outputs across a
+A common approach is to compute steady-state CFD forces across a
 parameterized attitude space, then interpolate an aero map:
 
 $$
@@ -389,70 +271,79 @@ F(V, h_{\text{FL}}, h_{\text{FR}}, h_{\text{RL}}, h_{\text{RR}},
 \beta, \delta, ...)
 $$
 
-This is powerful with enough compute and a meaningful parameterization, but
-the map is only as good as its coverage, input fidelity, and validation.
-Platform control matters because aero balance migrates with ride height and
-pitch — the car doesn't just gain downforce with speed, it can gain
-front-biased or rear-biased downforce, drag, pitch moment, or roll/yaw moment,
-all of which change tire loads and dynamic response. Transient aero is harder
-still, since a platform change doesn't necessarily produce an instant force
-response; a fuller model needs force-generation time constants or transient
-CFD-derived dynamics. Aero is a force law coupled to the suspension platform,
-not just a coefficient.
+This works with enough compute and a meaningful parameterization. The map is
+only as good as its coverage, input fidelity, and validation.
 
-## Torsional Rigidity
+Platform control matters because aero balance moves with ride height and
+pitch. With speed, the car can gain front-biased or rear-biased downforce,
+drag, pitch moment, or roll and yaw moment. All of these change tire loads
+and dynamic response. Transient aero is harder: a platform change does not
+always produce an instant force response. A fuller model needs
+force-generation time constants or dynamics from transient CFD. Aero is a
+force law coupled to the suspension platform, not a single coefficient.
 
-Treat chassis torsional rigidity as coupled compliance, not a trophy number —
-the real question is whether chassis compliance meaningfully changes the
-response you're trying to control.
+## Torsional rigidity
 
-A rigid-frame model assumes front and rear suspension share a common body
-motion. A compliant chassis weakens that: the axles roll more independently,
-the actual load transfer distribution drifts from the intended rigid-frame
-value, and the transient response changes because the chassis adds another
-compliance path and energy storage mechanism. Judge torsional rigidity through
-its outputs — LLTD error from nominal, available LLTD adjustability, roll
-gradient, yaw response, lateral acceleration response, contact patch load
-variation, frequency response, driver confidence — not the number itself.
+Treat chassis torsional rigidity as coupled compliance, not a target number.
+The question is whether chassis compliance changes the response you want to
+control.
 
-Production vehicles sometimes use compliance deliberately in bushings,
-steering, subframes, tires, and structure to filter noise, improve
-robustness, shape feel, or protect components. In most FSAE applications the
-first goal is minimizing uncontrolled compliance, so the vehicle does what the
-engineer thinks it does. Compliance isn't inherently bad — unmodeled
-compliance is.
+A rigid-frame model assumes front and rear suspension share one body motion.
+A compliant chassis weakens that. The axles roll more independently, and the
+actual load transfer distribution drifts from the rigid-frame value. The
+transient response also changes, because the chassis adds a compliance path
+and stores energy.
+
+Judge torsional rigidity by its effects:
+
+- LLTD error from nominal
+- available LLTD adjustment range
+- roll gradient
+- yaw response
+- lateral acceleration response
+- contact patch load variation
+- frequency response
+- driver confidence
+
+Production vehicles sometimes use compliance on purpose, in bushings,
+steering, subframes, tires, and structure. It can filter noise, improve
+robustness, shape feel, or protect components. In most FSAE cars, the first
+goal is to minimize uncontrolled compliance, so the car does what the engineer
+expects. Compliance is not bad in itself. Unmodeled compliance is.
 
 ## Suspension
 
-The suspension exists to serve the tire: it's a passive mechanical system
-whose job is to keep the tires in useful operating states across the
-vehicle's range of motion and loading.
+The suspension serves the tire. It is a passive mechanical system that keeps
+the tires in useful operating states across the car's range of motion and
+loading.
 
-Suspension design changes camber, toe, caster, kingpin inclination, mechanical
-trail, scrub radius, motion ratio, spring/damper velocity, jacking response,
-anti behavior, roll stiffness distribution, and contact patch load variation.
-Each matters because it changes force generation, moment generation, or time
-response: camber matters because tires are camber-sensitive, toe creates slip
-angle and yaw moment, caster/KPI/trail/scrub matter because contact-patch
-forces create moments about steering and suspension axes, and motion ratio
-matters because a component-level spring or damper rate isn't the wheel-level
-rate.
+Suspension design changes these properties, and each one changes force
+generation, moment generation, or time response:
 
-Kinematics and compliance testing is system identification, not "the answer"
-— it lets an engineer compare the theoretical design to its physical
-equivalent. Analytical calculations can get close, but physical compliance
-(wheel bearings, joints, tires, structural interfaces with unloaded, seated,
-and snubbed rates) changes the effective behavior. The cleanest suspension
-question is always downstream: what did this do to the tire, and what did the
-vehicle do in response?
+| Property | Why it matters |
+| :-- | :-- |
+| Camber | Tires are camber-sensitive. |
+| Toe | Creates slip angle and yaw moment. |
+| Caster, KPI, mechanical trail, scrub radius | Contact-patch forces create moments about the steering and suspension axes. |
+| Motion ratio, spring and damper velocity | A component-level spring or damper rate is not the wheel-level rate. |
 
-## Transient Response
+Jacking response, anti behavior, roll stiffness distribution, and contact
+patch load variation also change force generation, moment generation, or time
+response.
 
-Driver confidence is a dynamic systems problem. A driver doesn't feel a roll
-center — they feel the time history of yaw rate, lateral acceleration, roll,
+Kinematics and compliance testing is system identification. It lets an
+engineer compare the design to the physical car. Analytical calculations can
+get close. Physical compliance changes the effective behavior: wheel bearings,
+joints, tires, and structural interfaces with unloaded, seated, and snubbed
+rates. Ask the downstream question: what did this do to the tire, and what did
+the vehicle do in response?
+
+## Transient response
+
+Driver confidence is a dynamic systems problem. A driver does not feel a roll
+center. They feel the time history of yaw rate, lateral acceleration, roll,
 steering torque, sideslip, and tire capacity. Frequency response, phase, lag,
-damping, and bandwidth are how the vehicle communicates with the driver, not
-abstract control theory.
+damping, and bandwidth describe how the car communicates with the driver.
 
 For yaw response:
 
@@ -468,26 +359,26 @@ G_{a_y}(j\omega) =
 \frac{A_y(j\omega)}{\Delta_{\text{HWA}}(j\omega)}
 $$
 
-Magnitude tells you how much response the vehicle produces; phase tells you
-when it arrives. For many driver-confidence targets, useful yaw-rate response
-should begin before full lateral acceleration buildup — the car needs to
-rotate toward a stable yaw state before the full lateral demand arrives. If
-yaw develops too slowly and lateral acceleration arrives suddenly, the driver
-gets a poor on-center feel and the tire system takes a sharp contact patch
-load event — bad twice: less predictable for the driver, and worse for grip in
-a nonlinear tire system.
+Magnitude says how much response the car produces. Phase says when it
+arrives.
 
-Open-loop tests (ramp steer, step steer, frequency response) are powerful
-because they expose the plant directly: quasi-steady behavior, transient
-buildup, overshoot, delay, and phase, without a driver feedback loop hiding
-any of it. Closed-loop driver behavior is the final reality, but open-loop
-testing is how you learn what the vehicle is before asking a driver to control
-it.
+For many driver-confidence targets, useful yaw-rate response should begin
+before full lateral acceleration builds. The car must rotate toward a stable
+yaw state before the full lateral demand arrives. If yaw develops too slowly
+and lateral acceleration arrives suddenly, two things go wrong. The driver
+gets a poor on-center feel. The tires take a sharp contact patch load event,
+which costs grip in a nonlinear tire.
 
-## Understeer Gradient
+Open-loop tests expose the plant directly: ramp steer, step steer, and
+frequency response. They show quasi-steady behavior, transient buildup,
+overshoot, delay, and phase, with no driver feedback loop to hide them.
+Closed-loop driver behavior is the final test. Open-loop testing shows what
+the vehicle is before a driver has to control it.
 
-Treat understeer gradient as a local slope, not a personality. In the linear
-region (often roughly 0.1 g to 0.4 g for many practical evaluations):
+## Understeer gradient
+
+Understeer gradient is a local slope. In the linear region (often about 0.1 g
+to 0.4 g in practical evaluations):
 
 $$
 K =
@@ -497,40 +388,41 @@ K =
 \right|_{\text{linear}}
 $$
 
-where $\delta_{\text{excess}}$ is the steering input above the simple
-geometric curvature requirement. It's useful because it shows how required
-steering changes with lateral acceleration in a local region — but one slope
-can't describe the whole vehicle. A car can have a reasonable linear
-understeer gradient and still be poor in transient response, limit behavior,
-contact patch load control, or driver confidence. Metrics are measurements,
-not complete explanations.
+$\delta_{\text{excess}}$ is the steering input above the geometric curvature
+requirement. The gradient shows how required steering changes with lateral
+acceleration in a local region. One slope cannot describe the whole vehicle.
+A car can have a reasonable linear understeer gradient and still be poor in
+transient response, limit behavior, contact patch load control, or driver
+confidence. Metrics are measurements, not complete explanations.
 
-## Why Simulation Matters
+BobSim reports linear and limit understeer gradients from steady-state
+sweeps. See [Steady-state handling](/reference/metrics#steady-state-handling).
 
-The physical picture is too coupled to evaluate from isolated metrics alone. A
-change to spring rate, damper curve, tire pressure, aero platform, geometry,
-or chassis stiffness rarely affects only one behavior — it propagates through
-loads, states, constraints, and force laws.
+## Why simulation matters
 
-Simulation makes those connections repeatable: the same vehicle definition
+The physical system is too coupled to judge from isolated metrics. A change to
+spring rate, damper curve, tire pressure, aero platform, geometry, or chassis
+stiffness rarely affects one behavior. It propagates through loads, states,
+constraints, and force laws.
+
+Simulation makes those connections repeatable. The same vehicle definition
 runs through the same maneuvers, with the same signal definitions, fitting
-methods, and output metrics. That doesn't make the model automatically
-correct, but it makes the assumptions inspectable and the results comparable.
-In BobDyn, this is why reports keep both the trace and the summary — a
-steady-state sweep may report understeer gradient, but the steering,
-curvature, roll, sideslip, and acceleration traces still matter.
+methods, and output metrics. That does not make the model correct. It makes
+the assumptions inspectable and the results comparable. This is why BobDyn
+reports keep both the trace and the summary. A steady-state sweep may report
+understeer gradient, but the steering, curvature, roll, sideslip, and
+acceleration traces still matter.
 
-Standard tests (ramp steer, step steer, frequency response, K&C-style sweeps,
-envelope studies) reduce a complicated vehicle into measurable outputs without
-pretending those outputs are the whole vehicle — they're a common language for
-correlation, debugging, and design exploration. A K&C sweep identifies
-geometry and compliance; a maneuver simulation shows the response those
-properties produce. The two are more useful together than either alone.
+Standard tests reduce the vehicle to measurable outputs: ramp steer, step
+steer, frequency response, K&C-style sweeps, and envelope studies. They give a
+common language for correlation, debugging, and design exploration. A K&C
+sweep identifies geometry and compliance. A maneuver simulation shows the
+response those properties produce. Use them together.
 
-## The Design Philosophy
+## The design questions
 
-Vehicle dynamics gets clear when every named concept is forced back into the
-dynamic system:
+Vehicle dynamics becomes clear when you force every named concept back into
+the dynamic system:
 
 - What are the states?
 - What are the inputs?
@@ -542,7 +434,7 @@ dynamic system:
 - What response is desired?
 
 Roll centers, LLTD, cornering stiffness, aero balance, damping ratio, natural
-frequency, understeer gradient, and bandwidth are useful because they compress
-behavior into engineering language — but the vehicle doesn't optimize the
-language, it responds to the physical system underneath. The work of vehicle
-dynamics is making the physics produce the behavior.
+frequency, understeer gradient, and bandwidth compress behavior into
+engineering language. The vehicle responds to the physical system underneath,
+not to the language. The work of vehicle dynamics is to make the physics
+produce the behavior you want.
