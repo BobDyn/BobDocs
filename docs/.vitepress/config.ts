@@ -127,6 +127,7 @@ const sidebar = {
         page("Vehicle Dynamics",            "/reference/vehicle-dynamics"),
         page("FSAE Bridge",                 "/reference/fsae-bridge"),
         page("Vehicle Performance Metrics", "/reference/metrics"),
+        page("Choosing Metrics",            "/reference/choosing-metrics"),
         page("Engineering Knowledge Base",   "/reference/field-notes"),
       ],
     },
