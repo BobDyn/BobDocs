@@ -29,7 +29,7 @@ features:
       height: "26"
       wrap: true
     title: BobDyn/BobLib
-    details: A Modelica library for representing the vehicle as an acausal multibody dynamic system with explicit geometry, constraints, tires, suspension, steering, chassis, and powertrain interfaces.
+    details: A Modelica library that models the vehicle as an acausal multibody system with explicit geometry, constraints, tires, suspension, and powertrain interfaces.
 
   - icon:
       src: /icons/bobsim.svg
@@ -38,7 +38,7 @@ features:
       height: "26"
       wrap: true
     title: BobDyn/BobSim
-    details: A local browser app and Python workflow runner that uses BobDyn/BobLib models to set up vehicles, launch studies, extract signals, generate plots, compute metrics, and produce reports.
+    details: A local browser app and Python workflow runner. It sets up vehicles, runs studies on BobDyn/BobLib models, and turns the results into metrics, plots, and reports.
 
   - icon:
       src: /icons/bobdyn.svg
@@ -47,22 +47,18 @@ features:
       height: "26"
       wrap: true
     title: BobDyn
-    details: The parent framework that connects physical modeling, automated simulation, analysis, reporting, and design correlation into one transparent workflow.
+    details: The parent framework. It joins the physical model and the analysis workflow so that every report traces back to plain-text model and config files.
 ---
 
 ## Vehicle Model Structure
 
 BobDyn models the vehicle as a hierarchy of physical systems. The structure is
-kept explicit so geometry, loads, constraints, and response signals can be
-traced from full-vehicle behavior down to subsystem assumptions.
+explicit, so you can trace geometry, loads, constraints, and response signals
+from full-vehicle behavior down to subsystem assumptions.
 
-This is central to the project philosophy: transparency starts with knowing
-where each piece of vehicle behavior lives in the model.
-
-Start with [BobDyn/BobSim](/bobsim/) for app-guided vehicle setup, simulation
-workflows, case execution, metrics, plots, and reports. Go to
-[BobDyn/BobLib](/boblib/) when you want to inspect, modify, or debug the
-low-level vehicle models directly.
+Start with [BobDyn/BobSim](/bobsim/) to set up a vehicle, run studies, and get
+metrics, plots, and reports. Go to [BobDyn/BobLib](/boblib/) to inspect,
+change, or debug the vehicle models directly.
 
 <div class="model-structure-diagram">
 
@@ -131,31 +127,43 @@ flowchart TB
 
 ---
 
-## A physical model for vehicle characterization
+## How BobDyn Works
 
-Vehicles are dynamic systems, and the driver experiences their response rather than their equations. BobDyn is built around that idea: use meaningful response metrics, keep the model inspectable, and make every study traceable from configuration to report.
+The driver feels a vehicle's response, not its equations. So BobDyn describes
+vehicles with response metrics, keeps the model inspectable, and makes every
+study traceable from configuration to report.
 
-BobDyn/BobLib provides the physical vehicle model in Modelica. BobDyn/BobSim takes that model, runs repeatable studies, extracts signals, and turns the results into plots, metrics, and reports.
+BobDyn/BobLib provides the physical vehicle model in Modelica. BobDyn/BobSim
+runs repeatable studies on that model and turns the results into plots,
+metrics, and reports. You can inspect, compare, and reuse those results across
+design iterations.
 
-The result is a workflow for generating simulation ground truth that you can inspect, compare, and reuse across design iterations.
+Every part of the pipeline is plain text under version control:
+
+| Part | Where it lives |
+| :-- | :-- |
+| Physical models | Modelica. Geometry, constraints, and force generation are written from first principles. |
+| Configuration | Vehicle records, test setups, and simulation parameters in YAML and Modelica `.mo` files |
+| Execution | Python workflows for simulation, extraction, analysis, and reporting. You can extend, change, or replace them. |
+| Results | Outputs link back to the model structure, configuration, and equations that produced them. |
 
 ---
 
-## What BobDyn enables
+## What You Can Do With BobDyn
 
 |Capability|Description|
 |:--|:--|
 |**Standard tests**|Run repeatable studies such as steady-state cornering, transient steering response, and kinematics/compliance workflows.|
-|**Automated reporting**|Turn simulation output into metrics, plots, CSV files, and engineering reports without hand-built post-processing.|
+|**Automated reporting**|Turn simulation output into metrics, plots, CSV files, and engineering reports with no manual post-processing.|
 |**Model correlation**|Use full-system simulation results as reference data for reduced-order models, design tools, and simplifying assumptions.|
-|**Design exploration**|Sweep parameters, compare configurations, and see how physical changes propagate through vehicle-level behavior.|
+|**Design exploration**|Sweep parameters, compare configurations, and see how physical changes affect vehicle-level behavior.|
 
 ---
 
 ## Sample Outputs
 
-The animations below are two input samples: one closed-loop PI control example
-and one open-loop prescribed-frequency input example.
+The two animations show input samples: a closed-loop PI control input and an
+open-loop prescribed-frequency input.
 
 <div class="sample-output-grid">
   <article class="sample-output-card">
@@ -186,10 +194,9 @@ and one open-loop prescribed-frequency input example.
   </article>
 </div>
 
-The PDF reports below come from current BobDyn/BobSim StandardSim workflows.
-They do not reflect the input samples above; they are separate generated study
-artifacts rendered here for quick inspection, with direct PDF links available
-for a wider view.
+The PDF reports come from BobDyn/BobSim StandardSim workflows. They are
+separate studies, not the input samples above. Open a PDF link for a wider
+view.
 
 <div class="sample-output-grid">
   <article class="sample-output-card">
@@ -216,14 +223,10 @@ for a wider view.
   </article>
 </div>
 
-## Minimal Worked Example
+## Quick Start
 
-The fastest user path downloads the BobSim desktop app from the
-[GitHub Release](https://github.com/BobDyn/BobSim/releases/latest), extracts
-it, and runs `BobSim`.
-
-For source-checkout development, run the same app in Docker. You need Git,
-Make, and Docker. The BobSim image contains OpenModelica and Python:
+Run BobSim from a source checkout in Docker. You need Git, Make, and Docker.
+The BobSim image contains OpenModelica and Python.
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
@@ -241,34 +244,14 @@ Setup -> Save Vehicle -> Write to MBD -> Simulation -> Archive
 
 ![BobSim app showing the guided Setup view with vehicle architecture controls and preview](/images/bobsim/app-setup-architecture.png)
 
-For a scripted release baseline:
+To run all four standard studies without the app, run
+`make standard-eval-all`. It builds the Modelica executables when they are
+missing, then runs RampSteerEval, SteadyStateEval, TransientEval, and
+FourPostEval. The PDF reports and metrics CSVs go to
+`_3_StandardSim/generated_results/`.
 
-```bash
-make standard-eval-all
-```
-
-The `standard-eval-all` target builds the required Modelica executables when
-they are missing, then runs RampSteerEval, SteadyStateEval, TransientEval, and
-FourPostEval. The expected review artifacts are PDF reports and metrics CSVs
-under `_3_StandardSim/generated_results/` and, for CLI-oriented configs,
-`_3_StandardSim/results/`.
-
----
-
-## Transparent by design
-
-BobDyn is built to eliminate black-box behavior through an explicit, inspectable, and reproducible simulation pipeline.
-
-- **Physical models are defined from first principles**  
-  Geometry, constraints, and force generation are implemented directly in Modelica.
-
-- **Configuration is human-readable**  
-  Vehicle records, test setups, and simulation parameters are defined in plain-text YAML and Modelica `.mo` files.
-
-- **Execution is visible and scriptable**  
-  Simulation, extraction, analysis, and reporting workflows are implemented in Python and designed to be built upon, modified, or replaced.
-
-- **Results are directly traceable**  
-  Outputs can be linked back to the model structure, configuration, and equations that produced them.
-
-All models, solvers, workflows, and reports come from plain-text, version-controlled sources.
+The [BobSim Startup](/startup-guide/bobsim) tutorial covers each step. To use
+the released desktop app from the
+[GitHub Release](https://github.com/BobDyn/BobSim/releases/latest) instead, see
+[Run BobSim Without Docker](/startup-guide/bobsim-without-docker). The desktop
+app needs a local OpenModelica to simulate.
