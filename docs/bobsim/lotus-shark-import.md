@@ -76,13 +76,18 @@ catches geometry edited after the datum was last verified.
 
 ## Overlay Report
 
-The overlay report plots the imported ("variant") car's suspension kinematic
-curves against the tracked baseline car, for both front and rear axles, across
-bump, roll, and (front axle only) steer sweeps — the same curve set as the
-app's own kinematics view (camber, toe, roll centre, instant centres, and
-related metrics). Steer curves are plotted against the solved road-wheel
-steer angle rather than commanded rack travel; the rear axle has no steer
-panels, since it isn't steered.
+The overlay report plots the imported ("variant") car's kinematic curves over
+the tracked baseline car. It uses the same curves as the app's kinematics view.
+
+| Sweep | Axles | Range | X-axis |
+| :-- | :-- | :-- | :-- |
+| Bump | Front and rear | ±40 mm jounce, 21 points | Jounce |
+| Roll | Front and rear | ±1.5° body roll, 21 points | Roll angle |
+| Steer | Front only | ±30 mm rack travel, 21 points | Solved road-wheel steer angle |
+
+The steer sweep plots camber, scrub radius, mechanical trail, roll-centre y
+and z, kingpin inclination, and caster. The x-axis is the steer angle that the
+solver finds, not the rack travel. The rear axle has no steer panels.
 
 ```bash
 make shark-overlay SHARK=<shark.shk>
@@ -95,11 +100,24 @@ _3_StandardSim/generated_results/shark_overlay_report.pdf
 _3_StandardSim/generated_results/shark_overlay_report.md
 ```
 
-The PDF includes a cover/notes page, paginated summary tables (design-position
-values, working-range slope, peak delta, and significance ranked against
-configurable tolerances via `--tol-deg`/`--tol-mm`), a headline grid of curves
-that exceed tolerance, and a full appendix grid of every curve/axle pair. The
-Markdown summary mirrors the same tables.
+The PDF includes a cover page, a run notes page, paginated summary tables
+(design-position values, working-range slope, peak delta, and significance
+ranked against configurable tolerances via `--tol-deg`/`--tol-mm`), a headline
+grid of curves that exceed tolerance, and a full appendix grid of every
+curve/axle pair. The Markdown summary mirrors the same tables.
+
+<article class="sample-output-card">
+  <p class="sample-output-label">Sample Overlay Report</p>
+  <p>
+    Generated from the rear-axle test fixture <code>tests/fixtures/rear_pushrod.shk</code>.
+    The datum gate is closed, so z-dependent curves are withheld. The front axle
+    is unchanged, so its bump, roll, and steer curves coincide.
+  </p>
+  <div class="sample-output-links">
+    <a href="/shark_overlay_report_69e561ac.pdf" target="_blank" rel="noreferrer">Open PDF report</a>
+  </div>
+  <PdfEmbed src="/shark_overlay_report_69e561ac.pdf" max-height="34rem" />
+</article>
 
 ### Four-Post Section
 
