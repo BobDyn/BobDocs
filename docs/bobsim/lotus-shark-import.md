@@ -100,11 +100,24 @@ _3_StandardSim/generated_results/shark_overlay_report.pdf
 _3_StandardSim/generated_results/shark_overlay_report.md
 ```
 
-The PDF includes a cover/notes page, paginated summary tables (design-position
-values, working-range slope, peak delta, and significance ranked against
-configurable tolerances via `--tol-deg`/`--tol-mm`), a headline grid of curves
-that exceed tolerance, and a full appendix grid of every curve/axle pair. The
-Markdown summary mirrors the same tables.
+The PDF includes a cover page, a run notes page, paginated summary tables
+(design-position values, working-range slope, peak delta, and significance
+ranked against configurable tolerances via `--tol-deg`/`--tol-mm`), a headline
+grid of curves that exceed tolerance, and a full appendix grid of every
+curve/axle pair. The Markdown summary mirrors the same tables.
+
+<article class="sample-output-card">
+  <p class="sample-output-label">Sample Overlay Report</p>
+  <p>
+    Generated from the rear-axle test fixture <code>tests/fixtures/rear_pushrod.shk</code>.
+    The datum gate is closed, so z-dependent curves are withheld. The front axle
+    is unchanged, so its bump, roll, and steer curves coincide.
+  </p>
+  <div class="sample-output-links">
+    <a href="/shark_overlay_report_69e561ac.pdf" target="_blank" rel="noreferrer">Open PDF report</a>
+  </div>
+  <PdfEmbed src="/shark_overlay_report_69e561ac.pdf" max-height="34rem" />
+</article>
 
 ### Four-Post Section
 
