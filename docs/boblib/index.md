@@ -94,6 +94,16 @@ flowchart TB
 
 </div>
 
+<details class="diagram-text">
+<summary>Text version</summary>
+
+1. VehicleInterfaces (shared contracts) and Records (vehicle data and schemas) feed the BobLib domains: chassis, aero, powertrain, controls.
+2. The domains feed Experiments.Standards: VehicleSim and FourPostSim.
+3. The experiments go through translation, initialization, regression, and smoke checks.
+4. Checked models run through direct omc/OMEdit or BobSim workflows.
+
+</details>
+
 ## Release Checks
 
 From the BobLib repository root:

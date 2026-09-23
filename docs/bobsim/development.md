@@ -43,6 +43,7 @@ development, run the same app from a source checkout.
 From the BobSim root:
 
 ```bash
+make docker-build
 make app
 ```
 
@@ -54,10 +55,14 @@ http://127.0.0.1:8765
 
 ![BobSim app Setup view after launch, showing guided setup tabs and vehicle preview](/images/bobsim/app-setup-architecture.png)
 
-The app runs in the Python environment that launched it. Install
-`requirements.txt` locally before using `make app`; install OpenModelica locally
-before building or running simulations from the app, or select a local
-OpenModelica install from the app's Simulation toolchain selector.
+`make app` runs the app in the `app` compose service. That service has a
+network so it can publish its port, which the other services do not. The port
+is published on `127.0.0.1` only. `APP_PORT` sets the host port. The app in the
+container uses the image's OpenModelica, so no local install is needed.
+
+`make app RUN=` runs the app in the Python environment that launched it.
+Install `requirements.txt` locally for that, and a local OpenModelica before
+building or running simulations from the app.
 
 Released desktop builds store generated user data in the per-user runtime
 workspace:
@@ -172,9 +177,6 @@ omc --version
 python -c "import yaml, scipy, pandas, matplotlib; print('ok')"
 ```
 
-VisualSim also needs the PyVista/Qt/VTK stack and FFmpeg support through
-ImageIO.
-
 ## Make Target Reference
 
 Setup and shell targets:
@@ -182,7 +184,7 @@ Setup and shell targets:
 | Target | Action |
 | :-- | :-- |
 | `make init` | Initialize/update git submodules |
-| `make app` | Launch the local BobSim browser app |
+| `make app` | Launch the BobSim browser app in Docker (`RUN=` for the host) |
 | `make deploy` | Build the native desktop artifact for the current OS |
 | `make deploy-package` | Package the current deploy artifact for release |
 | `make deploy-release` | Clean, build, and package a release artifact |
@@ -340,7 +342,8 @@ python -m pip install -r requirements.txt
 
 `omc` is missing from the app run log
 
-Open the app's OpenModelica toolchain selector and choose the `omc` executable
+This happens only outside Docker. Use `make app`, or open the app's
+OpenModelica toolchain selector and choose the `omc` executable
 plus the OpenModelica library directory. If auto-detection fails, common
 library defaults are `%APPDATA%\.openmodelica\libraries` on Windows and
 `~/.openmodelica/libraries` on macOS/Linux. For source-checkout CLI work, use
@@ -362,7 +365,7 @@ make clean-opt
 
 then rerun the relevant `make opt-*` target.
 
-`Visual render fails on import`
+`The app page does not load`
 
-Install the visualization dependencies from `requirements.txt`, and prefer the
-Docker shell if local Qt/VTK/PyVista packages are difficult to align.
+Open `http://127.0.0.1:8765`, not the `0.0.0.0` address the container prints.
+If the port is taken, use `make app APP_PORT=8766`.

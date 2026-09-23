@@ -31,7 +31,7 @@ debugging, and OMEdit diagram inspection.
 
 Launch the released desktop app by running `BobSim`.
 
-From a source checkout, launch the app from the BobSim root:
+From a source checkout, launch the app in Docker from the BobSim root:
 
 ```bash
 make app
@@ -50,7 +50,8 @@ The normal BobSim loop is:
    Aero, and Powertrain.
 3. Click `Save Vehicle`.
 4. Click `Write to MBD`.
-5. Verify the OpenModelica toolchain if Simulation asks for it.
+5. Outside Docker only, verify the OpenModelica toolchain if Simulation asks
+   for it.
 6. Open `Simulation`, choose a workflow, configure it, then `Build + Run`.
 7. Open `Archive` to review the generated PDF, metrics, and signal archive.
 
@@ -69,7 +70,7 @@ The vehicle chooser supports:
 
 | Action | What it does |
 | :-- | :-- |
-| `Load Vehicle` | Loads a saved vehicle from `_5_App/vehicle_configs/` |
+| `Load Vehicle` | Loads a saved vehicle from `_5_App/user_data/config/vehicles/` |
 | `Create Vehicle` | Starts from a checked-in architecture template |
 | `Import YAML` | Imports a vehicle YAML file |
 | `Continue Active File` | Keeps the currently active vehicle data |
@@ -127,8 +128,9 @@ Use `Save Config` when the same run setup should be reused later.
 
 ![BobSim simulation configuration modal with run config controls and Build and Run button](/images/bobsim/app-simulation-config.png)
 
-Simulation requires a verified OpenModelica toolchain. BobSim auto-detects
-common installs and lets you manually select the `omc` executable plus the
+Simulation requires a verified OpenModelica toolchain. With `make app` the app
+uses the image's OpenModelica and there is nothing to set. The desktop release
+and `make app RUN=` need a local install. BobSim auto-detects common installs and lets you manually select the `omc` executable plus the
 OpenModelica library directory when needed. The usual user library directories
 are `%APPDATA%\.openmodelica\libraries` on Windows and
 `~/.openmodelica/libraries` on macOS/Linux.
@@ -151,13 +153,13 @@ time-series appendix pages by default, and the retained per-run data lives in
 `signals.zip`. Saved app archive packages live under:
 
 ```text
-_5_App/saved_results/
+_5_App/user_data/results/saved/
 ```
 
 Vehicle-specific app workspaces live under:
 
 ```text
-_5_App/vehicle_workspaces/
+_5_App/user_data/workspaces/vehicles/
 ```
 
 Use `Delete` in Archive to remove a local run from both the saved archive and
@@ -280,8 +282,8 @@ If a simulation fails in the app:
 2. Check `Run Log`.
 3. Confirm the top status strip is green enough for the workflow you are
    running.
-4. Confirm the OpenModelica toolchain selector shows a verified `omc` and
-   library directory.
+4. Outside Docker, confirm the OpenModelica toolchain selector shows a
+   verified `omc` and library directory.
 5. Set `execution.cleanup: false` in the run config if you need raw artifacts.
 6. Rerun and inspect the retained run directory.
 

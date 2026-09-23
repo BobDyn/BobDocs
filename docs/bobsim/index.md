@@ -68,6 +68,17 @@ flowchart TB
 
 </div>
 
+<details class="diagram-text">
+<summary>Text version</summary>
+
+1. The BobSim app (Setup / Simulation / Archive) drives the BobLib model library (generated vehicle definitions) and the BobSim workflow YAML (cases and runtime overrides).
+2. The model library feeds the BobLib standard entry point: VehicleSim or FourPostSim.
+3. The entry point and the workflow YAML feed the OpenModelica executable.
+4. The executable writes BobSim outputs: reports, metrics, plots, sensitivities.
+5. The outputs go back to the app.
+
+</details>
+
 ## Repository Layout
 
 | Path | Role |
@@ -94,16 +105,14 @@ extract it, and run `BobSim`.
 The desktop app bundles the Python backend and embedded frontend. OpenModelica
 and generated simulation executables stay local to the user's machine.
 
-For source-checkout development, launch the app with:
+For source-checkout development, run the app in Docker. You need Git, Make,
+and Docker. The BobSim image contains OpenModelica and Python:
 
 ```bash
 git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
 cd BobSim
 make init
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+make docker-build
 make app
 ```
 
@@ -121,10 +130,9 @@ Setup -> Save Vehicle -> Write to MBD -> Simulation -> Archive
 
 ![BobSim app Setup view with guided steps, vehicle controls, and architecture preview](/images/bobsim/app-setup-architecture.png)
 
-For Docker-backed CLI workflows:
+The CLI workflows run in the same image:
 
 ```bash
-make docker-build
 make help
 ```
 

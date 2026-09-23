@@ -18,8 +18,8 @@ definition used by the standard workflows.
 Common app vehicle paths:
 
 ```text
-_5_App/vehicle_configs/
-_5_App/vehicle_workspaces/<vehicle>/config/vehicle.yml
+_5_App/user_data/config/vehicles/
+_5_App/user_data/workspaces/vehicles/<vehicle>/config/vehicle.yml
 ```
 
 Use the `Setup` view to load, create, import, edit, save, and write the active
@@ -47,7 +47,7 @@ The app exposes supported workflow fields in the browser and stores reusable
 run configs under:
 
 ```text
-_5_App/sim_configs/
+_5_App/user_data/config/simulations/
 ```
 
 Default app configs live in:
