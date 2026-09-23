@@ -8,71 +8,39 @@ next:
 
 # BobDyn/BobLib
 
-BobDyn/BobLib is the low-level Modelica vehicle model layer for BobDyn. The
-active package is `BobLib`: a standalone VehicleInterfaces-aligned library
-that retains BobLib's detailed chassis, suspension, tire, aero, powertrain, and
-control physics.
+BobLib is the Modelica vehicle model library for BobDyn. It holds the chassis,
+suspension, tire, aero, powertrain, and control physics, built inside the
+VehicleInterfaces contracts.
 
-::: info Current package name
-Current examples use `BobLib.*` class names. Modelica regression and component
-fixtures live in the sibling `Tests/BobLibTest` package.
+| Use | When you want to |
+| :-- | :-- |
+| BobLib | Inspect, change, translate, simulate, or debug the Modelica models directly. Browse diagrams in OMEdit. Run regression tests. |
+| [BobSim](/bobsim/) | Run complete vehicle studies: case execution, signal extraction, metrics, plots, reports, envelope maps, and sensitivity studies. |
+
+::: info In-package documentation
+BobLib ships its own guide at `BobLib.UsersGuide`. BobLib's README treats it as
+the source of truth for the package version. If this site and the UsersGuide
+disagree, the UsersGuide wins.
 :::
 
-Use BobDyn/BobLib when you want to inspect, modify, translate, simulate, or
-debug the physical Modelica models directly.
+## Key facts
 
-Use [BobDyn/BobSim](/bobsim/) when you want complete analysis workflows: case
-execution, signal extraction, metrics, plots, reports, envelope maps,
-sensitivity studies, and public baseline artifacts.
+| Item | Value |
+| :-- | :-- |
+| Package | `BobLib` (version `0.2.0` in `BobLib/package.mo`) |
+| Test package | `Tests/BobLibTest`, a sibling package of regression and component fixtures |
+| Dependencies | Modelica Standard Library `4.1.0`, VehicleInterfaces `2.0.2` |
+| Entry points | `Experiments.Standards.VehicleSim`, `FourPostSim`, and `VehicleFMI` |
+| Vehicle data | Checked-in Modelica records. There is no Python or YAML generation step. |
+| Shared signals | The VehicleInterfaces `controlBus`, plus a BobLib `AtmosphereBus` |
+| Animation | On by default (`headless = false`) |
 
-::: tip Which layer should I use?
-Clone BobLib directly for model development, package inspection, OMEdit diagram
-work, and regression testing. Start with BobSim when you want to run complete
-vehicle studies.
-:::
+## How the parts fit
 
-## Highlights
-
-- Built against Modelica Standard Library `4.1.0` and VehicleInterfaces `2.0.2`
-- Public subsystem packages follow the VehicleInterfaces chassis, driveline,
-  powertrain, driver, road, atmosphere, and bus contracts
-- `controlBus` is the shared VehicleInterfaces signal namespace for
-  standardized cross-subsystem intent, telemetry, status, and limits
-- BobLib physics live inside those contracts rather than beside duplicate
-  connector systems
-- Vehicle-level powertrain layout is explicit: battery, VCU, inverter, motor,
-  and driveline are visible at the simulation assembly level
-- Aero has a BobLib interface and rigid mount; ride heights arrive through
-  `controlBus.chassisBus`, while density and wind arrive through BobLib's
-  `AtmosphereBus`
-- Records are the durable Modelica parameter schemas and vehicle data
-- Python/YAML vehicle generation has been removed from the active model path
-- `Experiments.Standards.VehicleSim` and `Experiments.Standards.FourPostSim`
-  are the front-facing simulation entry points
-- `headless=false` by default so OMEdit examples open with animation visible
-- Root tests cover BobLib standards plus the `Tests/BobLibTest` regression and
-  component fixtures
-
-## Operating Model
-
-BobLib work now happens in four phases:
-
-1. Select or edit Modelica records and architecture templates.
-2. Translate the Modelica entry points.
-3. Run initialization, regression, and smoke checks.
-4. Simulate directly or through BobSim workflows.
-
-Vehicle selection is plain Modelica. The standard entry points extend checked-in
-templates under:
-
-```text
-BobLib.Experiments.Standards.Templates.Vehicle
-BobLib.Experiments.Standards.Templates.FourPost
-```
-
-Those templates expose the complete record and subsystem redeclare set so users
-can either follow the template pattern or hard-code a project/year-specific
-entry point.
+The standard entry points extend checked-in templates under
+`BobLib.Experiments.Standards.Templates`. To change a vehicle, you edit records
+and templates, translate the entry points, run the checks, and then simulate
+directly or through BobSim.
 
 <div class="workflow-diagram">
 
@@ -104,36 +72,24 @@ flowchart TB
 
 </details>
 
-## Release Checks
-
-From the BobLib repository root:
-
-```bash
-make test PYTHON=.venv/bin/python
-```
-
-That target runs Python checks, OpenModelica translation checks, initialization
-baselines, signal-level regressions, and BobLib smoke checks. The Modelica
-checks load Modelica `4.1.0` and VehicleInterfaces `2.0.2`.
-
-## Documentation Map
+## Pages
 
 | Page | Use it for |
 | :-- | :-- |
-| [Setup](/boblib/setup) | Clone path, prerequisites, Python environment, OpenModelica expectations |
-| [CLI Workflow](/boblib/cli-workflow) | `omc` loading, make targets, direct simulation |
-| [OMEdit Workflow](/boblib/omedit-workflow) | Opening BobLib visually, diagram browsing, manual simulation |
-| [Package Map](/boblib/package-map) | Repository layout and Modelica package areas |
-| [Control Bus](/boblib/control-bus) | VehicleInterfaces bus wiring, telemetry ownership, and explicit connector boundaries |
-| [Static Templates](/boblib/generation) | Checked-in records, subsystem redeclares, and architecture templates |
-| [Entry Points](/boblib/entry-points) | `VehicleSim`, `FourPostSim`, maneuver modes, tire relaxation behavior |
-| [Development](/boblib/development) | Regression tests, architecture rules, checks before commit |
-| [Troubleshooting](/boblib/troubleshooting) | Common OpenModelica, OMEdit, dependency, and regression problems |
+| [Setup](/boblib/setup) | Clone path, OpenModelica, libraries, Python environment |
+| [CLI Workflow](/boblib/cli-workflow) | Load, build, and simulate with `omc` |
+| [OMEdit Workflow](/boblib/omedit-workflow) | Open BobLib in OMEdit, browse diagrams, run a simulation |
+| [Package Map](/boblib/package-map) | Repository layout and Modelica packages |
+| [Control Bus](/boblib/control-bus) | Bus wiring, signal ownership, and what stays on explicit connectors |
+| [Static Templates](/boblib/generation) | Records, redeclares, and architecture templates |
+| [Entry Points](/boblib/entry-points) | `VehicleSim`, `FourPostSim`, `VehicleFMI`, maneuver modes, outputs |
+| [Tests and Checks](/boblib/testing) | `make` targets, test files, baselines |
+| [Development](/boblib/development) | Architecture rules and checks before you commit |
+| [Troubleshooting](/boblib/troubleshooting) | OpenModelica, OMEdit, dependency, and check failures |
 
-## Maturity Notes
+## Maturity
 
-- `BobLib` is the current standalone package root.
-- Public subsystem models should enter through the VehicleInterfaces-style
-  top-level domains. Reusable physics can live deeper within each domain.
-- Public release confidence comes from the root CI harness plus BobSim's
-  workflow-level checks.
+BobLib's README describes it as active engineering infrastructure, not a
+finished general-purpose vehicle library. Validate model outputs against
+measured data before you trust them. Release confidence comes from the BobLib
+check suite plus BobSim's workflow-level checks.
