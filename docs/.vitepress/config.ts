@@ -155,6 +155,7 @@ assertSidebarCoversDir("use-guide", sidebar["/use-guide/"]);
 assertSidebarCoversDir("boblib", sidebar["/boblib/"]);
 assertSidebarCoversDir("bobsim", sidebar["/bobsim/"]);
 assertSidebarCoversDir("reference", sidebar["/reference/"]);
+assertSidebarCoversDir("reference/field-notes", sidebar["/reference/"]);
 
 // ---------------------------------------------------------------------------
 // Config
