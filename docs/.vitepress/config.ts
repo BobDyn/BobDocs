@@ -91,6 +91,7 @@ const sidebar = {
         page("Control Bus",     "/boblib/control-bus"),
         page("Static Templates", "/boblib/generation"),
         page("Entry Points",    "/boblib/entry-points"),
+        page("Tests and Checks", "/boblib/testing"),
         page("Development",     "/boblib/development"),
         page("Troubleshooting", "/boblib/troubleshooting"),
       ],
