@@ -126,6 +126,7 @@ const sidebar = {
       items: [
         page("Vehicle Dynamics",            "/reference/vehicle-dynamics"),
         page("FSAE Bridge",                 "/reference/fsae-bridge"),
+        page("Single-Season Validation",    "/reference/fsae-season-plan"),
         page("Vehicle Performance Metrics", "/reference/metrics"),
         page("Choosing Metrics",            "/reference/choosing-metrics"),
         page("Engineering Knowledge Base",   "/reference/field-notes"),
