@@ -47,7 +47,7 @@ or serviced consistently.
 
 GD&T and datums are the language that connect design intent to inspection.
 Tolerances should control the features that actually locate, seal, rotate,
-align, or transfer load. Over-tolerancing increases cost; under-tolerancing
+align, or transfer load. Over-tolerancing increases cost. Under-tolerancing
 creates assembly variation and unreliable performance.
 
 Welding and heat treatment can change material properties near the joint or
@@ -176,10 +176,10 @@ enough that teams can test compatibility instead of discovering conflicts at
 final assembly.
 
 Risk can be tracked by likelihood, severity, detectability, and mitigation
-plan. The important part is not the scoring system itself; it is whether the
-team can see which uncertainties still threaten the design.
+plan. The scoring system matters less than whether the team can see which
+uncertainties still threaten the design.
 
-A requirement should be testable. "Lightweight" is a preference; "mass shall
+A requirement should be testable. "Lightweight" is a preference. "Mass shall
 be less than 4.0 kg" is a requirement. Good requirements define value, units,
 condition, tolerance, and verification method.
 
@@ -268,9 +268,8 @@ Regression testing is not the same as validation. A regression test can prove
 that a simulation still matches a previous result. It cannot prove that the
 previous result represented the real system.
 
-A mature engineering claim refuses to overreach. If a test does not cover a
-region, the correct conclusion is not that the model is wrong everywhere; it is
-that the model is unvalidated in that region.
+An engineering claim should not overreach. If a test does not cover a region,
+the model is unvalidated in that region, not wrong everywhere.
 
 ## Engineering Economy
 
@@ -327,7 +326,7 @@ $$
 
 Book depreciation methods include straight-line, declining-balance, and
 units-of-production approaches. Depreciation affects accounting and tax
-analysis; it is not the same as physical wear.
+analysis. It is not the same as physical wear.
 
 Incremental rate-of-return analysis compares alternatives by the additional
 investment required and the additional return produced. It avoids selecting an

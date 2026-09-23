@@ -183,8 +183,8 @@ keys, and relationships. They are useful when data must be queried, joined,
 validated, and kept consistent across entities.
 
 Common relational operations include selection, projection, join, union,
-difference, and aggregation. These operations are not only database details;
-they define how engineering data can be compared without losing traceability.
+difference, and aggregation. These operations define how engineering data can be
+compared without losing traceability.
 
 Data-interchange formats such as CSV, JSON, YAML, Parquet, HDF5, MAT, and
 SQLite each imply different tradeoffs in readability, schema strictness,
@@ -197,8 +197,8 @@ still need to be explicit.
 
 Continuous integration can check formatting, unit tests, smoke simulations,
 translation, regression metrics, documentation builds, and dependency health.
-The goal is not to prove correctness absolutely; it is to catch drift before it
-becomes invisible.
+The goal is to catch drift before it becomes invisible, not to prove
+correctness.
 
 A good simulation tool separates model definition, execution, result
 extraction, plotting, and reporting. This makes it easier to rerun workflows,

@@ -58,8 +58,8 @@ f(x) + \nabla f(x)^T\Delta x +
 \frac{1}{2}\Delta x^T\nabla^2 f(x)\Delta x
 $$
 
-Taylor approximations connect calculus, linearization, uncertainty
-propagation, optimization, and numerical methods.
+Taylor approximations underlie linearization, uncertainty propagation,
+optimization, and numerical methods.
 
 For a vector function $f(x)$, first-order linearization uses the Jacobian:
 
@@ -67,8 +67,7 @@ $$
 f(x+\Delta x)\approx f(x)+J_f(x)\Delta x
 $$
 
-This is the mathematical bridge between nonlinear models and local linear
-models. It appears in state-space linearization, Newton methods, Kalman-style
+This links nonlinear models to local linear models. It appears in state-space linearization, Newton methods, Kalman-style
 estimation, sensitivity studies, and uncertainty propagation.
 
 Conditioning describes how strongly input errors affect output errors. A
@@ -100,8 +99,8 @@ equations, partial differential equations, state-space models, transfer
 functions, empirical regressions, lookup tables, finite-element models,
 multibody models, optimization problems, and discrete-event simulations.
 
-The system boundary is critical. Anything outside the boundary is treated as
-an input, ignored, or absorbed into a parameter.
+Anything outside the system boundary is treated as an input, ignored, or
+absorbed into a parameter.
 
 Models can be physical, empirical, data-driven, or hybrid. A physical model
 uses conservation laws and constitutive relationships. An empirical model is
@@ -204,8 +203,8 @@ Buckingham Pi analysis states that a physical relationship with $n$ variables
 and $k$ independent dimensions can be written using $n-k$ nondimensional
 groups.
 
-Scaling is especially important when transferring results between models,
-tests, simulations, and real systems.
+Scaling matters when you transfer results between models, tests,
+simulations, and real systems.
 
 Common nondimensional groups include:
 
@@ -218,9 +217,8 @@ Common nondimensional groups include:
 | Nusselt number | convection relative to conduction |
 | Biot number | internal conduction resistance versus surface convection resistance |
 
-Nondimensional groups are not decoration. They describe which physical
-similarity conditions must hold before one test, simulation, or scale model can
-support claims about another.
+Nondimensional groups describe which physical similarity conditions must hold
+before one test, simulation, or scale model can support claims about another.
 
 ## System Modeling And Energy Domains
 
@@ -282,8 +280,7 @@ source, and transformation categories:
 | Transformer | changes effort-flow ratio | lever, gear, transformer, piston area |
 | Gyrator | swaps effort-flow relationship | motor, generator, electromechanical transducer |
 
-Causality matters because a model may imply impossible information flow. For
-example, commanding both force and displacement of an ideal mass without a
+A model can imply impossible information flow. For example, commanding both force and displacement of an ideal mass without a
 compliance or constraint model usually over-specifies the system.
 
 ## Electrical And Hydraulic Systems

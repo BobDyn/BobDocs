@@ -231,8 +231,8 @@ $$
 \nabla f(x^*)=0
 $$
 
-Convex problems are important because local optima are also global optima
-under appropriate assumptions.
+In convex problems, local optima are also global optima under appropriate
+assumptions.
 
 Common methods include steepest descent, Newton's method, quasi-Newton
 methods, conjugate gradient, coordinate descent, line search methods, and
@@ -299,7 +299,7 @@ stability, convergence criteria, and solver tolerances.
 
 A linear system may be solved by direct methods such as factorization or
 iterative methods such as Krylov subspace methods. Direct methods can be
-reliable for moderate dense systems; iterative methods are often necessary for
+reliable for moderate dense systems. Iterative methods are often necessary for
 large sparse systems.
 
 Condition number describes sensitivity:
@@ -326,7 +326,7 @@ relationships from noisy data. These are different tasks, even when both
 produce curves through or near data.
 
 Solver warnings, singular systems, nonconvergence, and sensitivity to
-tolerances are part of the technical result, not just software noise.
+tolerances are part of the technical result, not software noise.
 
 Newton's method for solving $F(x)=0$ updates:
 

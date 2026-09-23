@@ -30,8 +30,7 @@ $$
 F(s)=\int_0^\infty f(t)e^{-st}\,dt
 $$
 
-This makes linear differential equations easier to manipulate as algebraic
-relationships.
+Linear differential equations then become algebraic relationships.
 
 The Fourier transform represents signal content by frequency. Frequency-domain
 analysis is useful for bandwidth, phase lag, filtering, resonance, noise, and
@@ -174,7 +173,7 @@ $$
 
 Bode plots show magnitude and phase versus frequency. Root locus shows how
 closed-loop poles move as gain changes. Lead compensation can add phase and
-increase stability margin; lag compensation can improve low-frequency gain and
+increase stability margin. Lag compensation can improve low-frequency gain and
 steady-state accuracy.
 
 Gain margin and phase margin quantify how much loop gain or phase lag can be
@@ -248,8 +247,8 @@ J=\int_0^\infty (x^TQx+u^TRu)\,dt
 $$
 
 The matrices $Q$ and $R$ encode state-error and control-effort penalties. LQR
-does not remove the need for engineering judgment; it gives a disciplined way
-to express tradeoffs once the model and state scaling are meaningful.
+does not replace engineering judgment. It gives a disciplined way to express
+tradeoffs once the model and state scaling are meaningful.
 
 Robust control begins with the fact that every plant model is wrong outside
 some tolerance. Uncertainty can enter through parameters, unmodeled dynamics,

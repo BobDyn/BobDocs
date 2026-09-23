@@ -58,7 +58,7 @@ steering angle as lateral acceleration increases.
 
 Lateral load transfer moves normal load from inside tires to outside tires.
 Because tires are load sensitive, the outside tires do not gain as much force
-capacity as the inside tires lose. This is a central reason roll stiffness
+capacity as the inside tires lose. This is a main reason roll stiffness
 distribution affects balance.
 
 Longitudinal load transfer changes normal load during acceleration and
@@ -89,7 +89,7 @@ driver input.
 
 Quasi-steady-state analysis describes operating capability when transient
 states are assumed settled. Multibody dynamics describes physical response
-inside that capability envelope. Neither replaces testing; both need
+inside that capability envelope. Neither replaces testing. Both need
 correlation to measured response.
 
 Reduced vehicle models must preserve the original system behavior relevant to

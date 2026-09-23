@@ -208,7 +208,7 @@ $$
 Re=\frac{\rho V L}{\mu}
 $$
 
-Boundary-layer behavior is central to convection, drag, skin friction, and
+Boundary-layer behavior governs convection, drag, skin friction, and
 separation. Laminar and turbulent regimes require different assumptions.
 
 The incompressible continuity equation is:

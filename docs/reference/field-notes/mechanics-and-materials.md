@@ -49,17 +49,16 @@ $$
 $$
 
 This transport theorem is the source of centripetal, Coriolis, and gyroscopic
-terms. Those terms are not extra physics; they are bookkeeping required by
-the chosen frame.
+terms. Those terms are bookkeeping required by the chosen frame, not extra
+physics.
 
 Generalized coordinates $q$ describe system configuration using the variables
 that best match the constraints. They may be angles, lengths, modal
 coordinates, path coordinates, or any independent coordinates sufficient to
 describe configuration.
 
-Kinematics is often the hidden source of modeling errors. Sign conventions,
-frame definitions, derivative frames, and small-angle assumptions must be made
-explicit.
+Kinematics is a common source of modeling errors. Make sign conventions,
+frame definitions, derivative frames, and small-angle assumptions explicit.
 
 Rigid-body kinematics also separates translation of a reference point from
 rotation about that point. For two points $A$ and $B$ on a rigid body:
@@ -76,29 +75,9 @@ relative motion at joints or contacts.
 
 Mechanics relates force, momentum, motion, energy, and constraints.
 
-Newton's second law is most generally a momentum balance:
-
-$$
-\sum F = \frac{dp}{dt}
-$$
-
-For a constant-mass body in an inertial frame:
-
-$$
-\sum F = ma
-$$
-
-Angular dynamics follow the same structure:
-
-$$
-\sum M_O = \frac{dH_O}{dt}
-$$
-
-For a fixed principal axis with constant inertia:
-
-$$
-\sum M = I\alpha
-$$
+Newton's second law and its angular form are momentum balances.
+[Balance Laws](/reference/field-notes/math-and-modeling#balance-laws) gives the
+general forms and their reductions to $\sum F = ma$ and $\sum M = I\alpha$.
 
 Common ideal elements:
 
@@ -248,21 +227,8 @@ local load paths, stiffness discontinuities, and inspection requirements.
 Materials engineering relates structure, processing, properties, and
 performance.
 
-Stress and strain are:
-
-$$
-\sigma=\frac{F}{A}
-$$
-
-$$
-\epsilon=\frac{\Delta L}{L}
-$$
-
-Linear elastic behavior is:
-
-$$
-\sigma=E\epsilon
-$$
+Stress, strain, and linear elastic behavior are defined in
+[Machine Elements And Failure](#machine-elements-and-failure).
 
 Material behavior may include elastic deformation, plastic deformation, yield,
 fracture, fatigue, creep, wear, corrosion, thermal expansion, anisotropy, and
@@ -358,7 +324,7 @@ Galvanic corrosion occurs when dissimilar materials are electrically connected
 in an electrolyte. The less noble material tends to corrode faster, especially
 when a small anodic area is coupled to a large cathodic area.
 
-Passivation forms a protective surface film. It can dramatically reduce
+Passivation forms a protective surface film. It can greatly reduce
 corrosion rate, but local chemistry, chloride concentration, mechanical damage,
 or crevices can break down the passive layer.
 
