@@ -11,28 +11,21 @@ next:
 
 # Static Vehicle Templates
 
-BobLib no longer uses a Python/YAML generation step for the active vehicle.
-Vehicle architectures are checked in as ordinary Modelica classes and records
-so the package can be inspected, edited, translated, and reviewed without
-regenerating source files first.
+BobLib vehicle architectures are checked-in Modelica classes and records. There
+is no Python or YAML generation step. You can inspect, edit, translate, and
+review the package without regenerating source files.
 
-## VehicleInterfaces Boundary
+## Template layers
 
-BobLib is organized so VehicleInterfaces-facing models are obvious:
+Each standard entry point sits on three layers:
 
-- top-level subsystem models extend or adapt the VehicleInterfaces contracts
-- deeper packages contain BobLib's reusable physics
-- subsystem-specific actuators, records, tires, and helpers live with the
-  package that owns them
-- shared math, FMI, mechanics, and multibody helpers live under `Utilities`
+| Layer | Example | Role |
+| :-- | :-- | :-- |
+| Base template | `Templates.Vehicle.BaseVehicleSim` | Plant wiring, maneuver monitors, and the full replaceable subsystem set |
+| Architecture template | `Templates.Vehicle.VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar` | Redeclares the vehicle record and the front and rear axles for one architecture |
+| Entry point | `Standards.VehicleSim` | Extends one architecture template and sets the experiment |
 
-This keeps the shared contract separate from the physics implementation.
-
-## Standard Template Layer
-
-`BobLib.Experiments.Standards.Templates.Vehicle.BaseVehicleSim`
-contains the shared maneuver simulation assembly. It exposes the complete
-subsystem set as redeclareable items:
+`BaseVehicleSim` exposes each subsystem as a replaceable component:
 
 ```txt
 replaceable record VehicleRecord =
@@ -45,62 +38,74 @@ replaceable BobLib.PowerElectronics.InverterDC inverter;
 replaceable BobLib.ElectricDrives.Motor motor;
 replaceable BobLib.Transmissions.FixedRatioTransmission transmission;
 replaceable BobLib.Drivelines.RearFinalDriveDifferential driveline;
+replaceable BobLib.Chassis.Brakes.BasicVCUBrakes brakes;
 ```
 
-The front-facing entry point stays small:
+The road, atmosphere, and MultiBody world are also replaceable.
+
+An architecture template redeclares the record and the chassis axles. This is
+a shortened copy of
+`VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar`:
 
 ```txt
-model VehicleSim
-  extends Templates.Vehicle.BaseVehicleSim(
+model VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar
+  extends BaseVehicleSim(
     redeclare record VehicleRecord =
       BobLib.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord,
-    redeclare BobLib.Chassis.Chassis_DWBCStabar_DWBCStabar chassis,
-    redeclare BobLib.EnergyStorage.BatteryPack battery,
-    redeclare BobLib.Controllers.StandardVCU vcu,
-    redeclare BobLib.PowerElectronics.InverterDC inverter,
-    redeclare BobLib.ElectricDrives.Motor motor,
-    redeclare BobLib.Transmissions.FixedRatioTransmission transmission,
-    redeclare BobLib.Drivelines.RearFinalDriveDifferential driveline);
-end VehicleSim;
+    redeclare BobLib.Chassis.Chassis_DW chassis(
+      redeclare model FrAxleModel = BobLib.Chassis.Suspension.FrAxleDW_BC_Stabar,
+      redeclare model RrAxleModel = BobLib.Chassis.Suspension.RrAxleDW_BC_Stabar,
+      ...));
+end VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar;
 ```
 
-Users can follow the template pattern, redeclare a different architecture, or
-hard-code a year-specific model once the architecture is fixed.
+`Standards.VehicleSim` extends that template and adds the initial chassis pose
+and the experiment settings.
 
-## Four-Post Templates
+You can follow this pattern, redeclare a different architecture, or hard-code a
+year-specific model once the architecture is fixed.
 
-`BobLib.Experiments.Standards.Templates.FourPost.BaseFourPostSim` follows the
-same idea for K&C/four-post evaluation. The front-facing `FourPostSim` extends
-the selected architecture template, and the template redeclares the vehicle
-record plus matching front and rear four-post axle adapters.
+## Suspension matrix
 
-The current checked-in suspension matrix covers:
+The checked-in templates cover every front and rear combination of three axle
+types:
 
-- `DWDirect`
-- `DWBC`
-- `DWBCStabar`
+| Name | Axle models |
+| :-- | :-- |
+| `DWDirect` | `FrAxleDW_Direct`, `RrAxleDW_Direct` |
+| `DWBC` | `FrAxleDW_BC`, `RrAxleDW_BC` |
+| `DWBCStabar` | `FrAxleDW_BC_Stabar`, `RrAxleDW_BC_Stabar` |
 
-for front and rear axle positions.
+That gives nine `VehicleSim_EVBatInvMotDiff_<front>_<rear>` templates, nine
+`FourPostSim_<front>_<rear>` templates, and nine matching records under
+`Records.VehicleDefn`.
 
-## Extending The Matrix
+`Templates.FourPost.BaseFourPostSim` applies the same idea to four-post and K&C
+runs. Each four-post template redeclares the vehicle record and the front and
+rear axle models.
 
-To add a new vehicle architecture, add or update the Modelica sources directly:
+## Switch the architecture
 
-1. Add the record under `BobLib/Records/VehicleDefn/`.
-2. Add subsystem records under `Records/VehicleRecord/` near the owning domain.
-3. Add any needed axle assembly under `Chassis/Suspension/`.
+To change the architecture of a standard entry point, edit
+`BobLib/Experiments/Standards/VehicleSim.mo` or `FourPostSim.mo` so it extends a
+different architecture template. A project- or year-specific model can also
+extend a template and set explicit values there.
+
+## Add an architecture
+
+1. Add the vehicle record under `BobLib/Records/VehicleDefn/`.
+2. Add subsystem records under `Records/VehicleRecord/`, near the owning domain.
+3. Add any new axle assembly under `Chassis/Suspension/`.
 4. Add or update domain models one level below the public package boundary.
-5. Add a `VehicleSim` template or direct experiment that exposes the full
+5. Add a `VehicleSim` template, or a direct experiment that exposes the full
    redeclare set.
-6. Add a `FourPostSim` template when the architecture needs four-post/K&C
+6. Add a `FourPostSim` template if the architecture needs four-post or K&C
    coverage.
 7. Add the new classes to the relevant `package.order` files.
 8. Add or update `BobLibTest` fixtures.
-9. Run the translation, initialization, and smoke checks.
+9. Run the checks below.
 
-## Validation
-
-After changing static vehicle templates, run:
+## Validate a change
 
 ```bash
 make modelica-translation PYTHON=.venv/bin/python
@@ -108,5 +113,5 @@ make modelica-initialization PYTHON=.venv/bin/python
 python -m pytest Tests/test_boblib_modelica.py
 ```
 
-Run `make test PYTHON=.venv/bin/python` before release or before committing
-behavior changes.
+Run `make ci PYTHON=.venv/bin/python` before you commit a behavior change. See
+[Tests and Checks](/boblib/testing).

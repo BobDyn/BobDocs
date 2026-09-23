@@ -5,118 +5,113 @@ prev:
   text: 'Static Templates'
   link: '/boblib/generation'
 next:
-  text: 'Development'
-  link: '/boblib/development'
+  text: 'Tests and Checks'
+  link: '/boblib/testing'
 ---
 
 # Entry Points
 
-BobLib standard entry points are Modelica models intended for BobSim workflows
-and direct OpenModelica experiments.
+The standard entry points are the Modelica models in
+`BobLib.Experiments.Standards`. BobSim workflows and direct OpenModelica runs
+both start from them.
 
-## `BobLib.Experiments.Standards.VehicleSim`
+| Model | Use it for | BobSim studies |
+| :-- | :-- | :-- |
+| [`VehicleSim`](#vehiclesim) | Full-vehicle maneuver simulation | RampSteerEval, SteadyStateEval, TransientEval |
+| [`FourPostSim`](#fourpostsim) | Suspension and chassis response in heave and roll | FourPostEval |
+| [`VehicleFMI`](#vehiclefmi) | FMI export, driver-in-the-loop, and software-in-the-loop work | None |
 
-`VehicleSim` is the main maneuver simulation wrapper. It follows the
-VehicleInterfaces demo-style stack while inserting BobLib's detailed physics
-through explicit subsystem redeclares.
+## `VehicleSim`
 
-The visible vehicle-level assembly includes:
+`VehicleSim` is the main maneuver simulation. It follows the VehicleInterfaces
+demo-style assembly and inserts BobLib physics through subsystem redeclares.
+See [Static Vehicle Templates](/boblib/generation) for the template stack.
 
-- road and atmosphere models from VehicleInterfaces
-- BobLib driver environment and brakes through VehicleInterfaces boundaries
-- BobLib chassis and suspension
-- BobLib aero interface and CFD aero map
-- BobLib battery pack
-- BobLib VCU
-- BobLib DC inverter
-- BobLib electric motor
-- BobLib rear final drive and differential
-- Modelica MultiBody world
+The vehicle-level assembly contains:
 
-The assembly uses one shared VehicleInterfaces `controlBus`. Subsystems publish
-their owned measurements and commands on their domain buses: chassis ride
-heights feed aero through `chassisBus`, chassis/battery/motor measurements feed
-the VCU through their buses, the driver environment publishes driver intent,
-and the VCU publishes electric-drive and mechanical-brake requests for
-downstream subscribers. With the default regen blend, negative PI
-speed-control torque goes to the mechanical brake request. Because
-VehicleInterfaces 2.0.2 atmospheres have no control-bus connector, BobLib also
-adds a shared `AtmosphereBus`; atmosphere publishes density and wind there, and
-aero subscribes to compute relative airspeed locally.
-
-Current maneuver mode parameter:
-
-| `useMode` | Mode |
+| Subsystem | Default model |
 | :-- | :-- |
-| `0` | open-loop ramp steer |
-| `1` | open-loop sinusoidal steer |
-| `2` | step steer |
+| Road | `VehicleInterfaces.Roads.FlatRoad` |
+| Atmosphere | `BobLib.Atmospheres.ConstantAtmosphere` |
+| Driver environment | `BobLib.DriverEnvironments.Internal.Driver` |
+| Chassis and suspension | `BobLib.Chassis.Chassis_DW` with bellcrank double-wishbone axles and stabilizer bars |
+| Brakes | `BobLib.Chassis.Brakes.BasicVCUBrakes` |
+| Aero | `BobLib.Aero.CFDAeroMap` |
+| Battery | `BobLib.EnergyStorage.BatteryPack` |
+| VCU | `BobLib.Controllers.StandardVCU` |
+| Inverter | `BobLib.PowerElectronics.InverterDC` |
+| Motor | `BobLib.ElectricDrives.Motor` |
+| Transmission | `BobLib.Transmissions.FixedRatioTransmission` |
+| Driveline | `BobLib.Drivelines.RearFinalDriveDifferential` |
+| World | `Modelica.Mechanics.MultiBody.World` |
 
-Common output variables include:
+Subsystems share signals through one VehicleInterfaces `controlBus` and the
+BobLib `AtmosphereBus`. See [Control Bus](/boblib/control-bus).
 
-- `speed`
-- `accX`
-- `accY`
-- `yawVel`
-- `roll`
-- `sideslip`
-- `handwheelAngle`
-- `handwheelTorque`
-- `leftSteerAngle`
-- `rightSteerAngle`
-- `Fz_FL`, `Fz_FR`, `Fz_RL`, `Fz_RR`
+### Maneuver modes
 
-BobSim uses this entry point for RampSteer, SteadyStateEval, and TransientEval
-workflows.
+Set the maneuver with `vcu.useMode` on `StandardVCU`:
 
-## Tire Transients
+| `vcu.useMode` | Maneuver |
+| :-- | :-- |
+| `0` | Open-loop ramp steer (default) |
+| `1` | Open-loop sinusoidal steer |
+| `2` | Step steer |
+| `3` | Closed-loop steady-state lateral acceleration |
 
-Vehicle wrappers can redeclare the MF52 tire slip model to:
+In mode `3`, the VCU ramps `vcu.targetAy` and drives measured `accY` to that
+target with a handwheel-angle PI controller. The VCU speed controller holds
+longitudinal speed.
+
+### Outputs
+
+| Group | Variables |
+| :-- | :-- |
+| Motion | `velX`, `velY`, `accX`, `accY`, `yawVel`, `roll`, `sideslip` |
+| Steering | `handwheelAngle`, `handwheelTorque`, `steerExcess`, `leftSteerAngle`, `rightSteerAngle` |
+| Tire loads | `Fz_FL`, `Fz_FR`, `Fz_RL`, `Fz_RR` |
+
+## Tire transients
+
+The standard chassis models redeclare the MF52 slip model of all four tires to:
 
 ```text
 BobLib.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlip
 ```
 
-for front-left, front-right, rear-left, and rear-right tires. The transient slip
-model receives relaxation parameters from the matching tire model record:
-
-```text
-pVehicle.pFrTireModel.relaxation
-pVehicle.pRrTireModel.relaxation
-```
-
-The relaxation data is encoded in:
+The transient slip model reads relaxation parameters from the tire model
+records `pVehicle.pFrTireModel.relaxation` and
+`pVehicle.pRrTireModel.relaxation`. Their type is:
 
 ```text
 BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.RelaxationRecord
 ```
 
-If the relaxation coefficients are not populated, the transient slip model
-falls back to default longitudinal and lateral relaxation lengths.
+If the relaxation coefficients are not populated, the model falls back to
+default longitudinal and lateral relaxation lengths.
 
-## Animation And Batch Runs
+## Animation and batch runs
 
-BobLib standard models use:
+The standard models declare:
 
 ```text
 inner parameter Boolean headless = false
 ```
 
-by default on the public simulation paths. This means OMEdit examples open with
-MultiBody animation geometry visible. Set `headless=true` for batch or CI runs
-where visualization geometry is not needed.
+With the default, OMEdit shows MultiBody animation geometry. Set
+`headless = true` for batch or CI runs that do not need it.
 
-## `BobLib.Experiments.Standards.FourPostSim`
+## `FourPostSim`
 
-`FourPostSim` isolates suspension/chassis response for heave and roll sweeps.
-It extends a static four-post architecture template and uses
-`FourPostEvalRecord` outputs so K&C-style response data can be extracted
-consistently.
+`FourPostSim` isolates suspension and chassis response for heave and roll
+sweeps. It extends a four-post architecture template. Its outputs are two
+`FourPostEvalRecord` instances, `frKnC` and `rrKnC`, which hold K&C-style
+response data for the front and rear axles.
 
-Common output records:
+## `VehicleFMI`
 
-- `frKnC`
-- `rrKnC`
-
-BobSim uses this entry point for FourPostEval and downstream suspension
-metrics.
+`VehicleFMI` is a full vehicle whose only public inputs are the driver
+commands: steering-wheel angle, accelerator pedal, and brake pedal. The VCU and
+EV plant stay inside the model. Use it when an external source owns the driver
+commands, such as an FMI host, a driver-in-the-loop rig, or early
+software-in-the-loop work.

@@ -11,95 +11,88 @@ next:
 
 # Package Map
 
-This page maps the BobLib repository and the top-level Modelica package areas
-for the VehicleInterfaces-aligned package.
+This page maps the BobLib repository and its top-level Modelica packages.
 
-## Repository Layout
+## Repository layout
 
 | Path | Role |
 | :-- | :-- |
 | `BobLib/` | Production Modelica package root |
-| `Tests/BobLibTest/` | Sibling Modelica test package for regression and component fixtures |
-| `Tests/` | Python regression harness, baselines, and Modelica smoke tests |
-| `makefile` | Local CI and regression targets |
-| `msl_setup.mos` | Modelica Standard Library install helper |
-| `AGENTS.md` | Repository architecture rules for future agents |
+| `Tests/BobLibTest/` | Sibling Modelica package for regression and component fixtures |
+| `Tests/` | Python test harness, baselines, and pinned tool versions |
+| `makefile` | Check and dependency targets. See [Tests and Checks](/boblib/testing). |
+| `msl_setup.mos` | Installs Modelica `4.1.0` and VehicleInterfaces `2.0.2` |
+| `AGENTS.md` | Package architecture rules |
+| `CHANGELOG.md` | Release notes |
 | `README.md` | Repository readme |
 | `LICENSE` | GPLv3 license text |
+| `THIRD_PARTY_NOTICES.md` | Dependency license notices |
 
-## Public Domains
+## Public domains
 
-BobLib keeps VehicleInterfaces-facing models one level deep in the root
-package. Deeper packages hold BobLib physics, records, utilities, and icons.
+The first level of each domain package holds the VehicleInterfaces-facing
+models. Deeper packages hold BobLib physics and helpers. See the
+[architecture rules](/boblib/development#architecture-rules).
 
-| Package | Role |
+| Package | Contents |
 | :-- | :-- |
-| `Aero` | BobLib aero interface, CFD map implementation, and rigid aero mount |
-| `Chassis` | VehicleInterfaces chassis implementation backed by BobLib body, suspension, tire, and contact-patch physics |
-| `Controllers` | Vehicle controller models such as the VCU |
-| `Drivelines` | Final drive, differential, and halfshaft driveline models |
+| `UsersGuide` | In-package documentation. BobLib's README treats it as the source of truth for the package version. |
+| `Experiments` | Standard entry points and templates |
+| `Records` | Vehicle data and standard output schemas |
+| `Aero` | Aero interface, CFD aero map, and rigid aero mount |
+| `Atmospheres` | Constant atmosphere and the BobLib `AtmosphereBus` |
+| `Chassis` | VehicleInterfaces chassis backed by BobLib body, suspension, tire, brake, and contact-patch physics |
+| `Controllers` | VCU models: `VCU`, `StandardVCU`, and the internal `VCUCore` |
+| `DriverEnvironments` | Driver environments that publish driver intent |
+| `Drivelines` | Final drive, differential, and halfshaft models |
 | `ElectricDrives` | Electric machine models |
 | `EnergyStorage` | Battery pack models |
-| `PowerElectronics` | Inverter and DC power-electronics models |
-| `Experiments` | Front-facing standards and templates |
-| `Records` | Vehicle data, visual data, and standard output schemas |
-| `Utilities` | Shared math, FMI, mechanics, and multibody helpers |
+| `Engines` | A simple IC engine model |
+| `PowerElectronics` | DC inverter models |
+| `Transmissions` | Fixed-ratio transmission |
+| `Utilities` | Math, FMI, and mechanics helpers, including MultiBody helpers |
 | `Icons` | Reusable BobLib icon primitives |
 
 ## `BobLib.Experiments`
 
-Standardized simulation entry points live under:
+The standard entry points live in `BobLib.Experiments.Standards`:
 
-```text
-BobLib.Experiments.Standards
-```
+| Model | Role |
+| :-- | :-- |
+| `Standards.VehicleSim` | Full-vehicle maneuver simulation |
+| `Standards.FourPostSim` | Four-post suspension simulation |
+| `Standards.VehicleFMI` | Driver-input vehicle for FMI export and driver-in-the-loop work |
+| `Standards.Templates.Vehicle.BaseVehicleSim` | Shared template for `VehicleSim` |
+| `Standards.Templates.FourPost.BaseFourPostSim` | Shared template for `FourPostSim` |
+| `Standards.Templates.FMI.BaseVehicleFMI` | Shared template for `VehicleFMI` |
 
-Key models:
-
-- `Standards.VehicleSim`
-- `Standards.FourPostSim`
-- `Standards.VehicleFMI`
-- `Standards.Templates.Vehicle.BaseVehicleSim`
-- `Standards.Templates.FMI.BaseVehicleFMI`
-- `Standards.Templates.FourPost.BaseFourPostSim`
-- `Standards.Templates.FourPost.FourPostSim_DWBCStabar_DWBCStabar`
-
-`VehicleSim` follows the VehicleInterfaces demo-style assembly stack while
-exposing the BobLib battery, controller, inverter, motor, and driveline as
-explicit subsystem redeclares.
+Each template package also holds one model per suspension architecture, such as
+`Templates.FourPost.FourPostSim_DWBCStabar_DWBCStabar`. See
+[Static Vehicle Templates](/boblib/generation) and
+[Entry Points](/boblib/entry-points).
 
 ## `BobLib.Records`
 
-Records are the Modelica schemas and parameter data for the package.
+Records are the Modelica parameter schemas and vehicle data.
 
-Notable areas:
+| Package | Contents |
+| :-- | :-- |
+| `Records.VehicleDefn` | Complete vehicle records, one per architecture |
+| `Records.VehicleRecord` | Subsystem records, grouped by domain |
+| `Records.StandardRecord` | Output records such as `FourPostEvalRecord` |
 
-- `Records.VehicleDefn`
-- `Records.VehicleRecord`
-- `Records.StandardRecord`
-- `Records.VisualRecord`
+The default vehicle record is
+`BobLib.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord`.
 
-The default vehicle definition record is:
-
-```text
-BobLib.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord
-```
-
-MF52 tire data lives under:
-
-```text
-BobLib/Records/VehicleRecord/Chassis/Suspension/Templates/Tire/MF52/
-```
-
-The tire record package includes `RelaxationRecord.mo`, which stores the
-PAC2002-style relaxation coefficients consumed by transient slip.
+MF52 tire data lives under
+`BobLib/Records/VehicleRecord/Chassis/Suspension/Templates/Tire/MF52/`. That
+package includes `RelaxationRecord.mo`, which stores the PAC2002-style
+relaxation coefficients that transient slip uses.
 
 ## `BobLibTest`
 
-Modelica development and regression models live in a sibling package so the
-production package remains focused.
-
-Useful examples:
+Test models live in a sibling package, so the production package holds no test
+code. Examples:
 
 - `BobLibTest.Regression.MF52PureSlipSmoke`
 - `BobLibTest.Regression.VehicleSimAnimationOn`
@@ -108,14 +101,5 @@ Useful examples:
 - `BobLibTest.TestVehicle.TestPowertrain.TestPowertrain`
 - `BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysics`
 
-## Root `Tests/`
-
-The repository-level `Tests/` directory contains release guardrails:
-
-| Path | Role |
-| :-- | :-- |
-| `Tests/modelica_translation_checks.py` | Translates standard entry points, key regressions, and every `BobLibTest` fixture |
-| `Tests/modelica_initialization_checks.py` | Zero-time simulates `BobLibTest` fixtures and compares initialization metrics |
-| `Tests/modelica_initialization_baseline.csv` | Baseline metrics for initialization checks |
-| `Tests/test_modelica_regression.py` | Signal-level Modelica regression simulations |
-| `Tests/test_boblib_modelica.py` | Loads MSL 4.1.0, VehicleInterfaces 2.0.2, and smoke-checks BobLib/BobLibTest |
+For the root `Tests/` Python files, see
+[Tests and Checks](/boblib/testing#what-each-check-runs).
