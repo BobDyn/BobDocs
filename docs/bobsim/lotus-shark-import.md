@@ -76,13 +76,18 @@ catches geometry edited after the datum was last verified.
 
 ## Overlay Report
 
-The overlay report plots the imported ("variant") car's suspension kinematic
-curves against the tracked baseline car, for both front and rear axles, across
-bump, roll, and (front axle only) steer sweeps — the same curve set as the
-app's own kinematics view (camber, toe, roll centre, instant centres, and
-related metrics). Steer curves are plotted against the solved road-wheel
-steer angle rather than commanded rack travel; the rear axle has no steer
-panels, since it isn't steered.
+The overlay report plots the imported ("variant") car's kinematic curves over
+the tracked baseline car. It uses the same curves as the app's kinematics view.
+
+| Sweep | Axles | Range | X-axis |
+| :-- | :-- | :-- | :-- |
+| Bump | Front and rear | ±40 mm jounce, 21 points | Jounce |
+| Roll | Front and rear | ±1.5° body roll, 21 points | Roll angle |
+| Steer | Front only | ±30 mm rack travel, 21 points | Solved road-wheel steer angle |
+
+The steer sweep plots camber, scrub radius, mechanical trail, roll-centre y
+and z, kingpin inclination, and caster. The x-axis is the steer angle that the
+solver finds, not the rack travel. The rear axle has no steer panels.
 
 ```bash
 make shark-overlay SHARK=<shark.shk>

@@ -11,6 +11,10 @@ powertrain inputs.
 
 ![BobSim Geometry setup preview showing hardpoints, suspension links, and kinematic plot controls](/images/bobsim/app-setup-geometry.png)
 
+The kinematic plots cover bump, roll, and steer sweeps. Steer plots are front
+axle only. See [Overlay Report](/bobsim/lotus-shark-import#overlay-report) for
+the sweep ranges.
+
 Tire setup has a dedicated preview path for `.tir` data. The `Load maps` tab
 renders pure longitudinal, pure lateral, combined longitudinal, and combined
 lateral tire force surfaces from the active tire evaluation.
