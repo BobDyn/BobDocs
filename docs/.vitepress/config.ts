@@ -107,15 +107,12 @@ const sidebar = {
         page("StandardSim",    "/bobsim/standard-sim"),
         page("LotusShark Import", "/bobsim/lotus-shark-import"),
         page("Archive",        "/bobsim/results"),
+        page("Replay",         "/bobsim/visualization"),
         page("EnvelopeSim",    "/bobsim/envelope"),
         page("OptSim / DOE",   "/bobsim/doe"),
+        page("Setup Solver and Trade Studies", "/bobsim/optsim-solve-trade"),
         page("Development",    "/bobsim/development"),
-      ],
-    },
-    {
-      text: "In Progress",
-      items: [
-        page("VisualSim",      "/bobsim/visualization"),
+        page("Make Targets",   "/bobsim/make-targets"),
       ],
     },
   ],

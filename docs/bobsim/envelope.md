@@ -5,33 +5,12 @@ title: EnvelopeSim
 
 # EnvelopeSim
 
-EnvelopeSim provides an optional, separate implementation of common vehicle
-envelope calculations. GGV and YMD maps show up in vehicle dynamics workflows
-everywhere; this is BobSim's transparent implementation of those ideas, tied to
-the active BobLib vehicle records.
+EnvelopeSim computes GGV and YMD envelope maps from a reduced vehicle model.
+It does not run the full Modelica maneuver simulations.
 
-EnvelopeSim is not the gold standard, the key theory reference, or a replacement
-for the full Modelica maneuver simulations. It is intended to be sane, readable,
-and useful when you want quick envelope calculations without running the full
-high-fidelity StandardSim path.
-
-Envelope tools live under:
-
-```text
-_2_EnvelopeSim/
-```
-
-## Layout
-
-| Path | Role |
-| :-- | :-- |
-| `_2_EnvelopeSim/vehicle_yaml.py` | Legacy/shared reduced vehicle input loader |
-| `_2_EnvelopeSim/GGV/ggv_config.yml` | GGV envelope config |
-| `_2_EnvelopeSim/GGV/ggv_generation.py` | GGV envelope workflow |
-| `_2_EnvelopeSim/YMD/ymd_config.yml` | YMD envelope config |
-| `_2_EnvelopeSim/YMD/ymd_generation.py` | YMD envelope workflow |
-| `_2_EnvelopeSim/Build/` | Intermediate CSV outputs |
-| `_2_EnvelopeSim/results/` | Public reports and metrics CSVs |
+EnvelopeSim is optional and separate from StandardSim. It is meant to be easy
+to read and good enough for quick checks. It is not the reference for envelope
+theory, and it does not replace the Modelica simulations.
 
 ## Commands
 
@@ -41,91 +20,89 @@ make envelope-ymd
 make envelope-all
 ```
 
-Use `make envelope-all` when you intentionally want the optional envelope
-artifacts alongside a release baseline.
+Add `make envelope-all` to a release baseline only when you want the envelope
+reports in it.
 
-## Shared Vehicle Inputs
+## When to use it
 
-EnvelopeSim builds a reduced scalar vehicle model from the active BobLib
-vehicle data and the latest useful standard-study metrics.
+| Use EnvelopeSim to | Use something else when |
+| :-- | :-- |
+| Check plausibility before running expensive Modelica sweeps | The question depends on time-domain multibody behavior: use [StandardSim](/bobsim/standard-sim) |
+| Compare tire, aero, and mass assumptions | It depends on controller or suspension transient response: use StandardSim |
+| See limit trends across speed | The envelope result points to a model-level issue: inspect it in [BobDyn/BobLib](/boblib/) |
+| Cross-check StandardSim results against reduced-order expectations | |
 
-It loads:
+## Layout
 
-- wheelbase and track from suspension wheel-center geometry
-- sprung, driver, and unsprung mass data
-- center-of-gravity data
-- tire coefficients from the active tire template
-- aero scalars from the active aero map
-- useful four-post metrics when available
+| Path | Role |
+| :-- | :-- |
+| `_2_EnvelopeSim/vehicle_yaml.py` | Projects `vehicle.yml` into the reduced envelope model |
+| `_2_EnvelopeSim/vehicle_loader.py` | Loads that projection for the envelope workflows |
+| `_2_EnvelopeSim/GGV/ggv_config.yml` | GGV envelope config |
+| `_2_EnvelopeSim/GGV/ggv_generation.py` | GGV envelope workflow |
+| `_2_EnvelopeSim/YMD/ymd_config.yml` | YMD envelope config |
+| `_2_EnvelopeSim/YMD/ymd_generation.py` | YMD envelope workflow |
+| `_2_EnvelopeSim/VehicleReview/` | Vehicle review report that cross-checks the vehicle against StandardSim and EnvelopeSim |
+| `_2_EnvelopeSim/Build/` | Intermediate CSV outputs |
+| `_2_EnvelopeSim/results/` | Reports and metrics CSVs |
 
-If four-post metrics are missing, EnvelopeSim falls back to static front mass
-fraction for lateral load transfer distribution.
+## Shared vehicle inputs
 
-## GGV Envelope
+EnvelopeSim reads the repository's `vehicle.yml` and reduces it to scalar
+inputs. It carries through mass, CG, wheelbase and track, static load split,
+lateral load transfer split, nominal aero, and tire peak coefficients. It does
+not model kinematics, compliance, damping, or transient effects.
 
-Run:
+| Input | Source |
+| :-- | :-- |
+| Wheelbase and track | Suspension wheel-center positions |
+| Mass and CG | Sprung, driver, and unsprung mass data |
+| Tire coefficients | The vehicle's tire file |
+| Aero scalars | The vehicle's aero map |
+| Lateral load transfer distribution | Roll stiffnesses from FourPostEval metrics, scaled for the current anti-roll bar rates |
+
+EnvelopeSim reads the FourPostEval metrics from
+`_3_StandardSim/results/four_post_eval_report_metrics.csv`. If that file is
+missing, it uses built-in nominal roll stiffnesses instead.
+
+::: warning
+The shipped FourPostEval config writes its metrics to
+`_3_StandardSim/generated_results/`, not `_3_StandardSim/results/`. Unless
+you copy the file, EnvelopeSim may use the nominal roll stiffnesses.
+:::
+
+## GGV envelope
+
+Use GGV for a quick map of combined longitudinal and lateral capability across
+speed.
 
 ```bash
 make envelope-ggv
 ```
 
-Config:
+Config: `_2_EnvelopeSim/GGV/ggv_config.yml`
 
-```text
-_2_EnvelopeSim/GGV/ggv_config.yml
-```
+| Output | Path |
+| :-- | :-- |
+| Report | `_2_EnvelopeSim/results/ggv_report.pdf` |
+| Metrics | `_2_EnvelopeSim/results/ggv_report_metrics.csv` |
+| Raw envelope | `_2_EnvelopeSim/Build/GGV/ggv_first_principles.csv` |
+| Track performance profile | `_2_EnvelopeSim/Build/GGV/ggv_track_performance_profile.csv` |
+| Track velocity profile | `_2_EnvelopeSim/Build/GGV/ggv_track_velocity_profile.csv` |
 
-Useful outputs:
+## YMD envelope
 
-```text
-_2_EnvelopeSim/Build/GGV/ggv_first_principles.csv
-_2_EnvelopeSim/Build/GGV/ggv_track_performance_profile.csv
-_2_EnvelopeSim/Build/GGV/ggv_track_velocity_profile.csv
-_2_EnvelopeSim/results/ggv_report.pdf
-_2_EnvelopeSim/results/ggv_report_metrics.csv
-```
-
-Use GGV when you want a quick map of combined longitudinal and lateral
-capability across speed.
-
-## YMD Envelope
-
-Run:
+Use YMD to inspect lateral force and yaw moment across sideslip and steering.
 
 ```bash
 make envelope-ymd
 ```
 
-Config:
+Config: `_2_EnvelopeSim/YMD/ymd_config.yml`
 
-```text
-_2_EnvelopeSim/YMD/ymd_config.yml
-```
-
-Useful outputs:
-
-```text
-_2_EnvelopeSim/Build/YMD/ymd_first_principles.csv
-_2_EnvelopeSim/Build/YMD/ymd_trim_curve.csv
-_2_EnvelopeSim/results/ymd_report.pdf
-_2_EnvelopeSim/results/ymd_report_metrics.csv
-```
-
-Use YMD when you want to inspect lateral force and yaw moment behavior across
-sideslip and steering.
-
-## When To Use EnvelopeSim
-
-EnvelopeSim is useful for:
-
-- fast plausibility checks before expensive Modelica sweeps
-- comparing tire, aero, and mass assumptions
-- seeing limit trends across speed
-- producing compact optional artifacts tied to the active vehicle record
-- cross-checking whether StandardSim behavior aligns with reduced-order expectations
-
-Use StandardSim when the question depends on time-domain multibody behavior,
-controller behavior, suspension transient response, or detailed model behavior.
-
-Use BobDyn/BobLib directly when the envelope result points to a model-level
-issue that needs inspection or debugging.
+| Output | Path |
+| :-- | :-- |
+| Report | `_2_EnvelopeSim/results/ymd_report.pdf` |
+| Metrics | `_2_EnvelopeSim/results/ymd_report_metrics.csv` |
+| Raw envelope | `_2_EnvelopeSim/Build/YMD/ymd_first_principles.csv` |
+| Trim curve | `_2_EnvelopeSim/Build/YMD/ymd_trim_curve.csv` |
