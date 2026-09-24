@@ -2,8 +2,8 @@
 layout: doc
 title: Development
 prev:
-  text: 'Entry Points'
-  link: '/boblib/entry-points'
+  text: 'Tests and Checks'
+  link: '/boblib/testing'
 next:
   text: 'Troubleshooting'
   link: '/boblib/troubleshooting'
@@ -11,160 +11,58 @@ next:
 
 # Development
 
-This page covers checks and conventions for changing BobLib itself.
+This page lists the package rules and the pre-commit checks for changes to
+BobLib itself. For the `make` targets and test files, see
+[Tests and Checks](/boblib/testing).
 
-## Release Gate
+## Architecture rules
 
-From the BobLib repository root:
+BobLib builds its physics inside the VehicleInterfaces contracts. BobLib's
+`AGENTS.md` holds the full rule set. The main rules:
 
-```bash
-make test PYTHON=.venv/bin/python
-```
-
-That target runs Python checks and all Modelica regression checks for BobLib
-and the `Tests/BobLibTest` fixtures.
-
-For narrower loops:
-
-```bash
-make lint
-make test-python PYTHON=.venv/bin/python
-make modelica-translation PYTHON=.venv/bin/python
-make modelica-initialization PYTHON=.venv/bin/python
-make modelica-regression PYTHON=.venv/bin/python
-```
-
-## Python Tests
-
-Root Python tests live under:
-
-```text
-Tests/
-```
-
-The focused Python tests cover:
-
-- package structure and Modelica smoke coverage
-- selected signal-level Modelica regressions through pytest
-- BobLib/BobLibTest OpenModelica smoke checks
-
-Run:
-
-```bash
-make test-python PYTHON=.venv/bin/python
-python -m pytest Tests/test_boblib_modelica.py
-```
-
-## Modelica Translation Checks
-
-`make modelica-translation` runs:
-
-```text
-Tests/modelica_translation_checks.py
-```
-
-It loads Modelica `4.1.0`, VehicleInterfaces `2.0.2`, `BobLib/package.mo`,
-and `Tests/BobLibTest/package.mo`, then runs `checkModel` for standard entry
-points and fixtures.
-
-The focused package smoke check lives in:
-
-```text
-Tests/test_boblib_modelica.py
-```
-
-It runs `checkModel` on BobLib standard entry points and representative
-fixtures, and includes a few source-level structure checks for the package.
-
-## Initialization Checks
-
-`make modelica-initialization` runs:
-
-```text
-Tests/modelica_initialization_checks.py
-```
-
-It zero-time simulates `BobLibTest` fixtures, extracts compact numeric
-initialization metrics, and compares them against:
-
-```text
-Tests/modelica_initialization_baseline.csv
-```
-
-Use initialization baseline changes as an explicit review signal for vehicle
-model or fixture behavior.
-
-## Signal Regressions
-
-`make modelica-regression` runs:
-
-```text
-Tests/test_modelica_regression.py
-Tests/test_boblib_modelica.py
-```
-
-Current coverage includes:
-
-- MF52 pure-slip force and moment sanity
-- bilinear aero interpolation
-- CFD aero map output
-- VCU bus subscription/publishing and request handling
-- `VehicleSim`, `VehicleFMI`, and `FourPostSim` smoke translation
-- representative chassis, tire, aero, and powertrain fixtures
-
-## Architecture Rules
-
-BobLib should read as though it started from VehicleInterfaces and then built
-BobLib physics inside those contracts.
-
-- VehicleInterfaces extensions should live at the first level of each public
-  root package.
-- Underlying BobLib physics should start one level deeper.
-- Avoid duplicate public connector systems when VehicleInterfaces already
+- The first level of each public domain package holds the VehicleInterfaces
+  adapters and insertion points that experiments use.
+- BobLib physics, templates, and helpers start one level deeper, usually in
+  `Internal`, `Templates`, `Actuators`, or another purpose-specific package.
+- Do not add a duplicate connector or interface when VehicleInterfaces already
   provides the contract.
-- Chassis, suspension, tire, aero, powertrain, controls, records, and utilities
-  should own their local helpers rather than sharing ambiguous top-level
-  dumping grounds.
-- Reusable mechanics and multibody helpers belong under `Utilities.Mechanics`.
-- Modelica records are the schemas and durable vehicle data.
-- Tests for BobLib live in `Tests/BobLibTest`, not
-  inside the production package.
+- Tires live under `Chassis.Suspension`, because the axles own the wheel
+  centers, tire load paths, and contact-patch frames.
+- Reusable MultiBody helpers go under `Utilities.Mechanics.MultiBody`. Scalar
+  and record calculations go under `Utilities.Mechanics.Functions`.
+- First-level packages under `Records.VehicleRecord` mirror the public
+  subsystem packages. Complete vehicle records live under `Records.VehicleDefn`.
+- Test models live in `Tests/BobLibTest`, not in the production package.
 
-## Before Committing
+## Before you commit
 
-Before committing vehicle architecture or template changes, check:
+For vehicle architecture or template changes, confirm that:
 
-- `package.order` files include the records, subsystem models, templates, and
-  tests expected for the package state
-- public entry points use the intended
-  `BobLib.Experiments.Standards.*` models
-- `make test PYTHON=.venv/bin/python` passes
-- OMEdit can load `BobLib/package.mo` if the change touches
-  package structure or diagram annotations
-- BobSim can build the standard entry points if the public executable names
-  changed
+- the `package.order` files list the new records, subsystem models, templates,
+  and fixtures
+- public entry points use the intended `BobLib.Experiments.Standards.*` models
+- `make ci PYTHON=.venv/bin/python` passes
+- OMEdit loads `BobLib/package.mo`, if the change touches package structure or
+  diagram annotations
+- BobSim builds the standard entry points, if a public model name changed
 
-## OMEdit Screenshots
+## OMEdit screenshots
 
-The maintained GUI screenshots live in the [OMEdit Workflow](/boblib/omedit-workflow)
-page and are stored under `docs/public/images/omedit/`. Refresh them from a
-clean OMEdit session when package loading, tree traversal, diagram layout, or
-Simulation Setup defaults change. Keep screenshots small enough for the
-repository and prefer PNG for crisp OMEdit UI captures.
+The [OMEdit Workflow](/boblib/omedit-workflow) screenshots live under
+`docs/public/images/omedit/` in BobDocs. Refresh them from a clean OMEdit
+session when package loading, tree traversal, diagram layout, or Simulation
+Setup defaults change. Use PNG and keep the files small.
 
-## Useful Work Areas
-
-Useful areas of work include:
+## Open work areas
 
 - model robustness and initialization behavior
 - low-level fixture coverage for every reusable vehicle subsystem
 - further VehicleInterfaces alignment and connector cleanup
-- tire model validation and additional tire records
+- tire model validation and more tire records
 - standard workflow coverage through BobSim
 - OMEdit diagram polish and screenshot documentation
 
 ## License
 
-BobLib is distributed under the GNU General Public License v3.0 (GPLv3). See the
-[BobLib LICENSE](https://github.com/BobDyn/BobLib/blob/main/LICENSE) file for
-details.
+BobLib uses the GNU General Public License v3.0 (GPLv3). See the
+[BobLib LICENSE](https://github.com/BobDyn/BobLib/blob/main/LICENSE) file.
