@@ -5,56 +5,55 @@ title: FSAE Bridge
 
 # FSAE Bridge
 
-BobDyn is a high-fidelity vehicle analysis framework, not an FSAE-only tool —
-but FSAE gives one of the clearest reasons it exists. Teams need a car that
-performs well in a real competition, with limited time, limited test days,
-thin instrumentation history, and only a few chances to see the car in a true
-competition environment.
+This page explains how an FSAE team can connect simulation, controlled tests,
+and competition telemetry to claims about competition performance. The rule is
+to claim only what the evidence covers.
 
-That makes this subtle: the team doesn't just need a fast car on paper. It
-needs to understand capability, response, reliability, and driver interaction
-well enough to make decisions under uncertainty. BobDyn reduces uncertainty
-about the vehicle's physical response, and can support competition-focused
-design — through a careful chain of evidence, not a direct leap from
-simulation to points.
+BobDyn is not an FSAE-only tool. FSAE is a clear use case because teams have
+limited time, few test days, thin instrumentation history, and few chances to
+see the car in a real competition. The team must understand capability,
+response, reliability, and driver interaction well enough to decide under
+uncertainty. BobDyn reduces uncertainty about the vehicle's physical response.
+It supports competition decisions through a chain of evidence, not a direct
+jump from simulation to points.
 
-This page is for FSAE technical leads, vehicle dynamics groups, test leads, and
-simulation users connecting design decisions to competition evidence. It
-assumes comfort with basic vehicle dynamics and logged data, not a full
-driver-in-the-loop or professional test infrastructure.
+The page is for technical leads, vehicle dynamics groups, test leads, and
+simulation users. It assumes basic vehicle dynamics and logged data. It does
+not assume driver-in-the-loop (DIL) or professional test infrastructure.
 
-Read this alongside [Vehicle Dynamics](/reference/vehicle-dynamics): that page
-covers what the physical system is, this one covers what a competition team
-can responsibly claim about it. See
-[What This Does Not Claim](#what-this-does-not-claim) for the explicit limits.
+Related pages:
 
-## The FSAE Challenge
+- [Vehicle Dynamics](/reference/vehicle-dynamics) explains the physical
+  system. This page explains what a team can claim about it.
+- [Plan a Single-Season Validation](/reference/fsae-season-plan) gives the
+  steps to apply this page in one season.
+- [What this does not claim](#what-this-does-not-claim) lists the limits.
+
+## The FSAE problem
 
 FSAE performance combines vehicle capability, transient response, driver
-execution, tire state, reliability, weather and surface conditions, event
-operations, penalties, competitor performance, and the scoring system — it
-doesn't reduce to one vehicle-response metric.
+execution, tire state, reliability, weather and surface, event operations,
+penalties, competitor performance, and the scoring system. No single
+vehicle-response metric captures it.
 
-Lap simulation still helps: it exposes bottlenecks, compares assumptions, and
-prioritizes design work. The problem isn't lap simulation itself — it's
-treating a simulated lap time, a test-course lap time, or a points estimate as
-proof of competition performance.
+Lap simulation helps. It exposes bottlenecks, compares assumptions, and ranks
+design work. The error is to treat a simulated lap time, a test-course lap
+time, or a points estimate as proof of competition performance.
 
-The better question is narrower: **what can the team justifiably claim about
-the car's physical response, and where does that claim transfer to
-competition?** That question costs something — model discipline, repeatable
-tests, calibrated sensors, clean logs, and enough engineering time to compare
-the same signals across simulation, testing, and competition. The framework
-below spends that limited effort on claims that survive contact with real
-data.
+Ask a narrower question: **what can the team justifiably claim about the car's
+physical response, and where does that claim transfer to competition?** The
+answer costs model discipline, repeatable tests, calibrated sensors, clean
+logs, and engineering time to compare the same signals across simulation,
+testing, and competition. The framework below spends that effort on claims
+that hold up against real data.
 
-## Lap-Time Simulation As A Statistical Model
+## Lap time as a statistical model
 
-Treat lap time as a statistical model, not a single deterministic truth. The
-simulation itself can be deterministic physics — a point-mass solver, QSS
-envelope, optimal-control lap simulator, or multibody-derived reduced model —
-but the decision-facing result should carry uncertainty, because the inputs
-and context carry uncertainty:
+Treat lap time as a statistical model, not one deterministic answer. The
+simulation can be deterministic physics: a point-mass solver, a QSS envelope,
+an optimal-control lap simulator, or a reduced model derived from multibody
+dynamics. The inputs and context are uncertain, so the result you decide on
+should carry that uncertainty:
 
 $$
 T \sim p(T \mid
@@ -65,10 +64,10 @@ x_{\text{surface}},
 x_{\text{event}})
 $$
 
-where $T$ is lap time and the conditioning variables describe vehicle, driver,
-track, surface, and event context.
+$T$ is lap time. The conditioning variables describe vehicle, driver, track,
+surface, and event context.
 
-In practice, a lap-time simulation should report:
+A lap-time simulation should report:
 
 - expected lap time or segment time
 - uncertainty bands or percentiles
@@ -77,37 +76,35 @@ In practice, a lap-time simulation should report:
 - regions where the model has no validation coverage
 - residual error against test and competition telemetry
 
-That turns lap simulation into a decision tool instead of a claim machine — a
-team can still use a nominal lap time, but reads it as one statistic from a
-model, not the model's whole conclusion.
+A nominal lap time is still useful. Read it as one statistic from a model, not
+as the model's conclusion.
 
-## Reduced Models Must Reflect The System
+## Reduced models must reflect the system
 
-The core idea: a reduced-order model is a compressed view of the real
-physical system, not a separate reality. QSS envelopes, lap-time tools, tire
-abstractions, score sensitivity studies, and simple handling models all make a
-claim about the real vehicle, and that claim only holds if the reduced model
-preserves the parts of the system that matter for the question being asked.
+A reduced-order model is a compressed view of the physical system. QSS
+envelopes, lap-time tools, tire abstractions, score sensitivity studies, and
+simple handling models all make a claim about the real vehicle. That claim
+holds only if the reduced model keeps the parts of the system that matter for
+the question.
 
-For example:
+| Reduced model | Must reflect |
+| :-- | :-- |
+| QSS envelope | the tire, aero, mass, power, and load-transfer behavior it summarizes |
+| Lap-time model | the response regimes that appear on track |
+| Statistical lap-time model | uncertainty in inputs, driver behavior, and event context |
+| Points model | the uncertainty between vehicle performance and scored outcome |
+| Test-section comparison | the physical states used in competition |
 
-- a QSS envelope must reflect the tire, aero, mass, power, and load-transfer behavior it summarizes
-- a lap-time model must reflect the response regimes that actually appear on track
-- a statistical lap-time model must reflect uncertainty in inputs, driver behavior, and event context
-- a points model must reflect the uncertainty between vehicle performance and scored outcome
-- a test-section comparison must reflect the physical states used in competition
+If a reduced model no longer represents the system in the region of interest,
+it may still be convenient, but it is not evidence. In BobDyn, the
+high-fidelity model, controlled tests, and telemetry fingerprints anchor the
+reduced-order tools to the vehicle they represent.
 
-If a reduced model no longer represents the original system in the region of
-interest, it may still be convenient, but it isn't evidence. BobDyn keeps that
-connection visible: the high-fidelity model, controlled tests, and telemetry
-fingerprints anchor the reduced-order tools so they don't drift from the
-vehicle they claim to represent.
+## Evidence levels
 
-## Evidence Levels
-
-Simulation, test data, and competition outcomes don't connect in one simple
-line — they connect through evidence levels, adopted in layers, each
-supporting a different strength of claim:
+Simulation, test data, and competition outcomes connect through evidence
+levels. A team adopts them in layers. Each level supports a different strength
+of claim:
 
 | Level | Required evidence | What the team can claim |
 | :-- | :-- | :-- |
@@ -116,32 +113,19 @@ supporting a different strength of claim:
 | Competition telemetry | competition logs using the same signal set and definitions | local transfer claims where response fingerprints overlap |
 | Repeated competition coverage | repeated section data, driver/context notes, and uncertainty estimates | stronger bounded claims with quantified residual uncertainty |
 
-For a single-year team, the minimum viable version isn't a perfect simulation
-program — it's:
+More evidence improves resolution. It does not change the rule: claim only
+what the evidence covers.
 
-1. keep a simple QSS envelope current,
-2. run the high-fidelity model on the most important design questions,
-3. log steering, speed, acceleration, yaw rate, throttle, and brake in testing,
-4. repeat a small number of controlled steady-state and transient maneuvers,
-5. log the same signals at competition,
-6. compare only the sections and regimes the data actually cover.
+## The evidence chain
 
-Everything beyond that improves resolution — it doesn't change the basic
-rule: claim only what the evidence covers.
+Simulation does not predict competition performance directly. It supports a
+chain of evidence. QSS defines the envelope. MBD evaluates response inside it.
+Standardized maneuvers validate that response. Instrumented test and
+competition data produce response-space fingerprints. The team makes a claim
+only where the fingerprints overlap.
 
-## Core Workflow
-
-Simulation shouldn't directly predict FSAE competition performance — it should
-support a chain of evidence:
-
-1. Quasi-steady-state analysis defines the operating envelope.
-2. Multibody dynamics evaluates physical response inside that envelope.
-3. Standardized steady-state and transient extraction maneuvers validate the response scientifically.
-4. Instrumented test and competition data produce response-space fingerprints.
-5. The team allows performance claims only where the fingerprints overlap.
-
-This isn't a points model — it's a way to decide where test and simulation
-evidence can support bounded claims about real competition sections.
+This is not a points model. It decides where test and simulation evidence
+support bounded claims about real competition sections.
 
 <div class="workflow-diagram">
 
@@ -163,59 +147,59 @@ flowchart TB
 
 </div>
 
-## QSS Defines Capability
+### QSS defines capability
 
-Quasi-steady-state analysis defines what the vehicle could do under
-simplified equilibrium assumptions — combined longitudinal/lateral
-acceleration limits, where tire, aero, power, or braking limits appear, which
-speed ranges expose a bottleneck, and whether a design direction is worth
-higher-fidelity analysis. It describes the operating envelope, not how the
-full dynamic system enters, leaves, or feels inside those states.
+Quasi-steady-state analysis shows what the vehicle could do under simplified
+equilibrium assumptions:
 
-## MBD Explains Response
+- combined longitudinal and lateral acceleration limits
+- where tire, aero, power, or braking limits appear
+- which speed ranges expose a bottleneck
+- whether a design direction is worth higher-fidelity analysis
 
-BobDyn's multibody model evaluates the physical response inside that
-envelope: geometry, compliance, inertia, transient tire behavior, steering,
-load paths, damping, aero, and constraints become a time-domain vehicle
-response. That matters because drivers don't experience an envelope plot —
-they experience buildup, delay, overshoot, correction demand, stability,
-saturation, and confidence.
+QSS describes the operating envelope. It does not describe how the full
+dynamic system enters, leaves, or feels inside those states.
 
-BobDyn/BobLib and BobDyn/BobSim keep those response mechanisms visible:
-engineers can inspect the model, teams can repeat the tests, signals stay
-close to the metrics, and reports trace back to configuration and source.
+### MBD explains response
 
-## Standardized Maneuvers Validate Response
+BobDyn's multibody model evaluates the physical response inside the envelope.
+Geometry, compliance, inertia, transient tire behavior, steering, load paths,
+damping, aero, and constraints become a time-domain vehicle response. Drivers
+do not feel an envelope plot. They feel buildup, delay, overshoot, correction
+demand, stability, saturation, and confidence.
 
-Before making competition claims, validate with controlled maneuvers. The
-specific standard matters less than the practice: repeatable maneuvers that
-extract steady-state and transient response comparably across simulation,
-test, and future vehicle iterations. Two that work well for dynamic-system
-correlation:
+BobDyn/BobLib and BobDyn/BobSim keep those response mechanisms visible.
+Engineers can inspect the model. Teams can repeat the tests. Signals stay close
+to the metrics, and reports trace back to configuration and source.
+
+### Standardized maneuvers validate response
+
+Validate the model with controlled maneuvers before you make competition
+claims. The specific standard matters less than repeatable maneuvers that
+extract steady-state and transient response the same way across simulation,
+test, and later vehicles. Two work well for dynamic-system correlation:
 
 - ISO 4138-style steady-state response extraction
 - ISO 7401-style transient steering response extraction
 
-These don't prove a car will win — they validate pieces of the response model
-under controlled conditions. If the model can't reproduce measured
-steady-state and transient response in standardized maneuvers, don't trust it
-to explain more complex competition sections.
+These maneuvers do not prove a car will win. They validate parts of the
+response model under controlled conditions. If the model cannot reproduce
+measured response in standardized maneuvers, do not trust it to explain more
+complex competition sections.
 
-## Fingerprints, Not Scaling
+### Fingerprints, not scaling
 
-The most important distinction here: don't take a test-section lap time and
-scale it to a competition lap time — that's a scaling problem, and usually the
-wrong one. Instead, compare physical response-space fingerprints. A test
-section supports a claim about a competition section only when the measured
-vehicle response is sufficiently similar.
+Do not scale a test-section lap time to a competition lap time. Compare
+physical response-space fingerprints instead. A test section supports a claim
+about a competition section only when the measured vehicle response is
+sufficiently similar.
 
-Useful fingerprint signals: lateral acceleration, yaw rate, yaw acceleration,
-speed, steering input, throttle, brake, correction behavior — what the car and
-driver actually did, not just how long the segment took.
+Useful fingerprint signals are lateral acceleration, yaw rate, yaw
+acceleration, speed, steering input, throttle, brake, and correction behavior.
+They record what the car and driver did, not only how long the segment took.
 
-A fingerprint isn't one number — it describes a section's response state using
-time histories, distributions, and extracted features. A practical feature
-vector:
+A fingerprint describes a section's response state with time histories,
+distributions, and extracted features. A practical feature vector:
 
 $$
 \phi =
@@ -225,9 +209,9 @@ a_y,\ r,\ \dot{r},\ V,\ \delta,\ \text{throttle},\ \text{brake},
 \right]
 $$
 
-where the exact entries depend on available sensors and the claim being made.
-Define the feature vector before the comparison, so the similarity test
-doesn't become a post-hoc justification.
+The exact entries depend on the available sensors and the claim. Define the
+feature vector before the comparison, so the similarity test does not become
+a post-hoc justification.
 
 Ways to check similarity:
 
@@ -238,17 +222,17 @@ Ways to check similarity:
 - correction behavior such as steering reversals, correction energy, or driver input rate
 - uncertainty bands from repeated runs when repeated data exist
 
-"Sufficiently similar" isn't universal — define it for the claim. A lateral
-capability claim cares most about speed, lateral acceleration, and tire
-utilization. A driver-confidence or transient-stability claim cares more
-about yaw-rate phase, correction behavior, and steering effort.
+Define "sufficiently similar" for each claim. A lateral capability claim
+depends most on speed, lateral acceleration, and tire utilization. A
+driver-confidence or transient-stability claim depends more on yaw-rate phase,
+correction behavior, and steering effort.
 
-## Coverage Drives Uncertainty
+## Coverage drives uncertainty
 
-Coverage bridges test data and competition claims. If a competition-like test
-section covers the same response regimes as a real competition section, the
-test data supports a stronger transfer claim; where coverage is weak or
-absent, uncertainty grows and strong claims should be rejected:
+Coverage connects test data to competition claims. When a test section covers
+the same response regimes as a competition section, the test data supports a
+stronger transfer claim. Where coverage is weak or absent, uncertainty grows
+and you should reject strong claims.
 
 | Situation | Claim quality |
 | :-- | :-- |
@@ -257,35 +241,53 @@ absent, uncertainty grows and strong claims should be rejected:
 | Similar lap time, different response regimes | Weak claim |
 | Competition region has no test coverage | No strong performance claim |
 
-This doesn't pretend every test day predicts competition — it asks where the
-physics are similar enough for a bounded claim. Refusal should leave a visible
-record: mark a section as uncovered in the report, downgrade a result from a
-transfer claim to an observation, exclude the section from points or lap-time
-claims, add the missing regime to the next test plan, or report the model or
-test as unvalidated in that region. Refusal isn't failure — it prevents false
-confidence.
+A rejected claim should leave a visible record. You can:
 
-## Competition Data Matters
+- mark the section as uncovered in the report
+- downgrade the result from a transfer claim to an observation
+- exclude the section from points or lap-time claims
+- add the missing regime to the next test plan
+- report the model or test as unvalidated in that region
 
-This depends on complete competition instrumentation. At minimum, log the same
-response signals at competition as in testing: accelerations, yaw rate and
-yaw acceleration, speed, steering, throttle, brake, time alignment, and
+A rejected claim is not a failure. It prevents false confidence.
+
+## Competition data
+
+The framework needs complete competition instrumentation. At minimum, log the
+same response signals at competition as in testing: accelerations, yaw rate
+and yaw acceleration, speed, steering, throttle, brake, time alignment, and
 segment markers.
 
 Without competition telemetry, the framework can still validate the vehicle
-and compare test configurations, but can't confidently say which test
+and compare test configurations. It cannot say with confidence which test
 fingerprints matched real competition response. With competition telemetry,
-even one year of data becomes far more valuable — the team can identify which
-response regimes were actually used at competition, then focus future testing
-and simulation on covering those regimes.
+even one year of data shows which response regimes the car used at
+competition. Future testing and simulation can then focus on those regimes.
 
-The minimum useful competition logger doesn't need exotic hardware, but it
-does need consistency: preserve sensor calibration, channel names, units,
-sample rates, filtering choices, and segment definitions between test and
-competition. A comparison between incompatible logs is usually a workflow
-problem before it's a vehicle dynamics problem.
+The logger does not need exotic hardware, but it needs consistency. Keep
+sensor calibration, channel names, units, sample rates, filtering choices, and
+segment definitions the same between test and competition. A comparison
+between incompatible logs is usually a workflow problem before it is a vehicle
+dynamics problem.
 
-## What This Does Not Claim
+## Driver layer
+
+DIL and subjective-objective correlation sit above the core validation stack.
+They help to:
+
+- train drivers
+- reduce run-to-run variance
+- expose correction behavior
+- connect subjective feedback to measurable response metrics
+- translate driver comments into setup changes
+
+The core stack does not require them. A team can build a QSS, MBD,
+standardized-maneuver, and telemetry-fingerprint workflow without DIL. On a
+single-year timeline this matters, because DIL costs time, infrastructure, and
+calibration effort. The core stack should rest on measured vehicle response
+first.
+
+## What this does not claim
 
 This framework does not claim that:
 
@@ -295,59 +297,20 @@ This framework does not claim that:
 - driver-in-the-loop is required for core validation
 - a single competition year eliminates uncertainty
 
-It claims something narrower: when measured response-space fingerprints
+It claims something narrower. When measured response-space fingerprints
 overlap sufficiently, test data can support statistically bounded performance
 claims for similar competition sections. When coverage is weak, uncertainty
 increases and the stack rejects strong claims. Without repeated data or a
-clear uncertainty model, weaken the claim — the evidence can support an
+clear uncertainty model, weaken the claim: the evidence can support an
 engineering comparison, not a strong statistical bound.
 
-## Driver Layer
+## What winning requires
 
-Driver-in-the-loop and subjective-objective correlation sit above the core
-validation stack. They add value by training drivers, reducing run-to-run
-variance, exposing correction behavior, connecting subjective feedback to
-measurable response metrics, and translating driver comments into setup
-levers — but the core stack doesn't require them. A team can build a serious
-QSS, MBD, standardized-maneuver, and telemetry-fingerprint workflow without
-DIL.
+Designing a car to win is not the same as optimizing one simulated lap.
+Winning requires capability, response quality, driver confidence,
+reliability, repeatability, scoring awareness, and operational execution.
 
-That matters on a single-year timeline: DIL is powerful but consumes time,
-infrastructure, and calibration effort. The core stack should stand on
-measured vehicle response first.
-
-## Accelerated Single-Year Path
-
-For a team with one season of runway:
-
-1. Build a QSS envelope to understand capability and bottlenecks.
-2. Use BobDyn MBD to evaluate physical response inside that envelope.
-3. Run standardized steady-state and transient extraction maneuvers.
-4. Instrument competition-like test sections with complete telemetry.
-5. Instrument real competition with the same telemetry package.
-6. Compare response-space fingerprints by section.
-7. Use overlap to make bounded local claims.
-8. Treat uncovered regions as uncertainty, not as evidence.
-
-The goal is faster learning with fewer unjustified assumptions, not perfect
-prediction. People-hours are the real constraint, so prioritize:
-
-1. define the few response claims that matter most,
-2. make the logging and units reliable,
-3. validate the model against controlled maneuvers,
-4. compare a small number of competition-like sections,
-5. only then expand the metric library or driver-layer analysis.
-
-## What Winning Means Here
-
-Designing a vehicle to win competition isn't the same as optimizing one
-simulated lap. Winning requires capability, response quality, driver
-confidence, reliability, repeatability, scoring awareness, and operational
-execution.
-
-BobDyn primarily helps with the physical capability and response-quality
-pieces, and can support competition-relevant design decisions — while staying
-honest about what the data actually prove. The mature claim: BobDyn helps
-teams connect vehicle physics, controlled validation, and competition
-telemetry so they can make better design decisions under real FSAE
-constraints.
+BobDyn helps most with physical capability and response quality. It connects
+vehicle physics, controlled validation, and competition telemetry so a team
+can make better design decisions under FSAE constraints, and it stays honest
+about what the data prove.
