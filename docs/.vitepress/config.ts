@@ -130,7 +130,20 @@ const sidebar = {
         page("Single-Season Validation",    "/reference/fsae-season-plan"),
         page("Vehicle Performance Metrics", "/reference/metrics"),
         page("Choosing Metrics",            "/reference/choosing-metrics"),
-        page("Engineering Knowledge Base",   "/reference/field-notes"),
+      ],
+    },
+    {
+      text: "Engineering Knowledge Base",
+      link: "/reference/field-notes/",
+      items: [
+        page("Math And Modeling",             "/reference/field-notes/math-and-modeling"),
+        page("Mechanics And Materials",       "/reference/field-notes/mechanics-and-materials"),
+        page("Signals And Controls",          "/reference/field-notes/signals-and-controls"),
+        page("Thermal And Fluids",            "/reference/field-notes/thermal-and-fluids"),
+        page("Vehicles And Tires",            "/reference/field-notes/vehicles-and-tires"),
+        page("Data And Computation",          "/reference/field-notes/data-and-computation"),
+        page("Embedded Systems And Software", "/reference/field-notes/embedded-and-software"),
+        page("Design And Manufacturing",      "/reference/field-notes/design-and-manufacturing"),
       ],
     },
   ],
@@ -145,6 +158,7 @@ assertSidebarCoversDir("use-guide", sidebar["/use-guide/"]);
 assertSidebarCoversDir("boblib", sidebar["/boblib/"]);
 assertSidebarCoversDir("bobsim", sidebar["/bobsim/"]);
 assertSidebarCoversDir("reference", sidebar["/reference/"]);
+assertSidebarCoversDir("reference/field-notes", sidebar["/reference/"]);
 
 // ---------------------------------------------------------------------------
 // Config
