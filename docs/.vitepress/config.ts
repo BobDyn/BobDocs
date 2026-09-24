@@ -59,6 +59,8 @@ const sidebar = {
       text: "BobDyn/BobSim",
       items: [
         page("Startup", "/startup-guide/bobsim"),
+        page("Run Without Docker", "/startup-guide/bobsim-without-docker"),
+        page("Startup Problems", "/startup-guide/bobsim-troubleshooting"),
       ],
     },
   ],
@@ -75,6 +77,7 @@ const sidebar = {
       text: "BobDyn/BobSim",
       items: [
         page("Use Guide", "/use-guide/bobsim"),
+        page("CLI Workflow", "/use-guide/bobsim-cli"),
       ],
     },
   ],
