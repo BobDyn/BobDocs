@@ -5,108 +5,102 @@ title: Contributing
 
 # Contributing to BobDocs
 
-BobDocs uses **VitePress**, which turns simple text files (Markdown) into the website you see online.
+This page shows how to change the BobDocs site and get the change merged.
+BobDocs is a [VitePress](https://vitepress.dev/) site. Every page is a Markdown
+file under `docs/`.
 
----
+## How Changes Get Merged
 
-## The Rules of the Road
+1. You cannot push to `main`. It is protected and accepts reviewed changes
+   only.
+2. Make your changes on a new branch, for example `update-metrics` or
+   `fix-typo`.
+3. Push the branch to GitHub and open a pull request (PR).
+4. CI checks the PR. All checks must pass before the PR can merge.
 
-To keep the documentation stable and high-quality, we follow a simple workflow.
+## Set Up
 
-1. **Protect the Main Branch**: You cannot upload changes directly to the `main` branch. It is "protected," meaning it only accepts changes that have been reviewed.
-2. **Use Branches**: Always create a new "feature branch" for your work (e.g., `update-metrics` or `fix-typo`).
-3. **Push to Remote**: You'll upload your branch to GitHub and create a **Pull Request (PR)**.
-4. **Pass CI Checks**: Our automated system (CI) will check your work for errors. These checks must pass before your changes can be merged into the main site.
-
----
-
-## Step-by-Step Setup
-
-If you don't have the code on your computer yet, follow these steps:
-
-1. **Get the Code**:
-
-    Open your terminal/command prompt and run:
+1. Clone the repository:
 
     ```bash
     git clone https://github.com/BobDyn/BobDocs.git
     cd BobDocs
     ```
 
-2. **Install Tools**:
-
-    Make sure you have [Node.js](https://nodejs.org/) installed. Then run:
+2. Install [Node.js](https://nodejs.org/). CI uses Node.js 20. Then install
+   the dependencies:
 
     ```bash
     npm install
     ```
 
-3. **See Your Changes Live**:
-
-    Run this command to start a private version of the website on your computer:
+3. Start a local copy of the site:
 
     ```bash
     npm run dev
     ```
 
-    Open `http://localhost:5173` in your browser. As you save files, the page will update automatically!
+    Open `http://localhost:5173` in your browser. The page reloads when you
+    save a file.
 
----
+## Make A Change
 
-## How to Contribute (The Workflow)
-
-### 1. Create a Branch
-
-Before you start typing, create a new branch:
+### 1. Create a branch
 
 ```bash
 git switch -c your-branch-name
 ```
 
-### 2. Write Your Content
+### 2. Edit or add a page
 
-Most of the work happens in the `docs/` folder. Files end in `.md` (Markdown).
+Pages are `.md` files in `docs/`. Every page starts with frontmatter:
 
-* **Frontmatter**: Every file needs a small header at the very top:
-
-    ```markdown
-    ---
-    layout: doc
-    title: Your Page Title
-    ---
-    ```
-
-* **Math**: We support LaTeX!
-
-    Inline: `$a = F/m$`
-
-    Blocks:
-
-    ```markdown
-    $$
-    a_y = \frac{v^2}{R}
-    $$
-    ```
-
-* **Headings**: Use `#` for the big title, `##` for sections, and `###` for sub-sections.
-
-### 3. Add to the Navigation (If needed)
-
-If you created a *new* file, add a single entry to the `sidebar` section of `docs/.vitepress/config.ts` — a page title and URL path. The build will fail with a clear error if you forget, so you can't accidentally ship an unreachable page.
-
-Editing `##` and `###` headings in an *existing* file needs no config change — those populate the right-hand "On this page" outline automatically. They do not affect the left-hand sidebar, which only lists whole pages.
-
-### 4. Check for Errors
-
-Run the build command to make sure there are no broken links or math errors:
-
-```bash
-npm run build
+```markdown
+---
+layout: doc
+title: Your Page Title
+---
 ```
 
-### 5. Submit Your Work
+| Feature | Syntax |
+| :-- | :-- |
+| Headings | `#` for the page title, `##` for sections, `###` for subsections |
+| Inline math | `$a = F/m$` |
+| Block math | `$$` on its own line before and after the equation |
+| Internal links | No `.md` extension, for example `[Metrics](/reference/metrics)` |
 
-Once you're happy with your changes:
+Block math example:
+
+```markdown
+$$
+a_y = \frac{v^2}{R}
+$$
+```
+
+### 3. Add a new page to the sidebar
+
+If you create a new file, add one entry for it to the `sidebar` section of
+`docs/.vitepress/config.ts`: a page title and a URL path. For pages under
+`startup-guide/`, `use-guide/`, `boblib/`, `bobsim/`, and `reference/`, the
+build fails with an error if you forget.
+
+You do not need to change the config when you edit `##` and `###` headings.
+They fill the "On this page" outline on the right automatically. The sidebar
+on the left lists whole pages only.
+
+### 4. Run the checks
+
+CI runs these checks on every PR. Run them before you push:
+
+```bash
+npm run build                          # dead links, sidebar coverage, render errors
+npx markdownlint-cli "docs/**/*.md"    # markdown lint
+npm run lint:ts                        # eslint over docs/.vitepress
+```
+
+CI also checks external links.
+
+### 5. Open a pull request
 
 ```bash
 git add .
@@ -114,22 +108,24 @@ git commit -m "Briefly explain what you changed"
 git push origin your-branch-name
 ```
 
-Then, go to the [GitHub repository](https://github.com/BobDyn/BobDocs) and click the green **"Compare & pull request"** button.
+Then go to the [GitHub repository](https://github.com/BobDyn/BobDocs) and
+click **Compare & pull request**.
 
----
+## Page Navigation
 
-## Advanced Features
+The "On this page" outline on the right comes from your `##` and `###`
+headings. The sidebar on the left is the list in `config.ts`. The **Next** and
+**Previous** buttons at the bottom of a page default to the neighboring pages
+in the sidebar. To change them, set `prev` or `next` in the page frontmatter.
+Most guide pages do this to control the link text.
 
-### Sidebars & "On this page"
+## Custom Components
 
-The right-hand "On this page" menu is automatic — it pulls from your `##` and `###` headings. The left-hand sidebar is the manually curated list in `config.ts`. The "Next"/"Previous" buttons at the bottom of a page default to your neighbors in that sidebar list, but you can override either one by setting `prev`/`next` in the page's frontmatter — most guide pages do this to control the exact wording.
-
-### Custom Components
-
-If you need complex interactive plots (like a PID simulator), we use Vue components. You can drop them into Markdown like this:
+For interactive content, such as a PID simulator plot, use a Vue component in
+Markdown:
 
 ```markdown
 <PIDPlot />
 ```
 
-Check `docs/.vitepress/theme/components/` to see what's available.
+The components are in `docs/.vitepress/theme/components/`.

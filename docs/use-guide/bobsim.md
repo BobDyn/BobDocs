@@ -4,69 +4,50 @@ title: BobSim Use Guide
 prev:
   text: 'BobLib Use Guide'
   link: '/use-guide/boblib'
+next:
+  text: 'BobSim CLI Workflow'
+  link: '/use-guide/bobsim-cli'
 ---
 
 # BobDyn/BobSim Use Guide
 
-This guide explains how to use BobDyn/BobSim after the environment is set up.
-For normal work, launch the BobSim app first and use the CLI when you need
-scripted, Docker, or CI-style workflows.
+Use this guide for daily work in the BobSim app after setup is done. To run the
+same studies from `make` targets, for scripts or CI, see
+[BobSim CLI Workflow](/use-guide/bobsim-cli).
 
-::: info Starting point
-In this guide, the BobDyn/BobSim root means the repository directory created by
-the BobSim clone step. Start there before running commands or editing workflow
-files.
-:::
-
-::: tip Choose the right layer
-Use BobDyn/BobSim for simulation workflows: setup, cases, sweeps, metrics,
-plots, reports, envelopes, sensitivities, and result files.
-
-Use [BobDyn/BobLib](/use-guide/boblib) for the low-level Modelica model layer:
-suspension assemblies, Modelica records, tire models, direct OpenModelica
-debugging, and OMEdit diagram inspection.
-:::
+Use BobSim for simulation workflows: setup, cases, sweeps, metrics, plots, and
+reports. Use [BobLib](/use-guide/boblib) for the Modelica model layer:
+subsystem assemblies, records, tire models, and OMEdit diagrams.
 
 ## Daily App Workflow
 
-Launch the released desktop app by running `BobSim`.
+Start the app:
 
-From a source checkout, launch the app in Docker from the BobSim root:
+| You have | Run | Then open |
+| :-- | :-- | :-- |
+| A source checkout | `make app` from the BobSim root | `http://127.0.0.1:8765` |
+| The released desktop app | `BobSim` | The app opens its own window |
 
-```bash
-make app
-```
-
-Open:
-
-```text
-http://127.0.0.1:8765
-```
-
-The normal BobSim loop is:
+Then:
 
 1. Choose or create a vehicle in `Setup`.
-2. Work through Architecture, Geometry, Mass, Suspension, Compliances, Tires,
-   Aero, and Powertrain.
+2. Edit the Setup steps that you need to change.
 3. Click `Save Vehicle`.
 4. Click `Write to MBD`.
-5. Outside Docker only, verify the OpenModelica toolchain if Simulation asks
+5. Outside Docker only, verify the OpenModelica toolchain if `Simulation` asks
    for it.
-6. Open `Simulation`, choose a workflow, configure it, then `Build + Run`.
-7. Open `Archive` to review the generated PDF, metrics, and signal archive.
+6. Open `Simulation`, select a workflow, configure it, then click
+   `Build + Run`.
+7. Open `Archive` to review the PDF, metrics, and signal archive.
 
-The app keeps the public workflow visible: vehicle setup on the left rail,
-simulation launch in the middle, and result review after the run.
-
-![BobSim Setup view with the guided setup rail and vehicle architecture preview](/images/bobsim/app-setup-architecture.png)
+If you have not done this once yet, follow the
+[BobSim Startup](/startup-guide/bobsim) tutorial first.
 
 ## Setup View
 
 Use `Setup` to manage the active vehicle.
 
 ![BobSim vehicle chooser dialog for loading, creating, importing, or continuing a vehicle](/images/bobsim/app-vehicle-chooser.png)
-
-The vehicle chooser supports:
 
 | Action | What it does |
 | :-- | :-- |
@@ -75,32 +56,24 @@ The vehicle chooser supports:
 | `Import YAML` | Imports a vehicle YAML file |
 | `Continue Active File` | Keeps the currently active vehicle data |
 
-The setup steps expose editable vehicle data while the preview shows the
-current vehicle shape, hardpoints, mass placement, suspension behavior, tire
-data, aero maps, and powertrain layout. Use `Next` and `Previous` for the
-guided path, or jump directly with the parameter tabs.
+The eight steps are Architecture, Geometry, Mass, Suspension, Compliances,
+Tires, Aero, and Powertrain. Use `Next` and `Previous` to go in order, or
+select a step tab to go to it directly. The preview shows what the current step
+affects: vehicle shape, hardpoints, mass placement, suspension, tire data, aero
+maps, or powertrain layout.
 
 ![BobSim Geometry setup step with hardpoint editors and vehicle preview](/images/bobsim/app-setup-geometry.png)
 
-The Tires step has its own preview mode. Use the `Setup` tab for tire
-assignment and the `Load maps` tab to inspect the live pure/combined tire force
-surfaces.
+The Tires step has two tabs. Use `Setup` to assign tires and `Load Maps` to
+inspect the live pure and combined slip force surfaces.
 
 ![BobSim Tires setup step with load-map controls and live pure and combined slip tire surface preview](/images/bobsim/app-setup-tires.png)
 
-When edits are ready:
-
-```text
-Save Vehicle -> Write to MBD -> Simulation
-```
-
-`Write to MBD` generates the Modelica vehicle definition used by StandardSim.
-The top status strip shows whether BobLib is initialized, the vehicle
-definition is current, and the `VehicleSim` and `FourPostSim` builds are ready.
-
-The released desktop app stores generated vehicles, builds, configs, and
-results in the per-user BobSim runtime directory instead of inside the
-downloaded executable. Source checkouts use the repository working directory.
+When your edits are ready, click `Save Vehicle`, then `Write to MBD`.
+`Write to MBD` generates the Modelica vehicle definition that StandardSim uses.
+The top status strip shows whether BobLib is initialized, whether the vehicle
+definition is current, and whether the `VehicleSim` and `FourPostSim` builds
+are ready.
 
 ## Simulation View
 
@@ -116,193 +89,116 @@ definition.
 | `Transient` | Step steer and sine response | PDF report and metrics CSV |
 | `Four Post` | Heave, roll, and vertical-force suspension procedures | PDF report and metrics CSV |
 
-Each card has:
+Each card has these controls:
 
-- `Configure` for editable run inputs and saved run configs
-- `Build + Run` or `Run` for launching the workflow
-- `Run Log` for active and recent job output
-- `Review` when registered outputs exist
+| Control | What it does |
+| :-- | :-- |
+| `Configure` | Opens the editable run inputs and saved run configs |
+| `Build + Run` or `Run` | Launches the workflow |
+| `Run Log` | Shows output from active and recent jobs |
+| `Review` | Opens the outputs, when they exist |
 
-If you change a run config in the modal, click `Apply Edits` before running.
-Use `Save Config` when the same run setup should be reused later.
+If you change a run config in the modal, click `Apply Edits` before you run.
+Click `Save Config` to keep the run setup for later.
 
 ![BobSim simulation configuration modal with run config controls and Build and Run button](/images/bobsim/app-simulation-config.png)
 
-Simulation requires a verified OpenModelica toolchain. With `make app` the app
-uses the image's OpenModelica and there is nothing to set. The desktop release
-and `make app RUN=` need a local install. BobSim auto-detects common installs and lets you manually select the `omc` executable plus the
-OpenModelica library directory when needed. The usual user library directories
-are `%APPDATA%\.openmodelica\libraries` on Windows and
-`~/.openmodelica/libraries` on macOS/Linux.
+Simulation needs a verified OpenModelica toolchain. With `make app`, the app
+uses the image's OpenModelica and you set nothing. The desktop release and
+`make app RUN=` need a local install. See
+[Run BobSim Without Docker](/startup-guide/bobsim-without-docker).
 
 ## Archive View
 
-Use `Archive` after a run, or click `Review` from the Simulation workflow card.
+Use `Archive` after a run, or click `Review` on the Simulation workflow card.
 
 ![BobSim Archive view with local runs, downloadable files, and PDF preview](/images/bobsim/app-results-explore.png)
 
-Each successful Simulation workflow creates a local run package. Download:
+Each successful workflow run creates a local run package. You can download:
 
 - the generated PDF report
 - the metrics CSV
 - `signals.zip`, organized by run
 - `run-description.json`
 
-The PDF includes the configured report pages. FourPostEval omits raw
-time-series appendix pages by default, and the retained per-run data lives in
-`signals.zip`. Saved app archive packages live under:
+The PDF holds the configured report pages. FourPostEval leaves out raw
+time-series appendix pages by default. The per-run data is in `signals.zip`.
 
-```text
-_5_App/user_data/results/saved/
-```
+Click `Delete` to remove a run from both the saved archive and the vehicle
+workspace.
 
-Vehicle-specific app workspaces live under:
+## Where BobSim Puts Your Files
 
-```text
-_5_App/user_data/workspaces/vehicles/
-```
+A source checkout writes to these paths in the repository. The released
+desktop app stores its vehicles, builds, configs, and results in its
+[per-user runtime root](/startup-guide/bobsim-without-docker#run-the-released-desktop-app)
+instead.
 
-Use `Delete` in Archive to remove a local run from both the saved archive and
-the vehicle workspace mirror.
+| Path | Contents |
+| :-- | :-- |
+| `_3_StandardSim/generated_results/` | Reports and metric CSVs from the standard studies |
+| `_3_StandardSim/BuildBobLib/VehicleSim/` | Compiled `VehicleSim` and its run directories |
+| `_3_StandardSim/BuildBobLib/FourPostSim/` | Compiled `FourPostSim` and its run directories |
+| `_5_App/user_data/config/vehicles/` | Saved vehicles, one YAML per vehicle |
+| `_5_App/user_data/config/simulations/` | Saved simulation configs |
+| `_5_App/user_data/config/active/` | The app's editable copies of the study configs |
+| `_5_App/user_data/config/defaults/` | Original copies of the EnvelopeSim and OptSim configs |
+| `_5_App/user_data/config/app/` | App settings. The app in Docker keeps its OpenModelica choice in `openmodelica.docker.json`, the app on the host in `openmodelica.json`. |
+| `_5_App/user_data/results/saved/` | Archive packages |
+| `_5_App/user_data/workspaces/vehicles/<vehicle>/` | Per-vehicle builds, results, and processing |
+| `_5_App/user_data/cache/modelica/` | Modelica build cache |
 
-Standard app-registered outputs are under:
+The shipped StandardSim configs write reports to
+`_3_StandardSim/generated_results/`. Older checkouts may write them to
+`_3_StandardSim/results/`.
 
-```text
-_3_StandardSim/generated_results/
-```
+## Replay A Captured Run
 
-Some CLI configs and older checkouts may write equivalent public reports and
-metrics under:
+The `Replay` view plays back a run in 3D. A normal simulation run does not
+feed it, because a normal run keeps only the signals its metrics need. Until
+you capture a scene, `Replay` shows "No captured runs yet".
 
-```text
-_3_StandardSim/results/
-```
-
-## StandardSim Details
-
-StandardSim is the main high-fidelity simulation lane. It lives under:
-
-```text
-_3_StandardSim/
-```
-
-Use StandardSim when a question depends on the full Modelica vehicle response:
-steering behavior, settled balance, transient response, suspension heave/roll
-behavior, or K&C-style metrics.
-
-The active standard studies are:
-
-| Study | Use it for | CLI target |
-| :-- | :-- | :-- |
-| RampSteerEval | Open-loop ramp-steer handling response | `make standard-eval-ramp-steer` |
-| SteadyStateEval | Settled lateral-acceleration operating points | `make standard-eval-steady-state` |
-| TransientEval | Step steer and continuous sine response | `make standard-eval-transient` |
-| FourPostEval | Heave and roll suspension/chassis metrics | `make standard-eval-four-post` |
-
-The app is the clearest launch surface. The make targets are the scriptable
-surface.
-
-## CLI Workflow
-
-Use the CLI for batch work, Docker, automation, and CI.
-
-Run the complete standard baseline:
+To see `Replay` work without a simulation, write the synthetic demo scene. Then
+start the app and open `Replay`:
 
 ```bash
-make standard-eval-all
+make visual-demo
+make app
 ```
 
-Focused maneuver work:
+To capture a real run, BobSim runs one study again and records the suspension
+geometry:
 
 ```bash
-make standard-build
-make standard-eval-ramp-steer
-make standard-eval-steady-state
-make standard-eval-transient
+make visual-rig
+make visual-maneuver VISUAL_MANEUVER=transient
 ```
 
-Focused four-post work:
+| Target | Captures |
+| :-- | :-- |
+| `visual-rig` | The four-post rig |
+| `visual-maneuver` | A maneuver. `VISUAL_MANEUVER` takes `transient`, `ramp_steer`, or `steady_state`. |
 
-```bash
-make standard-build-four-post
-make standard-eval-four-post
-```
+All of these targets run in Docker. Scenes go to `_1_VisualSim/results/`. In
+the view, `Controls` shows the camera keys and `Export video` saves a
+recording.
 
-The run targets depend on the matching build targets, so they rebuild missing
-executables automatically.
-
-## EnvelopeSim
-
-EnvelopeSim is an optional reduced-order lane for common envelope maps. It is a
-separate implementation of calculations such as GGV and YMD maps, which are
-used widely in vehicle dynamics work.
-
-Run:
-
-```bash
-make envelope-ggv
-make envelope-ymd
-```
-
-or:
-
-```bash
-make envelope-all
-```
-
-Use these outputs for quick plausibility checks, tire/aero/mass assumption
-reviews, and limit-trend inspection. Use StandardSim when the question depends
-on multibody transient behavior.
-
-## OptSim
-
-OptSim is the sensitivity and response-surface lane. It lives under:
-
-```text
-_4_OptSim/
-```
-
-Run:
-
-```bash
-make opt-standard
-make opt-envelope
-make opt-refined
-```
-
-Use `opt-standard` for StandardSim pre-screen sensitivities, `opt-envelope` for
-EnvelopeSim sensitivities, and `opt-refined` for refined StandardSim response
-surfaces.
-
-## Debugging Runs
-
-If a simulation fails in the app:
+## Debug A Failed Run
 
 1. Open the workflow modal.
-2. Check `Run Log`.
-3. Confirm the top status strip is green enough for the workflow you are
-   running.
-4. Outside Docker, confirm the OpenModelica toolchain selector shows a
-   verified `omc` and library directory.
-5. Set `execution.cleanup: false` in the run config if you need raw artifacts.
-6. Rerun and inspect the retained run directory.
-
-If a simulation fails from the CLI:
-
-1. Confirm the relevant build target completed.
-2. Set `execution.cleanup: false` in the workflow config.
-3. Rerun the workflow.
-4. Inspect the retained run directory under the build tree.
-5. Check `overrides.txt`, `run.log`, and the result CSV.
-
-The shared runner deletes per-case directories by default after signal
-extraction, so disable cleanup before investigating raw artifacts.
+2. Read `Run Log`.
+3. Check that the top status strip shows the builds the workflow needs as
+   ready.
+4. Outside Docker, check that the `Toolchain` dialog shows a verified `omc`
+   and library directory.
+5. Inspect the retained run directory under the build tree. See
+   [A run failed and you want the raw directory](/startup-guide/bobsim-troubleshooting#a-run-failed-and-you-want-the-raw-directory).
 
 ## Related Pages
 
+- [BobSim CLI Workflow](/use-guide/bobsim-cli) for `make` targets, EnvelopeSim,
+  and OptSim
 - [BobSim App](/bobsim/app) for a tour of Setup, Simulation, and Archive
-- [BobDyn/BobSim overview](/bobsim/) for repository structure and target language
-- [StandardSim](/bobsim/standard-sim) for the standard high-fidelity evaluations
+- [Archive](/bobsim/results) for artifact locations and how to keep results
 - [Configuration](/bobsim/configuration) for YAML sections and build settings
-- [Archive](/bobsim/results) for artifact locations and preservation practices
-- [BobDyn/BobLib use guide](/use-guide/boblib) for Modelica model structure and regression checks
+- [BobDyn/BobLib Use Guide](/use-guide/boblib) for Modelica model work

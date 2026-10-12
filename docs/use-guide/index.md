@@ -11,24 +11,25 @@ next:
 
 # Use Guide
 
-Use this section after your environment is set up. BobDyn usage splits cleanly
-by layer.
+Use these guides after your environment is set up. If it is not, start with the
+[Startup Guide](/startup-guide/).
 
 | Guide | Use it when | You will mostly touch |
 | :-- | :-- | :-- |
-| [BobDyn/BobLib Use Guide](/use-guide/boblib) | You are editing, checking, or simulating the Modelica vehicle library directly | Modelica packages, records, OMEdit diagrams, direct OpenModelica workflows |
-| [BobDyn/BobSim Use Guide](/use-guide/bobsim) | You are running vehicle studies and collecting outputs | BobSim app Setup, Simulation, Archive, workflow YAML, reports, metrics |
+| [BobDyn/BobLib Use Guide](/use-guide/boblib) | You edit, check, or simulate the Modelica vehicle library directly | Modelica packages, records, OMEdit diagrams, direct OpenModelica workflows |
+| [BobDyn/BobSim Use Guide](/use-guide/bobsim) | You run vehicle studies in the app and collect outputs | BobSim app Setup, Simulation, Archive, reports, metrics |
+| [BobSim CLI Workflow](/use-guide/bobsim-cli) | You run the same studies from `make` targets, for scripts or CI | `make standard-eval-*`, EnvelopeSim, OptSim, workflow YAML |
 
-## Rule Of Thumb
+## Which Layer To Use
 
-Use BobLib when the question is "what is the vehicle model?" Use BobSim when
-the question is "what setup or study do I want to run with that model?"
+BobLib owns the physical vehicle model: Modelica packages, records,
+VehicleInterfaces adapters, subsystem models, and OMEdit diagrams. Use it when
+the question is "what is the vehicle model?"
 
-The two layers stay separate on purpose: BobLib keeps the physics inspectable,
-and BobSim keeps the analysis workflow repeatable.
+BobSim owns the analysis workflow around that model: app-guided setup, build
+orchestration, YAML cases, sweeps, signal extraction, metrics, plots, and
+reports. Use it when the question is "what setup or study do I want to run with
+that model?"
 
-## Next Pages
-
-- [BobLib Use Guide](/use-guide/boblib) for direct Modelica model work
-- [BobSim Use Guide](/use-guide/bobsim) for daily simulation workflows
-- [BobLib Startup](/startup-guide/boblib) and [BobSim Startup](/startup-guide/bobsim) if setup is not complete yet
+The two layers stay separate so that the physics stays inspectable and the
+analysis workflow stays repeatable.
