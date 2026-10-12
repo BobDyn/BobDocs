@@ -11,46 +11,12 @@ next:
 
 # CLI Workflow
 
-Use the CLI path for translation, initialization checks, regression checks, and
-direct simulation. It does not require OMEdit.
+Use `omc` to load, build, and simulate BobLib models without OMEdit. For the
+`make` check targets, see [Tests and Checks](/boblib/testing).
 
-## Make Targets
+## Load the package
 
-From the BobLib repository root:
-
-```bash
-make help
-```
-
-Important targets:
-
-| Target | Action |
-| :-- | :-- |
-| `make lint` | Run Ruff over the Python test harness |
-| `make test-python` | Run Python coverage and regression harness tests |
-| `make modelica-deps` | Install OpenModelica library dependencies |
-| `make modelica-translation` | Translate standard entry points and `BobLibTest` fixtures |
-| `make modelica-initialization` | Initialize `BobLibTest` fixtures and compare the baseline CSV |
-| `make modelica-regression` | Simulate signal-level regressions and smoke-check BobLib/BobLibTest |
-| `make test-modelica` | Run all Modelica checks |
-| `make test` | Run Python and Modelica checks |
-| `make ci` | Run the full local CI suite |
-
-For public release confidence, run:
-
-```bash
-make test PYTHON=.venv/bin/python
-```
-
-## Loading Smoke Test
-
-From the BobLib repository root:
-
-```bash
-omc
-```
-
-Then in the OpenModelica prompt:
+From the BobLib repository root, start `omc` and run:
 
 ```txt
 loadModel(Modelica, {"4.1.0"});
@@ -60,111 +26,80 @@ loadFile("Tests/BobLibTest/package.mo");
 getErrorString();
 ```
 
-A clean load should return `true` for both `loadFile(...)` calls and an empty
-or non-critical `getErrorString()` result.
+Both `loadFile(...)` calls should return `true`. `getErrorString()` should be
+empty or show only non-critical messages.
 
-## Translation And Simulation
+## Build or simulate an entry point
 
-To translate and build the active maneuver simulation without running it:
+After you load the package, build the model without running it:
 
 ```txt
-loadModel(Modelica, {"4.1.0"});
-loadModel(VehicleInterfaces, {"2.0.2"});
-loadFile("BobLib/package.mo");
 buildModel(BobLib.Experiments.Standards.VehicleSim);
 getErrorString();
 ```
 
-To simulate the checked-in active package as-is:
+Or build and run it with the model's default experiment settings:
 
 ```txt
-loadModel(Modelica, {"4.1.0"});
-loadModel(VehicleInterfaces, {"2.0.2"});
-loadFile("BobLib/package.mo");
 simulate(BobLib.Experiments.Standards.VehicleSim);
 getErrorString();
 ```
 
-The same pattern works for:
+The same calls work for `BobLib.Experiments.Standards.FourPostSim`. See
+[Entry Points](/boblib/entry-points) for the other models.
 
-```text
-BobLib.Experiments.Standards.FourPostSim
-```
+To change which vehicle architecture the entry points use, see
+[Static Vehicle Templates](/boblib/generation).
 
-## Static Vehicle Templates
+## Build in a scratch directory
 
-Vehicle architectures are checked in as Modelica records, subsystem models,
-four-post adapters, and standard templates. The default entry points are:
+A scratch directory keeps the generated C code, executables, XML, logs, and
+results out of the repository.
 
-```text
-BobLib.Experiments.Standards.VehicleSim
-BobLib.Experiments.Standards.FourPostSim
-```
+1. Set the paths from the BobLib repository root:
 
-They extend or redeclare templates under:
+   ```bash
+   BOBLIB_ROOT="$(pwd)"
+   RUN_DIR="/tmp/BobLibVehicleSim"
+   mkdir -p "$RUN_DIR"
+   ```
 
-```text
-BobLib.Experiments.Standards.Templates.Vehicle
-BobLib.Experiments.Standards.Templates.FourPost
-```
+2. Write a build script into the scratch directory:
 
-To switch the front-facing vehicle architecture, update `VehicleSim.mo` or
-`FourPostSim.mo` to extend or redeclare the desired template. Project/year-
-specific standard models can also extend the desired template and redeclare
-explicit values there.
+   ```bash
+   cat > "$RUN_DIR/build_vehicle_sim.mos" <<MOS
+   OpenModelica.Scripting.cd("$RUN_DIR");
+   loadModel(Modelica, {"4.1.0"});
+   loadModel(VehicleInterfaces, {"2.0.2"});
+   loadFile("$BOBLIB_ROOT/BobLib/package.mo");
+   buildModel(BobLib.Experiments.Standards.VehicleSim);
+   getErrorString();
+   MOS
+   ```
 
-## BobSim Handoff
+3. Run the script:
 
-When BobLib is used as the BobSim submodule, BobSim consumes the checked-in
-Modelica package. BobSim owns the workflow YAML, case generation, result
-extraction, plotting, and reporting; BobLib owns the physical models and
-records.
+   ```bash
+   omc "$RUN_DIR/build_vehicle_sim.mos"
+   ```
 
-From the BobSim root, use:
+4. Run the executable from the scratch directory:
+
+   ```bash
+   cd "$RUN_DIR"
+   ./BobLib.Experiments.Standards.VehicleSim
+   ```
+
+For the four-post model, use a separate scratch directory and replace the model
+class with `BobLib.Experiments.Standards.FourPostSim`.
+
+## Build through BobSim
+
+Inside BobSim, BobLib is a submodule. BobSim owns the workflow YAML, case
+generation, result extraction, plots, and reports. BobLib owns the physical
+models and records. From the BobSim root:
 
 ```bash
 make standard-build
 make standard-build-four-post
 ```
-
-## Scratch Builds
-
-Scratch-directory OMC builds keep generated C, executables, XML, logs, and
-result files out of the repository.
-
-From the BobLib repository root:
-
-```bash
-BOBLIB_ROOT="$(pwd)"
-RUN_DIR="/tmp/BobLibVehicleSim"
-mkdir -p "$RUN_DIR"
-```
-
-Create a build script in that scratch directory:
-
-```bash
-cat > "$RUN_DIR/build_vehicle_sim.mos" <<MOS
-OpenModelica.Scripting.cd("$RUN_DIR");
-loadModel(Modelica, {"4.1.0"});
-loadModel(VehicleInterfaces, {"2.0.2"});
-loadFile("$BOBLIB_ROOT/BobLib/package.mo");
-buildModel(BobLib.Experiments.Standards.VehicleSim);
-getErrorString();
-MOS
-```
-
-Run it:
-
-```bash
-omc "$RUN_DIR/build_vehicle_sim.mos"
-```
-
-Run the generated executable from the same scratch directory:
-
-```bash
-cd /tmp/BobLibVehicleSim
-./BobLib.Experiments.Standards.VehicleSim
-```
-
-For the four-post model, use a separate scratch directory and replace the model
-class with `BobLib.Experiments.Standards.FourPostSim`.

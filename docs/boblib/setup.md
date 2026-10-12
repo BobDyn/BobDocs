@@ -11,46 +11,44 @@ next:
 
 # BobDyn/BobLib Setup
 
-BobDyn/BobLib can be used directly as a standalone Modelica package, or
-indirectly as the BobLib submodule inside BobSim. For model development and
-debugging, clone BobLib directly.
+This page lists what you need to work on BobLib directly: the source,
+OpenModelica, the Modelica libraries, and a Python environment. For a guided
+first run, see the [BobLib Startup guide](/startup-guide/boblib).
 
-## Get BobLib Source
+## Get the source
 
-Clone BobLib directly and continue from the repository root:
+Clone BobLib directly for model development and debugging:
 
 ```bash
 git clone https://github.com/BobDyn/BobLib.git
 cd BobLib
 ```
 
-In the rest of the BobLib docs, "repository root" means this `BobLib`
-directory, which contains the production package, test package, Python harness,
-and helper make targets:
+"Repository root" in the BobLib docs means this `BobLib` directory. It holds:
 
-```text
-BobLib/package.mo
-Tests/BobLibTest/package.mo
-Tests/
-makefile
-msl_setup.mos
-```
+| Path | Contents |
+| :-- | :-- |
+| `BobLib/package.mo` | The production Modelica package |
+| `Tests/BobLibTest/package.mo` | The sibling package of regression and component fixtures |
+| `Tests/` | The Python test harness and baselines |
+| `makefile` | Check and dependency targets |
+| `msl_setup.mos` | The Modelica library install script |
 
-`BobLib/package.mo` is the production Modelica package. `Tests/BobLibTest` is
-the sibling Modelica package for regression and component fixtures.
+See [Package Map](/boblib/package-map) for the full layout.
 
-## OpenModelica Prerequisites
+## Install OpenModelica
 
-For CLI use, install:
+For CLI use, you need:
 
-- `omc` available on `PATH`
-- a C/C++ compiler toolchain usable by OpenModelica
+- `omc` on `PATH`
+- a C/C++ compiler toolchain that OpenModelica can use
 - Modelica Standard Library `4.1.0`
 - VehicleInterfaces `2.0.2`
 
-For OMEdit use, install the full OpenModelica GUI stack, not only the compiler.
+For OMEdit, install the full OpenModelica GUI stack, not only the compiler.
+BobLib CI uses the container `openmodelica/openmodelica:v1.26.3-ompython`.
 
-Useful official OpenModelica links:
+Official OpenModelica links:
 
 - [OpenModelica downloads](https://openmodelica.org/download/)
 - [Linux package install](https://openmodelica.org/download/download-linux/)
@@ -58,71 +56,67 @@ Useful official OpenModelica links:
 - [macOS notes](https://openmodelica.org/download/download-mac/)
 - [OMEdit user guide](https://openmodelica.org/doc/OpenModelicaUsersGuide/latest/omedit.html)
 
-Install the expected Modelica Standard Library package:
+Install both Modelica libraries at the exact versions:
 
 ```bash
 make modelica-deps
 ```
 
-That target runs `omc msl_setup.mos`. VehicleInterfaces `2.0.2` must also be
-installed in the OpenModelica package manager for BobLib checks.
+This target runs `omc msl_setup.mos`, which installs Modelica `4.1.0` and
+VehicleInterfaces `2.0.2` through the OpenModelica package manager.
 
-Verify:
+Check the compiler:
 
 ```bash
 omc --version
 ```
 
-## Python Environment
+## Set up Python
 
-Python is required for the regression harness. Create a local environment:
+The test harness needs Python with `pytest` and `ruff`. The versions are pinned
+in `Tests/requirements-dev.txt`.
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install pytest ruff
+python -m pip install --upgrade pip -r Tests/requirements-dev.txt
 ```
 
-On Windows PowerShell:
+On Windows PowerShell, activate the environment with:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-Verify:
+Check the install:
 
 ```bash
-python --version
 python -c "import pytest; print('ok')"
 ```
 
-## First Health Check
+## Run a first check
 
-Run the full local release gate:
-
-```bash
-make test PYTHON=.venv/bin/python
-```
-
-For a smaller first check:
+A small first check:
 
 ```bash
-make modelica-translation PYTHON=.venv/bin/python
-python -m pytest Tests/test_boblib_modelica.py
+make modelica-smoke PYTHON=.venv/bin/python
 ```
 
-The full test target verifies BobLib standards plus the `Tests/BobLibTest`
-regression and component fixtures.
+The full local gate takes longer:
 
-## BobSim Submodule Path
+```bash
+make ci PYTHON=.venv/bin/python
+```
 
-When BobLib is used inside BobSim, it lives at:
+See [Tests and Checks](/boblib/testing) for every target.
+
+## Use BobLib inside BobSim
+
+BobSim includes BobLib as a Git submodule at:
 
 ```text
 _0_Utils/external/BobLib/
 ```
 
-In that workflow, BobSim consumes BobLib as a static Modelica library. Vehicle
-architecture data is moving into checked-in Modelica records rather than a
-Python/YAML generation step.
+BobSim uses it as a static Modelica library. Vehicle data comes from
+checked-in Modelica records. There is no Python or YAML generation step.
