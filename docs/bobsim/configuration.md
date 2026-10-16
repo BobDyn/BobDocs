@@ -5,66 +5,49 @@ title: Configuration
 
 # Configuration
 
-BobDyn/BobSim configuration is mostly plain YAML plus generated Modelica
-definitions and a small number of OpenModelica build scripts. The app is the
-normal editor for vehicle setup and runnable workflow options; the files remain
-plain enough to inspect and version deliberately.
+This page is the reference for BobDyn/BobSim configuration: the vehicle
+source, the workflow YAML keys, and the OpenModelica build scripts. The app
+edits most of these values for you. The files stay plain text, so you can
+inspect and version them.
 
-## Vehicle Source
+## Vehicle source
 
-The app manages vehicle setup as YAML, then writes the generated Modelica
-definition used by the standard workflows.
+The app stores each vehicle as YAML. `Write to MBD` generates the BobLib
+Modelica definition that the standard workflows build.
 
-Common app vehicle paths:
-
-```text
-_5_App/user_data/config/vehicles/
-_5_App/user_data/workspaces/vehicles/<vehicle>/config/vehicle.yml
-```
-
-Use the `Setup` view to load, create, import, edit, save, and write the active
-vehicle. Use `Write to MBD` before opening `Simulation`; that is the step that
-updates the generated Modelica definition.
+| Path | Contents |
+| :-- | :-- |
+| `vehicle.yml` | The repository's default vehicle |
+| `_5_App/user_data/config/vehicles/` | Vehicles saved in the app |
+| `_5_App/user_data/workspaces/vehicles/<vehicle>/config/vehicle.yml` | The per-vehicle workspace copy |
 
 ![BobSim Setup view showing vehicle architecture inputs, Save Vehicle, Write to MBD, and Modelica stack status](/images/bobsim/app-setup-architecture.png)
 
-BobLib remains the physical model library and owns the standard entry-point
-templates. The standard build targets compile the selected Modelica entry
-points:
+From the command line, `make sync-vehicle` reports whether the BobLib records
+match `vehicle.yml`. `make sync-vehicle-write` regenerates them.
 
-```bash
-make standard-build
-make standard-build-four-post
-```
+BobLib stays the physical model library and owns the standard entry-point
+templates. To change model structure, work in BobLib. Keep BobSim workflow YAML
+for case definitions and runtime overrides.
 
-When changing the vehicle from the app, save the vehicle YAML and write it to
-MBD. When changing model structure directly, work in BobLib and keep BobSim
-workflow YAML focused on case definitions and runtime overrides.
+## App run configs
 
-## App Configs
+| Path | Contents |
+| :-- | :-- |
+| `_3_StandardSim/*/[name]_config.yml` | Checked-in seed config for each workflow |
+| `_5_App/user_data/config/active/` | The app's editable copy of each StandardSim config |
+| `_5_App/user_data/config/simulations/` | Named run configs saved from the app |
 
-The app exposes supported workflow fields in the browser and stores reusable
-run configs under:
-
-```text
-_5_App/user_data/config/simulations/
-```
-
-Default app configs live in:
-
-```text
-_5_App/sim_configs/_defaults/
-```
-
-The app can load a default config, save a named config, apply edits to the
-active run, and then launch the backing workflow. Advanced options that are not
-exposed in the form can still be edited in the underlying YAML.
+The app copies a seed config to `config/active/` the first time it uses it,
+then edits the copy. The `make standard-eval-*` targets read the active copy
+when it exists, and the seed otherwise. Fields that the app form does not show
+can still be edited in the YAML.
 
 ![BobSim simulation configuration modal with saved config controls and Apply Edits action](/images/bobsim/app-simulation-config.png)
 
-## Standard Workflow Configs
+## Workflow config shape
 
-The main standard configs are:
+The four standard configs are:
 
 ```text
 _3_StandardSim/RampSteerEval/ramp_steer_eval_config.yml
@@ -82,15 +65,15 @@ They share a common shape:
 | `execution` | Parallelism, worker count, cleanup, log streaming |
 | `sweep`, `test`, or `procedure` | Workflow-specific case generation |
 | `fit` | Workflow-specific fitting and filtering |
-| `report` | PDF/CSV output paths, title metadata, summary controls |
+| `report` | PDF and CSV output paths, title metadata, summary controls |
 | `plots` | Plot pages, layouts, signal keys, labels, scaling, overlays |
 
-## Simulation Section
+For the current values in each config, see [StandardSim](/bobsim/standard-sim).
 
-The `simulation` section tells BobSim which executable to run and which
-OpenModelica runtime flags to apply.
+## `simulation`
 
-Typical shape:
+The `simulation` section names the executable and the OpenModelica runtime
+flags.
 
 ```yaml
 simulation:
@@ -99,7 +82,7 @@ simulation:
   exec_name: BobLib.Experiments.Standards.VehicleSim
 
   start_time: 0.0
-  stop_time: 20.0
+  stop_time: 45.0
   solver: dassl
   tolerance: 1e-6
   output_format: csv
@@ -112,107 +95,87 @@ simulation:
   no_event_emit: true
 ```
 
-Useful keys:
-
 | Key | Effect |
 | :-- | :-- |
-| `build_dir` | Directory containing the executable and init XML |
+| `build_dir` | Directory that holds the executable and init XML |
 | `exec_name` | OpenModelica executable name |
 | `start_time`, `stop_time` | Default run time bounds, unless a case overrides them |
-| `stepSize` or `step_size` | Optional OpenModelica output/integration step size |
-| `solver` | Solver passed as `-s=<solver>` |
+| `stepSize` or `step_size` | Optional step size, passed as `-stepSize` |
+| `solver` | Solver, passed as `-s=<solver>` |
 | `tolerance` | Runtime tolerance |
-| `log_level` | OpenModelica log flags passed with `-lv` |
-| `variable_filter` | Limits variables emitted to the result file |
-| `extra_args` | Appended runtime arguments, such as `-jacobian=internalNumerical` |
+| `log_level` | OpenModelica log flags, passed as `-lv` |
+| `variable_filter` | Limits the variables written to the result file |
+| `case_timeout_s` | Optional per-case timeout in seconds |
+| `extra_args` | Extra runtime arguments, such as `-jacobian=internalNumerical` |
 | `no_grid` | Adds `-noEquidistantTimeGrid` |
 | `no_event_emit` | Adds `-noEventEmit` |
 
-The current public StandardSim configs use `-jacobian=internalNumerical` for
-the OpenModelica runtime Jacobian path.
+All four StandardSim configs pass `-jacobian=internalNumerical`.
+RampSteerEval and SteadyStateEval also pass `-ls=totalpivot`.
 
-On Windows, the generated executable may have an `.exe` suffix. BobSim accepts
-both the suffix and no-suffix executable names when checking build readiness.
+On Windows the executable may have an `.exe` suffix. BobSim accepts both forms
+when it checks that a build is ready.
 
-## Compliance and Damping Studies
-
+::: tip Compliance and damping studies
 Halfshaft compliance and damping are valid study parameters in the integrated
-powertrain model. Increasing compliance detail can add faster torsional modes,
-so refine the simulation settings when studying these effects: reduce the
-default step size or output interval, keep the adaptive solver tolerance tight
-enough for the target dynamics, and confirm the solver is actually resolving
-the halfshaft transient instead of stepping across it.
+powertrain model. More compliance detail can add faster torsional modes. When
+you study them, reduce the step size or output interval, keep the solver
+tolerance tight enough for those dynamics, and confirm the solver resolves the
+halfshaft transient instead of stepping across it.
+:::
 
-## Initial Parameters
+### `simulation.init_parameters`
 
-Some workflows define common Modelica overrides under
-`simulation.init_parameters`. RampSteerEval uses this for handwheel ramp
-timing and termination logic. SteadyStateEval uses it for closed-loop target
+Some workflows set Modelica parameter overrides under
+`simulation.init_parameters`. RampSteerEval uses them for handwheel ramp timing
+and termination logic. SteadyStateEval uses them for closed-loop target
 tracking, settle detection, termination logic, and velocity controller gains.
-
-Example:
 
 ```yaml
 simulation:
   init_parameters:
-    useMode: 0
     steerStart: 2.0
-    handwheelRampRate: 0.14
+    handwheelRampRate: 0.06
     enableLinearityTermination: true
-    linearityNonlinearityFraction: 0.20
+    linearityNonlinearityFraction: 0.2
     linearityReferenceAy: 4.0
     velGain: 100.0
     velTi: 2.0
 ```
 
-Case-specific overrides are layered on top by the workflow before the runner
-writes `overrides.txt`.
+The workflow layers case-specific overrides on top before the runner writes
+`overrides.txt`.
 
-Steady-state configs use `useMode: 3` and generate target lateral-acceleration
-cases from `sweep.targetAys`. The optional `sweep.maxAyByVelocity` map clips
-that target grid per velocity before cases are built:
+SteadyStateEval sets `useMode: 3` and builds target lateral-acceleration cases
+from `sweep.targetAys`. The optional `sweep.maxAyByVelocity` map caps that grid
+per velocity. See [SteadyStateEval](/bobsim/standard-sim#steadystateeval).
 
-```yaml
-sweep:
-  testVels: [12.5, 15.0, 17.5, 20.0]
-  targetAys: [2.0, 3.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0]
-  maxAyByVelocity:
-    12.5: 16.0
-    15.0: 10.0
-    17.5: 6.0
-    20.0: 4.0
-```
+## `execution`
 
-Leave caps in place for release-style runs that should complete cleanly across
-the default vehicle. Remove or raise them when intentionally probing the edge
-of the closed-loop solver envelope.
-
-## Execution Section
-
-The `execution` section controls case parallelism and retained debug output.
+The `execution` section controls case parallelism and which debug files stay.
 
 ```yaml
 execution:
   parallel: true
   max_workers: 4
-  cleanup: true
+  cleanup: false
   stream_logs: false
 ```
 
 | Key | Use |
 | :-- | :-- |
-| `parallel` | Run cases with `ProcessPoolExecutor` when true |
-| `max_workers` | Limit parallel case count |
-| `cleanup` | Delete per-case run directories after extraction |
-| `stream_logs` | Print selected solver/log lines while each case runs |
-| `fail_fast` | Stop on the first failed case when supported |
+| `parallel` | Run cases with `ProcessPoolExecutor` when `true` |
+| `max_workers` | Limit the parallel case count |
+| `cleanup` | Delete each run directory after extraction. Defaults to `false`. |
+| `stream_logs` | Print selected solver and log lines while each case runs |
+| `fail_fast` | Stop on the first failed case. With `parallel: true` the stop is not immediate. |
 
-Set `cleanup: false` when debugging a failed case. That preserves run
-directories with overrides, logs, and result CSVs.
+The shipped configs set `cleanup: false`. The run directories keep the
+overrides, logs, and result CSVs, and the app builds `signals.zip` from them.
 
-## Report Section
+## `report`
 
-The `report` section controls the public report artifact.
+The `report` section controls the PDF report.
 
 ```yaml
 report:
@@ -220,34 +183,24 @@ report:
   brand: BobSim
   title: Ramp-Steer Vehicle Characterization
   subtitle: Measured-$a_y$ ramp-response isolines with robust metric fits
-  output_path: _3_StandardSim/results/steady_state_eval_report.pdf
-  metric_target_velocity_mps: 15.0
+  output_path: _3_StandardSim/generated_results/ramp_steer_eval_report.pdf
+  metric_target_velocity_mps: 15
 ```
-
-Common keys:
 
 | Key | Use |
 | :-- | :-- |
-| `enabled` | Skip report generation when false |
+| `enabled` | Skip report generation when `false` |
 | `brand`, `title`, `subtitle` | Title page metadata |
 | `output_path` | PDF output path |
-| `metrics_csv_path` | Explicit metrics CSV path when supported |
-| `metric_target_velocity_mps` | Velocity used for exported summary metrics |
-| `notes` | Human-readable assumptions shown in the report |
+| `metrics_csv_path` | Explicit metrics CSV path, where supported |
+| `metric_target_velocity_mps` | Velocity used for the exported summary metrics |
+| `notes` | Assumptions shown in the report |
 | `summary_units` | Per-metric unit and scale overrides for FourPostEval tables |
 
-## Plots Section
+## `plots`
 
-Plots are declared in YAML and rendered by the shared plot engine.
-
-Layouts used by the standard workflows include:
-
-- `single`
-- `dual`
-- `triple`
-- `quad`
-
-Each plot maps result dictionary keys to axes:
+Plots are declared in YAML and drawn by the shared plot engine. The layouts
+are `single`, `dual`, `triple`, and `quad`. Each plot maps result keys to axes:
 
 ```yaml
 plots:
@@ -261,113 +214,70 @@ plots:
         y: { key: ay_gain, label: "|a_y / delta_HWA|" }
 ```
 
-Use `scale` when a signal needs unit conversion for display.
+Use `scale` to convert a signal's units for display.
 
-## Build Scripts
+## Build scripts
 
-The active OpenModelica build scripts are:
+The OpenModelica build scripts are:
 
 ```text
 _3_StandardSim/build_vehicle_sim.mos
 _3_StandardSim/build_four_post_sim.mos
 ```
 
-They load the BobLib submodule package, set OpenModelica command-line options,
-ensure the target build directories exist, change into the build directory, and
-call `buildModel(...)`.
+Each script sets the OpenModelica command-line options, loads Modelica
+`4.1.0`, VehicleInterfaces `2.0.2`, and the BobLib submodule package, creates
+the build directory, changes into it, and calls `buildModel(...)`.
 
-Prefer make targets over direct `omc` calls:
+Use the make targets instead of calling `omc` directly:
 
 ```bash
 make standard-build
 make standard-build-four-post
 ```
 
-Current build outputs are written under:
+They write to:
 
 ```text
 _3_StandardSim/BuildBobLib/VehicleSim/
 _3_StandardSim/BuildBobLib/FourPostSim/
 ```
 
-The BobSim app also exposes an OpenModelica toolchain selector in the
-Simulation area. It auto-detects common installs, and lets you choose the
-`omc` executable plus the OpenModelica library directory when auto-detection is
-not enough.
+## Other configs
 
-## Envelope Configs
+| Workflow | Configs | Reference |
+| :-- | :-- | :-- |
+| EnvelopeSim | `_2_EnvelopeSim/GGV/ggv_config.yml`, `_2_EnvelopeSim/YMD/ymd_config.yml` | [EnvelopeSim](/bobsim/envelope) |
+| OptSim | `_4_OptSim/StandardSens/configs/`, `_4_OptSim/EnvelopeSens/config.yml` | [OptSim](/bobsim/doe#layout) |
 
-EnvelopeSim is an optional, separate implementation of common GGV/YMD-style
-envelope calculations. Its configs live under:
+The app edits these configs in place, not as active copies.
 
-```text
-_2_EnvelopeSim/GGV/ggv_config.yml
-_2_EnvelopeSim/YMD/ymd_config.yml
-```
+## Common changes
 
-Run them through:
+To change the vehicle:
 
-```bash
-make envelope-ggv
-make envelope-ymd
-make envelope-all
-```
-
-EnvelopeSim reads the same active vehicle data and uses the latest useful
-standard-study metrics when available. It is intended as a sane, transparent
-implementation that can be used when desired, not as the canonical envelope
-reference for BobDyn.
-
-## OptSim Configs
-
-OptSim is split by workflow:
-
-```text
-_4_OptSim/StandardSens/
-_4_OptSim/EnvelopeSens/
-```
-
-Key StandardSens configs:
-
-| File | Role |
-| :-- | :-- |
-| `_4_OptSim/StandardSens/configs/vehicle_architecture.yaml` | Human-edited architecture and sweep source |
-| `_4_OptSim/StandardSens/configs/_doe_config.yaml` | Generated DOE config |
-| `_4_OptSim/StandardSens/configs/compiler_config.yaml` | BobLib path, standards, OMC settings, batch timeout |
-| `_4_OptSim/StandardSens/configs/aggregator_config.yaml` | Metric extraction map |
-| `_4_OptSim/EnvelopeSens/config.yml` | Envelope sensitivity config |
-
-Run:
-
-```bash
-make opt-standard
-make opt-envelope
-make opt-refined
-```
-
-## Common Changes
-
-To change the active vehicle:
-
-1. Edit the relevant BobLib Modelica record or subsystem redeclare.
+1. Edit it in the app and click `Write to MBD`. From the command line, edit
+   `vehicle.yml` and run `make sync-vehicle-write`.
 2. Run `make standard-build` or `make standard-build-four-post`.
-3. Rerun the relevant study.
+3. Rerun the study.
 
 To change a standard study:
 
-1. Edit that workflow's config YAML.
-2. Rebuild only if the Modelica source or selected vehicle record changed.
-3. Run the workflow target.
-4. Inspect the report and metrics CSV.
+1. Edit the workflow config. Edit the active copy if the app has made one.
+2. Run the workflow target. It rebuilds only if the Modelica source or a
+   generated vehicle record changed.
+3. Check the report and metrics CSV.
 
 To change a report page:
 
-1. Edit the workflow's `report` and `plots` sections for configuration-only changes.
-2. Edit `_0_Utils/reporting/` or `_0_Utils/plotting/` for report engine behavior.
+1. For configuration-only changes, edit the workflow's `report` and `plots`
+   sections.
+2. For report engine behavior, edit `_0_Utils/reporting/` or
+   `_0_Utils/plotting/`.
 3. Rerun the workflow.
 
 To change a sensitivity sweep:
 
-1. Edit the relevant OptSim config.
+1. Edit the OptSim config.
 2. Run `make clean-opt` if the sample set or variable dimensions changed.
 3. Run the matching `make opt-*` target.

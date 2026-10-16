@@ -5,35 +5,31 @@ title: Archive
 
 # Archive
 
-BobDyn/BobSim writes results in predictable workflow-specific directories. The
-public alpha path is the app's `Archive` view: review the generated PDF,
-download metrics, and download the per-run signal archive for any local run.
-Debug artifacts are
-per-case run directories, OpenModelica logs, override files, generated result
-CSVs, and compiled build artifacts.
+This page lists where BobDyn/BobSim writes each output and what the files
+contain. For most work, use the app's `Archive` tab. It holds the PDF report,
+the metrics CSV, and a per-run signal archive for each local run.
 
-In-app plotting and ad-hoc processing are intentionally gated off for the alpha.
-Users run simulations and review the PDF, metrics CSV, and raw signal bundle.
+## App archive packages
 
-## App Archive
-
-Use the app's `Archive` view after a simulation run, or click `Review` on a
-Simulation card when outputs exist.
+Open `Archive` after a simulation run, or click `Review` on a Simulation card
+when outputs exist.
 
 ![BobSim Archive view with local runs, downloadable files, and PDF preview](/images/bobsim/app-results-explore.png)
 
-After a Simulation job succeeds, BobSim creates a local archive package automatically.
-Each package can include:
+When a Simulation job succeeds, BobSim writes a local archive package. Each
+package can include:
 
-- `report.pdf`
-- `metrics.csv`
-- `signals.zip`
-- `run-description.json`
-- the active vehicle YAML
-- the active run config YAML
-- `manifest.json`
+| File | Contents |
+| :-- | :-- |
+| `report.pdf` | The workflow report |
+| `metrics.csv` | The exported summary metrics |
+| `signals.zip` | Per-run signals, overrides, logs, and descriptions |
+| `run-description.json` | What ran, and with which inputs |
+| `vehicle.yml` | Snapshot of the active vehicle |
+| `config.yml` | Snapshot of the workflow config |
+| `manifest.json` | Index of the package |
 
-The `signals.zip` archive is organized by run:
+`signals.zip` has one folder per run:
 
 ```text
 manifest.json
@@ -45,114 +41,76 @@ runs/
     description.json
 ```
 
-Saved app archive packages are written under:
+The app writes packages to `_5_App/user_data/results/saved/` and mirrors them
+under `_5_App/user_data/workspaces/vehicles/`. `Delete` on an Archive card
+removes both copies.
 
-```text
-_5_App/user_data/results/saved/
-```
+FourPostEval reports leave out the raw time-series pages by default. Use
+`signals.zip` for the per-run signal tables.
 
-Vehicle-scoped app workspaces live under:
+## Output locations
 
-```text
-_5_App/user_data/workspaces/vehicles/
-```
+| Workflow | Reports and metrics | Intermediate files |
+| :-- | :-- | :-- |
+| StandardSim | `_3_StandardSim/generated_results/` | `_3_StandardSim/BuildBobLib/<entry point>/` |
+| EnvelopeSim | `_2_EnvelopeSim/results/` | `_2_EnvelopeSim/Build/GGV/`, `_2_EnvelopeSim/Build/YMD/` |
+| OptSim | `_4_OptSim/results/` | `_4_OptSim/Build/StandardSens/`, `_4_OptSim/Build/EnvelopeSens/` |
+| Replay scenes | `_1_VisualSim/results/` | — |
 
-Use `Delete` from an Archive card or selected run detail to remove a local run.
-BobSim removes both the global package and the vehicle-workspace mirror.
+For the file names in each directory, see [StandardSim](/bobsim/standard-sim#outputs),
+[EnvelopeSim](/bobsim/envelope), and [OptSim](/bobsim/doe). For Replay scenes,
+see [Replay](/bobsim/visualization#replay-a-run).
 
-FourPostEval reports omit raw time-series appendix pages by default. Use
-`signals.zip` when you need the retained per-run signal tables, overrides, logs,
-and descriptions.
+`_3_StandardSim/results/` is an older output location. The shipped StandardSim
+configs write to `generated_results/`.
 
-## StandardSim Results
-
-StandardSim app-registered outputs live under:
-
-```text
-_3_StandardSim/generated_results/
-```
-
-CLI-oriented public outputs may also live under:
-
-```text
-_3_StandardSim/results/
-```
-
-Common report artifacts:
-
-```text
-_3_StandardSim/generated_results/ramp_steer_eval_report.pdf
-_3_StandardSim/generated_results/ramp_steer_eval_report_metrics.csv
-_3_StandardSim/generated_results/steady_state_eval_report.pdf
-_3_StandardSim/generated_results/steady_state_eval_report_metrics.csv
-_3_StandardSim/generated_results/transient_eval_report.pdf
-_3_StandardSim/generated_results/transient_eval_report_metrics.csv
-_3_StandardSim/generated_results/four_post_eval_report.pdf
-_3_StandardSim/generated_results/four_post_eval_report_metrics.csv
-
-_3_StandardSim/results/steady_state_eval_report.pdf
-_3_StandardSim/results/steady_state_eval_report_metrics.csv
-_3_StandardSim/results/transient_eval_report.pdf
-_3_StandardSim/results/transient_eval_report_metrics.csv
-_3_StandardSim/results/four_post_eval_report.pdf
-_3_StandardSim/results/four_post_eval_report_metrics.csv
-```
-
-Use the PDF first when reviewing a vehicle. Use the metrics CSV when comparing
-runs, driving a notebook, or feeding another analysis stage.
+Use the PDF first when you review a vehicle. Use the metrics CSV to compare
+runs, drive a notebook, or feed another analysis stage.
 
 ## Metrics CSVs
 
-Representative metric groups:
-
-| Workflow | Examples |
+| Workflow | Example metrics |
 | :-- | :-- |
-| RampSteerEval | lateral acceleration range, steering gradients, yaw/roll trends, limit-point derivatives |
-| SteadyStateEval | lateral acceleration range, steering gradients, understeer gradient, roll gradient, handwheel torque range |
-| TransientEval | step response, gain/phase response, time lags, velocity trends, fit quality |
-| FourPostEval | camber/toe/caster/KPI gains, motion ratios, roll stiffness, jacking, LLTD |
+| RampSteerEval | Lateral acceleration range, steering gradients, yaw and roll trends, limit-point derivatives |
+| SteadyStateEval | Lateral acceleration range, steering gradients, understeer gradient, roll gradient, handwheel torque range |
+| TransientEval | Step response, gain and phase response, time lags, velocity trends, fit quality |
+| FourPostEval | Camber, toe, caster, and KPI gains, motion ratios, roll stiffness, jacking, LLTD |
 
-The exact column layout is workflow-specific, but each public CSV is intended
-to be readable by spreadsheets, notebooks, and downstream scripts.
+The column layout differs by workflow. Each CSV opens in spreadsheets,
+notebooks, and scripts.
 
-## Raw Case Artifacts
+## Raw case files
 
-The shared Modelica runner creates a run directory for every case. The directory
-contains:
-
-```text
-overrides.txt
-run.log
-<exec_name>_res.csv
-```
-
-By default, active configs use:
-
-```yaml
-execution:
-  cleanup: true
-```
-
-Set `cleanup: false`, rerun the workflow, and inspect the retained directories
-when debugging a failed case.
-
-Typical retained paths:
+The shared Modelica runner creates a run directory for every case:
 
 ```text
 _3_StandardSim/BuildBobLib/VehicleSim/results/run_<id>/
 _3_StandardSim/BuildBobLib/FourPostSim/results/run_<id>/
 ```
 
-## Build Artifacts
+Each contains:
 
-OpenModelica build outputs live under:
+```text
+overrides.txt
+run.log
+manifest.json
+<exec_name>_res.csv
+```
+
+The shipped configs set `execution.cleanup: false`, so the directories stay
+after a run. The app builds `signals.zip` from them. Set `cleanup: true` to
+delete each directory after extraction.
+
+## Build artifacts
+
+OpenModelica writes build outputs to:
 
 ```text
 _3_StandardSim/BuildBobLib/VehicleSim/
 _3_StandardSim/BuildBobLib/FourPostSim/
 ```
 
-The two files the runner needs are:
+The runner needs two files from each:
 
 ```text
 BobLib.Experiments.Standards.VehicleSim
@@ -166,136 +124,37 @@ BobLib.Experiments.Standards.FourPostSim
 BobLib.Experiments.Standards.FourPostSim_init.xml
 ```
 
-Windows builds may include an `.exe` suffix on the executable. The init XML
-keeps the same `<exec_name>_init.xml` naming.
+Windows builds may add an `.exe` suffix to the executable. The init XML keeps
+the `<exec_name>_init.xml` name. Generated C files, object files, makefiles,
+binary Jacobian data, logs, and runtime support files may also be present.
 
-Generated C files, object files, makefiles, binary Jacobian data, logs, and
-runtime support files may also be present.
+## Docs samples
 
-## EnvelopeSim Results
+BobDocs keeps selected BobSim outputs under `docs/public/`. They are
+documentation examples, not the live BobSim working directory. To update them,
+regenerate the reports in BobSim, then copy the examples into BobDocs.
 
-Envelope public outputs live under:
+## Keep results comparable
 
-```text
-_2_EnvelopeSim/results/
-```
-
-Current public artifacts:
-
-```text
-_2_EnvelopeSim/results/ggv_report.pdf
-_2_EnvelopeSim/results/ggv_report_metrics.csv
-_2_EnvelopeSim/results/ymd_report.pdf
-_2_EnvelopeSim/results/ymd_report_metrics.csv
-```
-
-Intermediate CSV outputs live under:
-
-```text
-_2_EnvelopeSim/Build/GGV/
-_2_EnvelopeSim/Build/YMD/
-```
-
-## Visualization Results
-
-Vehicle setup visualization happens directly in the app preview. For Modelica
-animation and diagram-level inspection, use OMEdit with the BobLib standard
-models. Integrated models default to `headless=false`, so MultiBody animation
-geometry is visible unless you explicitly set `headless=true`.
-
-VisualSim is not an active primary workflow right now. If you intentionally use
-the offline VisualSim renderer, MP4 outputs are usually written to:
-
-```text
-_1_VisualSim/results/
-```
-
-The VisualSim renderer consumes:
-
-- a visualization template YAML
-- a `.npz` file containing visual signal arrays
-- an output MP4 path
-
-Example:
-
-```bash
-python _1_VisualSim/run_visual.py \
-  _1_VisualSim/visual_templates/transient_eval_visual.yml \
-  _1_VisualSim/sample_transient_visual.npz \
-  --mp4 _1_VisualSim/results/transient_eval_test.mp4
-```
-
-## OptSim Results
-
-OptSim public outputs live under:
-
-```text
-_4_OptSim/results/
-```
-
-Common public artifacts:
-
-```text
-_4_OptSim/results/standard_sensitivity_results.csv
-_4_OptSim/results/standard_sensitivity_report.pdf
-_4_OptSim/results/envelope_sensitivity_results.csv
-_4_OptSim/results/envelope_sensitivity_report.pdf
-_4_OptSim/results/refined_response_surface_results.csv
-```
-
-Private build and intermediate outputs live under:
-
-```text
-_4_OptSim/Build/StandardSens/
-_4_OptSim/Build/EnvelopeSens/
-```
-
-Generated StandardSens variants live under:
-
-```text
-_4_OptSim/Build/StandardSens/population/
-```
-
-Each variant can contain:
-
-```text
-variant.mo
-build/<standard>/
-results/<standard>/
-run_error_<standard>.log
-```
-
-## Public Docs Samples
-
-BobDocs embeds selected BobSim outputs under:
-
-```text
-docs/public/
-```
-
-Those files are documentation examples, not the live BobSim working directory.
-Regenerate reports in BobSim, then copy intentional public examples into
-BobDocs when updating the website.
-
-## Preserving Results
-
-Use these conventions when comparing runs:
-
-- Keep the source config with the result whenever possible.
-- Preserve the matching BobLib Modelica record and workflow config.
+- Keep the source config with the result.
+- Keep the matching vehicle YAML, generated BobLib record, and workflow config.
 - Export metrics CSVs for spreadsheet or notebook comparisons.
 - Keep raw case directories only for failures or deep debugging.
-- Clean build artifacts before timing compile performance.
+- Clean build artifacts before you time compile performance.
 
-Useful cleanup targets:
+Cleanup targets:
 
-```bash
-make clean-standard
-make clean-envelope
-make clean-opt
-make clean-all
-```
+| Target | Removes |
+| :-- | :-- |
+| `make clean-standard` | StandardSim build and result artifacts |
+| `make clean-envelope` | EnvelopeSim build and result artifacts |
+| `make clean-opt` | OptSim build and result artifacts |
+| `make clean-app` | App configs, saved vehicles, archive packages, and workspaces under `_5_App/user_data/` |
+| `make clean-all` | All of the above, plus Replay scenes and Python and tool caches |
 
-`make clean-standard`, `make clean-envelope`, and `make clean-opt` remove
-workflow artifacts while preserving tracked placeholder files. `make clean-all`
-also removes Python and tool caches.
+The cleanup targets keep tracked placeholder files.
+
+::: warning
+`make clean-all` runs `make clean-app`. It deletes your saved vehicles and
+archive packages in a source checkout.
+:::
