@@ -48,78 +48,74 @@ function assertSidebarCoversDir(dirName: string, entries: SidebarEntry[]) {
 
 const sidebar = {
   "/startup-guide/": [
-    page("Choose A Startup Path", "/startup-guide/"),
-    {
-      text: "BobDyn/BobLib",
-      items: [
-        page("Startup", "/startup-guide/boblib"),
-      ],
-    },
-    {
-      text: "BobDyn/BobSim",
-      items: [
-        page("Startup", "/startup-guide/bobsim"),
-        page("Run Without Docker", "/startup-guide/bobsim-without-docker"),
-        page("Startup Problems", "/startup-guide/bobsim-troubleshooting"),
-      ],
-    },
+    page("Getting started", "/startup-guide/"),
+    page("BobSim installation", "/startup-guide/bobsim"),
+    page("Desktop and native Python", "/startup-guide/bobsim-without-docker"),
+    page("BobSim troubleshooting", "/startup-guide/bobsim-troubleshooting"),
+    page("BobLib first run", "/startup-guide/boblib"),
   ],
-
   "/use-guide/": [
-    page("Choose A Use Path", "/use-guide/"),
-    {
-      text: "BobDyn/BobLib",
-      items: [
-        page("Use Guide", "/use-guide/boblib"),
-      ],
-    },
-    {
-      text: "BobDyn/BobSim",
-      items: [
-        page("Use Guide", "/use-guide/bobsim"),
-        page("CLI Workflow", "/use-guide/bobsim-cli"),
-      ],
-    },
+    page("Workflows", "/use-guide/"),
+    page("BobSim workflow", "/use-guide/bobsim"),
+    page("BobSim command line", "/use-guide/bobsim-cli"),
+    page("BobLib workflow", "/use-guide/boblib"),
   ],
-
   "/boblib/": [
+    page("BobLib", "/boblib/"),
     {
-      text: "BobDyn/BobLib",
+      text: "Working with the library",
       items: [
-        page("Overview",        "/boblib/"),
-        page("Setup",           "/boblib/setup"),
-        page("CLI Workflow",    "/boblib/cli-workflow"),
-        page("OMEdit Workflow", "/boblib/omedit-workflow"),
-        page("Package Map",     "/boblib/package-map"),
-        page("Control Bus",     "/boblib/control-bus"),
-        page("Static Templates", "/boblib/generation"),
-        page("Entry Points",    "/boblib/entry-points"),
-        page("Tests and Checks", "/boblib/testing"),
-        page("Development",     "/boblib/development"),
+        page("Setup", "/boblib/setup"),
+        page("OMEdit workflow", "/boblib/omedit-workflow"),
+        page("Command line", "/boblib/cli-workflow"),
         page("Troubleshooting", "/boblib/troubleshooting"),
       ],
     },
-  ],
-
-  "/bobsim/": [
     {
-      text: "BobDyn/BobSim",
+      text: "Model structure",
       items: [
-        page("Overview",       "/bobsim/"),
-        page("App",            "/bobsim/app"),
-        page("Configuration",  "/bobsim/configuration"),
-        page("StandardSim",    "/bobsim/standard-sim"),
-        page("LotusShark Import", "/bobsim/lotus-shark-import"),
-        page("Archive",        "/bobsim/results"),
-        page("EnvelopeSim",    "/bobsim/envelope"),
-        page("OptSim / DOE",   "/bobsim/doe"),
-        page("Development",    "/bobsim/development"),
+        page("Package map", "/boblib/package-map"),
+        page("Records and templates", "/boblib/generation"),
+        page("Entry points", "/boblib/entry-points"),
+        page("Control bus", "/boblib/control-bus"),
       ],
     },
     {
-      text: "In Progress",
+      text: "Development",
       items: [
-        page("VisualSim",      "/bobsim/visualization"),
+        page("Tests and checks", "/boblib/testing"),
+        page("Development", "/boblib/development"),
+        page("Unreleased preview", "/boblib/unreleased"),
+      ],
+    },
+  ],
+  "/bobsim/": [
+    page("BobSim", "/bobsim/"),
+    {
+      text: "Workspace",
+      items: [
+        page("Vehicle setup", "/bobsim/configuration"),
+        page("Models and fidelity", "/bobsim/models"),
+        page("Simulation workspace", "/bobsim/app"),
+      ],
+    },
+    {
+      text: "Analyses",
+      items: [
+        page("Response and four post", "/bobsim/standard-sim"),
+        page("GGV and yaw moment diagrams", "/bobsim/envelope"),
+        page("Tracks and racing lines", "/bobsim/tracks"),
+        page("Lap simulation", "/bobsim/laptime"),
+        page("Parameter studies", "/bobsim/doe"),
+      ],
+    },
+    {
+      text: "Results and integration",
+      items: [
+        page("Results and saved data", "/bobsim/results"),
+        page("Animation and signals", "/bobsim/visualization"),
+        page("Lotus SHARK import", "/bobsim/lotus-shark-import"),
+        page("Development", "/bobsim/development"),
       ],
     },
   ],
@@ -128,6 +124,7 @@ const sidebar = {
     {
       text: "Reference",
       items: [
+        page("Source versions", "/reference/versions"),
         page("Vehicle Dynamics",            "/reference/vehicle-dynamics"),
         page("Tire Behavior",               "/reference/tires"),
         page("FSAE Bridge",                 "/reference/fsae-bridge"),
@@ -170,7 +167,7 @@ assertSidebarCoversDir("reference/field-notes", sidebar["/reference/"]);
 export default withMermaid(
   defineConfig({
     title: "BobDyn",
-    description: "A high-fidelity, open-source vehicle simulation framework",
+    description: "Vehicle models and analysis documentation",
 
     cleanUrls: true,
 
@@ -189,7 +186,7 @@ export default withMermaid(
         "meta",
         {
           property: "og:description",
-          content: "A high-fidelity, open-source vehicle simulation framework",
+          content: "Vehicle models and analysis documentation",
         },
       ],
       ["meta", { property: "og:url", content: "https://bobdyn.com/" }],
@@ -200,7 +197,7 @@ export default withMermaid(
         "meta",
         {
           name: "twitter:description",
-          content: "A high-fidelity, open-source vehicle simulation framework",
+          content: "Vehicle models and analysis documentation",
         },
       ],
       ["meta", { name: "twitter:image", content: "https://bobdyn.com/bobdyn.png" }],
@@ -232,16 +229,10 @@ export default withMermaid(
       outline: 2,
 
       nav: [
-        { text: "Startup Guide", link: "/startup-guide/" },
-        { text: "Use Guide",     link: "/use-guide/" },
-        {
-          text: "Documentation",
-          items: [
-            { text: "BobDyn/BobLib", link: "/boblib/" },
-            { text: "BobDyn/BobSim", link: "/bobsim/" },
-            { text: "Reference", link: "/reference/vehicle-dynamics" },
-          ],
-        },
+        { text: "Getting started", link: "/startup-guide/" },
+        { text: "BobSim", link: "/bobsim/" },
+        { text: "BobLib", link: "/boblib/" },
+        { text: "Reference", link: "/reference/vehicle-dynamics" },
         { text: "Contributing", link: "/contributing" },
       ],
 

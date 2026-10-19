@@ -5,8 +5,9 @@ title: Vehicle Performance Metrics
 
 # Vehicle Performance Metrics
 
-This page lists the metrics that BobSim exports, grouped by the workflow that
-produces them. Each section gives the workflow, the maneuver, and the metric
+This page lists established report metrics by workflow. The MBD response
+tables describe the command-line evaluation suites, not every single Maneuver
+run. Available fields depend on the selected model and successful cases. Each section gives the workflow, the maneuver, and the metric
 table.
 
 A metric has meaning only with its maneuver, operating region, signal
@@ -18,15 +19,15 @@ metrics, see [Choosing Metrics](/reference/choosing-metrics).
 | Steady-state handling | RampSteerEval, SteadyStateEval | [Steady-state handling](#steady-state-handling) |
 | Transient and frequency response | TransientEval | [Transient handling](#transient-handling) |
 | Kinematics and compliance | FourPostEval | [Suspension, kinematics, and compliance](#suspension-kinematics-and-compliance) |
-| Envelope limits | EnvelopeSim GGV | [GGV](#ggv) |
-| Yaw moment and trim | EnvelopeSim YMD | [YMD](#ymd) |
+| Envelope limits | DynPy GGV | [GGV](#ggv) |
+| Yaw moment and trim | DynPy YMD | [YMD](#ymd) |
 | Design sensitivity | OptSim | [Sensitivity](#sensitivity) |
 
 ## Steady-state handling
 
 | | |
 | :-- | :-- |
-| Workflows | `RampSteerEval` and `SteadyStateEval` in `_3_StandardSim/` |
+| Workflows | `RampSteerEval` and `SteadyStateEval` in `simulations/response/mbd/` |
 | Maneuver | RampSteerEval ramps the handwheel angle at each test velocity. SteadyStateEval holds a closed-loop lateral-acceleration target until the car settles, for each target and velocity. |
 | Reduction | Fits each signal against measured $a_y$ along velocity isolines |
 | Reported velocity | The velocity nearest `report.metric_target_velocity_mps` (15 m/s in the shipped configs) |
@@ -73,7 +74,7 @@ is a steering measure such as roadwheel or handwheel angle.
 
 | | |
 | :-- | :-- |
-| Workflow | `TransientEval` in `_3_StandardSim/` |
+| Workflow | `TransientEval` in `simulations/response/mbd/` |
 | Maneuver | Step steer and continuous (sustained) sine steer |
 | Reduction | Step-response features in time, and gain and phase from sine fits |
 | Reported velocity | The velocity nearest `report.metric_target_velocity_mps` (15 m/s in the shipped config) |
@@ -119,7 +120,7 @@ response, and $\Delta(j\omega)$ is steering input in the frequency domain.
 
 | | |
 | :-- | :-- |
-| Workflow | `FourPostEval` in `_3_StandardSim/` |
+| Workflow | `FourPostEval` in `simulations/response/mbd/` |
 | Maneuver | Heave and roll sweeps on a four-post rig |
 | Reduction | K&C-style gains and averages over the sweep |
 
@@ -151,7 +152,7 @@ Definitions:
 
 | | |
 | :-- | :-- |
-| Workflow | EnvelopeSim GGV in `_2_EnvelopeSim/GGV/` |
+| Workflow | DynPy GGV in `simulations/envelope/ggv/` |
 | Maneuver | Reduced-order acceleration envelope over a set of speed slices |
 | Reduction | Envelope size, shape, and peaks, plus summaries over a track profile |
 
@@ -169,8 +170,8 @@ Definitions:
 
 | | |
 | :-- | :-- |
-| Workflow | EnvelopeSim YMD in `_2_EnvelopeSim/YMD/` |
-| Maneuver | Yaw moment diagram over sideslip and handwheel angle, at one or more speeds |
+| Workflow | DynPy YMD in `simulations/envelope/ymd/` |
+| Maneuver | Yaw moment diagram over sideslip and nominal front roadwheel angle, at one or more speeds |
 | Reduction | Peaks, zero-yaw-moment trim, local gradients, and a speed sweep |
 
 | Group | Metrics |
@@ -183,11 +184,15 @@ Definitions:
 | Zero-input sanity | `zero_input_lateral_accel_g`, `zero_input_yaw_moment_nm` |
 | Speed sweep | `speed_sweep_min_speed_mps`, `speed_sweep_max_speed_mps`, `speed_sweep_peak_lateral_accel_abs_g`, `speed_sweep_peak_lateral_accel_speed_mps`, `speed_sweep_peak_trim_lateral_accel_abs_g`, `speed_sweep_peak_trim_lateral_accel_speed_mps`, `speed_sweep_peak_abs_yaw_moment_nm`, `speed_sweep_peak_abs_yaw_moment_speed_mps` |
 
+The YMD export retains historical `hwa` field names. In the DynPy map, these
+values represent nominal front roadwheel angle, not handwheel angle. The
+[analysis guide](/bobsim/envelope) defines the operating conditions.
+
 ## Sensitivity
 
 | | |
 | :-- | :-- |
-| Workflow | OptSim in `_4_OptSim/` (StandardSens and EnvelopeSens) |
+| Workflow | Parameter studies in `optimization/response/` and `optimization/envelope/` |
 | Maneuver | None of its own. OptSim reruns the workflows above across design variables. |
 | Reduction | Metric change versus design variable |
 

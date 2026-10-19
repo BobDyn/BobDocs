@@ -1,19 +1,13 @@
 ---
 layout: doc
-title: Static Vehicle Templates
-prev:
-  text: 'Control Bus'
-  link: '/boblib/control-bus'
-next:
-  text: 'Entry Points'
-  link: '/boblib/entry-points'
+title: Records and templates
 ---
 
-# Static Vehicle Templates
+# Records and templates
 
-BobLib vehicle architectures are checked-in Modelica classes and records. There
-is no Python or YAML generation step. You can inspect, edit, translate, and
-review the package without regenerating source files.
+BobLib vehicle architectures are checked-in Modelica classes and records.
+Standalone BobLib uses these records directly. BobSim separately generates
+records from its vehicle YAML for its pinned library.
 
 ## Template layers
 
@@ -84,14 +78,14 @@ That gives nine `VehicleSim_EVBatInvMotDiff_<front>_<rear>` templates, nine
 runs. Each four-post template redeclares the vehicle record and the front and
 rear axle models.
 
-## Switch the architecture
+## Architecture selection
 
 To change the architecture of a standard entry point, edit
 `BobLib/Experiments/Standards/VehicleSim.mo` or `FourPostSim.mo` so it extends a
 different architecture template. A project- or year-specific model can also
 extend a template and set explicit values there.
 
-## Add an architecture
+## New architectures
 
 1. Add the vehicle record under `BobLib/Records/VehicleDefn/`.
 2. Add subsystem records under `Records/VehicleRecord/`, near the owning domain.
@@ -105,7 +99,7 @@ extend a template and set explicit values there.
 8. Add or update `BobLibTest` fixtures.
 9. Run the checks below.
 
-## Validate a change
+## Validation
 
 ```bash
 make modelica-translation PYTHON=.venv/bin/python

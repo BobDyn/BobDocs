@@ -1,12 +1,6 @@
 ---
 layout: doc
 title: Tests and Checks
-prev:
-  text: 'Entry Points'
-  link: '/boblib/entry-points'
-next:
-  text: 'Development'
-  link: '/boblib/development'
 ---
 
 # Tests and Checks

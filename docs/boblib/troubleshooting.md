@@ -1,9 +1,6 @@
 ---
 layout: doc
 title: Troubleshooting
-prev:
-  text: 'Development'
-  link: '/boblib/development'
 ---
 
 # Troubleshooting
@@ -58,7 +55,7 @@ BobLib/Experiments/Standards/FourPostSim.mo
 ```
 
 The templates live under `BobLib/Experiments/Standards/Templates/`. See
-[Static Vehicle Templates](/boblib/generation).
+[Records and templates](/boblib/generation).
 
 If a class is missing from OMEdit or `omc`, check that the relevant
 `package.order` file lists the record, subsystem model, axle assembly, or

@@ -1,12 +1,6 @@
 ---
 layout: doc
 title: Control Bus
-prev:
-  text: 'Package Map'
-  link: '/boblib/package-map'
-next:
-  text: 'Static Templates'
-  link: '/boblib/generation'
 ---
 
 # Control Bus
@@ -52,7 +46,7 @@ connect(driverEnvironment.steeringWheel, chassis.steeringWheel);
 
 :::
 
-## Publish and subscribe
+## Signal publication and subscription
 
 BobLib follows one ownership rule:
 

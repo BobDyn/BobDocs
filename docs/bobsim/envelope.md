@@ -1,131 +1,97 @@
 ---
 layout: doc
-title: EnvelopeSim
+title: GGV and yaw moment diagrams
 ---
 
-# EnvelopeSim
+# GGV and yaw moment diagrams
 
-EnvelopeSim provides an optional, separate implementation of common vehicle
-envelope calculations. GGV and YMD maps show up in vehicle dynamics workflows
-everywhere; this is BobSim's transparent implementation of those ideas, tied to
-the active BobLib vehicle records.
+Both analyses use DynPy with KinPy geometry and the vehicle's tire models.
+They solve operating points rather than integrating a maneuver through time.
 
-EnvelopeSim is not the gold standard, the key theory reference, or a replacement
-for the full Modelica maneuver simulations. It is intended to be sane, readable,
-and useful when you want quick envelope calculations without running the full
-high-fidelity StandardSim path.
+## GGV
 
-Envelope tools live under:
+A GGV is the acceleration boundary over speed. Each slice has path-tangential
+acceleration $a_t$ and path-normal acceleration $a_n$.
 
-```text
-_2_EnvelopeSim/
+```mermaid
+flowchart TB
+    V[Vehicle and DOF] --> S[Speed slices]
+    S --> B[Algebraic balance and limits]
+    B --> A[Acceleration boundary]
+    B --> D[Braking boundary]
+    A --> G[GGV result]
+    D --> G
 ```
 
-## Layout
+At a sampled speed and lateral demand, the solver holds sideslip locally
+constant and sets heading rate from the path condition:
 
-| Path | Role |
-| :-- | :-- |
-| `_2_EnvelopeSim/vehicle_yaml.py` | Legacy/shared reduced vehicle input loader |
-| `_2_EnvelopeSim/GGV/ggv_config.yml` | GGV envelope config |
-| `_2_EnvelopeSim/GGV/ggv_generation.py` | GGV envelope workflow |
-| `_2_EnvelopeSim/YMD/ymd_config.yml` | YMD envelope config |
-| `_2_EnvelopeSim/YMD/ymd_generation.py` | YMD envelope workflow |
-| `_2_EnvelopeSim/Build/` | Intermediate CSV outputs |
-| `_2_EnvelopeSim/results/` | Public reports and metrics CSVs |
+$$
+\dot\beta=0,\qquad \dot\psi=\frac{a_n}{V}.
+$$
 
-## Commands
+It solves for the remaining operating state, including steering, torque, and
+the suspension and wheel states retained by the model. The constrained search
+finds the upper and lower feasible tangential accelerations:
+
+$$
+a_t^{\mathrm{upper}}=\max_{\mathrm{feasible}} a_t,\qquad
+a_t^{\mathrm{lower}}=\min_{\mathrm{feasible}} a_t.
+$$
+
+The constraints include tire fits, contact loads, steering, sideslip, torque,
+power, and force and moment balance. Neighboring solutions seed the next solve.
+The lateral endpoint is searched separately with tangential acceleration free.
+Tire lift is not an accepted operating point.
+
+### Angular balance
+
+Zero yaw acceleration is not zero yaw rate. For a full inertia tensor,
+
+$$
+\mathbf I\dot{\boldsymbol\omega}
+=\mathbf M-\boldsymbol\omega\times(\mathbf I\boldsymbol\omega).
+$$
+
+Thus zero body angular acceleration does not generally imply zero net moment.
+The equations retain the required inertial terms.
+
+### Sampling and interpretation
+
+Speed coverage and acceleration search bounds are generated from the vehicle.
+The current generator uses nine speed slices. Both cornering directions are
+solved independently when enabled. A symmetric vehicle may produce similar
+branches, but the implementation does not assume that result.
+
+The upper longitudinal boundary can be negative when the vehicle cannot
+sustain its speed. A missing or non-converged point is not proof that every
+nearby operating state is physically impossible. These are local numerical
+searches, not a global optimality or dynamic-stability guarantee.
+
+The result includes an envelope CSV, plots, metrics, and a report.
+[QSS Lap](/bobsim/laptime) uses this saved envelope directly.
+
+## Yaw moment diagram
+
+YMD sweeps nominal front roadwheel angle $\delta$ and body sideslip $\beta$ at
+prescribed speed and yaw rate. Longitudinal and retained vertical and wheel
+states are equilibrated. Lateral acceleration and yaw moment are outputs:
+
+$$
+(\delta,\beta)\longmapsto(a_y,M_z).
+$$
+
+Most map points deliberately have nonzero yaw moment. They are not steady
+cornering solutions. A zero-moment crossing identifies a candidate trim branch,
+not proof of time-domain stability. Failed cells are excluded from valid plots.
+
+## Command line
 
 ```bash
 make envelope-ggv
 make envelope-ymd
-make envelope-all
 ```
 
-Use `make envelope-all` when you intentionally want the optional envelope
-artifacts alongside a release baseline.
-
-## Shared Vehicle Inputs
-
-EnvelopeSim builds a reduced scalar vehicle model from the active BobLib
-vehicle data and the latest useful standard-study metrics.
-
-It loads:
-
-- wheelbase and track from suspension wheel-center geometry
-- sprung, driver, and unsprung mass data
-- center-of-gravity data
-- tire coefficients from the active tire template
-- aero scalars from the active aero map
-- useful four-post metrics when available
-
-If four-post metrics are missing, EnvelopeSim falls back to static front mass
-fraction for lateral load transfer distribution.
-
-## GGV Envelope
-
-Run:
-
-```bash
-make envelope-ggv
-```
-
-Config:
-
-```text
-_2_EnvelopeSim/GGV/ggv_config.yml
-```
-
-Useful outputs:
-
-```text
-_2_EnvelopeSim/Build/GGV/ggv_first_principles.csv
-_2_EnvelopeSim/Build/GGV/ggv_track_performance_profile.csv
-_2_EnvelopeSim/Build/GGV/ggv_track_velocity_profile.csv
-_2_EnvelopeSim/results/ggv_report.pdf
-_2_EnvelopeSim/results/ggv_report_metrics.csv
-```
-
-Use GGV when you want a quick map of combined longitudinal and lateral
-capability across speed.
-
-## YMD Envelope
-
-Run:
-
-```bash
-make envelope-ymd
-```
-
-Config:
-
-```text
-_2_EnvelopeSim/YMD/ymd_config.yml
-```
-
-Useful outputs:
-
-```text
-_2_EnvelopeSim/Build/YMD/ymd_first_principles.csv
-_2_EnvelopeSim/Build/YMD/ymd_trim_curve.csv
-_2_EnvelopeSim/results/ymd_report.pdf
-_2_EnvelopeSim/results/ymd_report_metrics.csv
-```
-
-Use YMD when you want to inspect lateral force and yaw moment behavior across
-sideslip and steering.
-
-## When To Use EnvelopeSim
-
-EnvelopeSim is useful for:
-
-- fast plausibility checks before expensive Modelica sweeps
-- comparing tire, aero, and mass assumptions
-- seeing limit trends across speed
-- producing compact optional artifacts tied to the active vehicle record
-- cross-checking whether StandardSim behavior aligns with reduced-order expectations
-
-Use StandardSim when the question depends on time-domain multibody behavior,
-controller behavior, suspension transient response, or detailed model behavior.
-
-Use BobDyn/BobLib directly when the envelope result points to a model-level
-issue that needs inspection or debugging.
+Source: [GGV generation](https://github.com/BobDyn/BobSim/blob/main/simulations/envelope/ggv/ggv_generation.py),
+[YMD](https://github.com/BobDyn/BobSim/tree/main/simulations/envelope/ymd), and
+[quasi-steady equations](https://github.com/BobDyn/BobSim/blob/main/engines/dynpy/qss.py).

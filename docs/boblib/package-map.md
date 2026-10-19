@@ -1,12 +1,6 @@
 ---
 layout: doc
 title: Package Map
-prev:
-  text: 'OMEdit Workflow'
-  link: '/boblib/omedit-workflow'
-next:
-  text: 'Control Bus'
-  link: '/boblib/control-bus'
 ---
 
 # Package Map
@@ -68,7 +62,7 @@ The standard entry points live in `BobLib.Experiments.Standards`:
 
 Each template package also holds one model per suspension architecture, such as
 `Templates.FourPost.FourPostSim_DWBCStabar_DWBCStabar`. See
-[Static Vehicle Templates](/boblib/generation) and
+[Records and templates](/boblib/generation) and
 [Entry Points](/boblib/entry-points).
 
 ## `BobLib.Records`
