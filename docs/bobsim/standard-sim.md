@@ -1,314 +1,100 @@
 ---
 layout: doc
-title: StandardSim
+title: Vehicle response and four post
 ---
 
-# StandardSim
+# Vehicle response and four post
 
-StandardSim is BobDyn/BobSim's high-fidelity simulation lane. It runs
-BobDyn/BobLib Modelica executables through Python workflows that define cases,
-run the solver, extract signals, compute metrics, and build engineering
-reports.
+These workflows share a vehicle definition but solve different problems.
+The app exposes Four post under Kinematics and Maneuver under Vehicle response.
+Existing command-line names retain the `standard-` prefix.
 
-The clearest launch surface is the app's `Simulation` view. Use the CLI targets
-when you want scripted or Docker-backed runs.
+## Four post
 
-The active StandardSim area lives under:
+BobLib's rig prescribes chassis roll about global x and heave along the rotated
+local z axis. Contact-patch global z coordinates remain fixed. Other contact
+translations and rotations remain free according to the rig's constraints.
+It does not prescribe four independent wheel travels.
 
-```text
-_3_StandardSim/
+```mermaid
+flowchart LR
+    A[Heave and roll input] --> B[Constrained chassis and axles]
+    C[Contact heights fixed] --> B
+    D[Test forces] --> B
+    B --> E[Geometry, loads and stiffness]
 ```
 
-## Structure
+The standard test uses zero world gravity, spring preload, and scheduled test
+forces. The steering excitation is **handwheel angle**, transmitted through
+the rack-and-pinion C-factor. It is not the rack-displacement sweep in the
+Setup kinematics plot.
 
-| Path | Role |
-| :-- | :-- |
-| `_3_StandardSim/build_vehicle_sim.mos` | OpenModelica build script for `VehicleSim` |
-| `_3_StandardSim/build_four_post_sim.mos` | OpenModelica build script for `FourPostSim` |
-| `_3_StandardSim/_modelica_runner.py` | Shared OpenModelica executable runner |
-| `_3_StandardSim/RampSteerEval/` | Open-loop ramp-steer workflow |
-| `_3_StandardSim/SteadyStateEval/` | Settled target lateral-acceleration workflow |
-| `_3_StandardSim/TransientEval/` | Step and sine transient workflow |
-| `_3_StandardSim/FourPostEval/` | Heave and roll four-post workflow |
-| `_3_StandardSim/BuildBobLib/` | OpenModelica executables and generated build artifacts |
-| `_3_StandardSim/results/` | Public reports and metrics CSVs |
-| `_3_StandardSim/generated_results/` | App-registered reports and metrics CSVs |
+Heave is displayed in mm and roll in degrees in the app. Front and rear
+reports cover geometry, motion ratios, load response, and stiffness metrics.
+The run is a constrained test, not a free-running vehicle.
 
-## App Workflows
+## Maneuver
 
-Open `Simulation` in the app after `Setup`, `Save Vehicle`, and `Write to MBD`.
+Maneuver combines model selection with a steering waveform:
 
-![BobSim Simulation catalog with Ramp Steer, Steady State, Transient, and Four Post workflow cards](/images/bobsim/app-simulation-catalog.png)
+| Input | Parameters and behavior |
+| --- | --- |
+| Ramp | Start, rate or magnitude, and ramp end. Steering holds after the ramp. |
+| Step | Start, magnitude, and rise duration. A finite rise avoids an ideal discontinuity. |
+| Sine | Amplitude and frequency. One run describes the selected excitation. |
 
-| App card | Workflow | Use it for |
-| :-- | :-- | :-- |
-| `Ramp Steer` | RampSteerEval | Open-loop steering ramp response |
-| `Steady State` | SteadyStateEval | Settled lateral-acceleration operating points |
-| `Transient` | TransientEval | Step steer and continuous sine response |
-| `Four Post` | FourPostEval | Heave, roll, and vertical-force suspension procedures |
+The waveform duration and simulation stop time are distinct. The preview shows
+what the input will do during the run.
 
-Each card opens a run modal with editable config fields, saved config controls,
-`Build + Run`, and `Run Log`.
+DynPy steering inputs are nominal mean front **roadwheel angles**. KinPy maps
+them to rack travel and individual corner poses. BobLib maneuver inputs are
+**handwheel angles**. Comparing their numeric amplitudes directly is incorrect.
 
-![BobSim Ramp Steer simulation modal with Configure and Run Log tabs](/images/bobsim/app-simulation-config.png)
+PI speed control adds drive or braking demand to the initial trim. It cannot
+maintain target speed beyond the tire or powertrain limits. Actual speed is a
+result worth reviewing alongside the steering response.
 
-## Build Targets
+DynPy integrates
 
-| Command | Builds | Output directory |
-| :-- | :-- | :-- |
-| `make standard-build` | `BobLib.Experiments.Standards.VehicleSim` | `_3_StandardSim/BuildBobLib/VehicleSim/` |
-| `make standard-build-four-post` | `BobLib.Experiments.Standards.FourPostSim` | `_3_StandardSim/BuildBobLib/FourPostSim/` |
+$$
+\dot{\mathbf{x}}=\mathbf{f}(\mathbf{x},\mathbf{u},t).
+$$
 
-Both targets compile the active generated BobLib Modelica entry point. The
-build scripts create the target directories before `buildModel(...)`, and the
-app also ensures the directories exist before invoking OpenModelica.
-
-## Run Targets
-
-| Command | Workflow | Main config |
-| :-- | :-- | :-- |
-| `make standard-eval-ramp-steer` | Open-loop ramp-steer characterization | `_3_StandardSim/RampSteerEval/ramp_steer_eval_config.yml` |
-| `make standard-eval-steady-state` | Steady-state cornering characterization | `_3_StandardSim/SteadyStateEval/steady_state_eval_config.yml` |
-| `make standard-eval-transient` | Step steer and continuous sine response | `_3_StandardSim/TransientEval/transient_eval_config.yml` |
-| `make standard-eval-four-post` | Suspension/chassis heave and roll sweeps | `_3_StandardSim/FourPostEval/four_post_eval_config.yml` |
-| `make standard-eval-all` | All standard evaluations | All four configs above |
-
-Direct Python module entry points are still available for development:
-
-```bash
-python -m _3_StandardSim.RampSteerEval.ramp_steer_eval_sim
-python -m _3_StandardSim.SteadyStateEval.steady_state_eval_sim
-python -m _3_StandardSim.TransientEval.transient_eval_sim
-python -m _3_StandardSim.FourPostEval.four_post_eval_sim
-```
-
-Prefer the make targets for public workflows because they rebuild missing
-executables automatically.
-
-## Shared Runner
-
-`_3_StandardSim/_modelica_runner.py` is the shared execution layer.
-
-For each case it:
-
-1. Creates a run directory under the relevant build tree.
-2. Writes `overrides.txt` with Modelica parameter overrides.
-3. Runs the compiled OpenModelica executable.
-4. Applies solver, time, output, event, log, and extra runtime flags.
-5. Reads the generated CSV result file.
-6. Extracts raw time histories or final steady values.
-7. Preserves case metadata.
-8. Removes the run directory when `execution.cleanup: true`.
-
-The runner expects these files to exist:
-
-```text
-<build_dir>/<exec_name>
-<build_dir>/<exec_name>_init.xml
-```
-
-If either file is missing, rerun the matching build target.
-
-On Windows the executable may be written with an `.exe` suffix. BobSim checks
-for both forms.
-
-## RampSteerEval
-
-RampSteerEval characterizes open-loop steering ramp behavior using the unified
-`VehicleSim` executable.
-
-Use it when you want a first handling proof path from the app or CLI. It sweeps
-configured velocity cases, applies a handwheel ramp, records the vehicle
-response, and writes report metrics from the measured lateral-acceleration
-path.
-
-Current config highlights:
-
-| Key | Current role |
-| :-- | :-- |
-| `simulation.exec_name` | `BobLib.Experiments.Standards.VehicleSim` |
-| `simulation.build_dir` | `_3_StandardSim/BuildBobLib/VehicleSim` |
-| `simulation.init_parameters.useMode` | `0`, open-loop ramp steer |
-| `simulation.init_parameters.enableLinearityTermination` | enables the steering-gain-loss ramp cutoff |
-| `simulation.init_parameters.linearityNonlinearityFraction` | local lateral-gain loss fraction that stops the ramp |
-| `simulation.init_parameters.linearityReferenceAy` | reference measured lateral acceleration before cutoff evaluation |
-| `sweep.testVels` | velocity isolines |
-| `sweep.maxAy` | positive ramp target used to choose the ramp direction and report range |
-| `fit.ay_linear_max` | linear fit band upper bound |
-
-The app exposes the nonlinearity cutoff controls in the Ramp Steer run config
-modal. If higher-speed ramp-steer runs stop before the desired lateral
-acceleration, increase the cutoff fraction or disable the cutoff for that run.
-
-Main outputs:
-
-```text
-_3_StandardSim/generated_results/ramp_steer_eval_report.pdf
-_3_StandardSim/generated_results/ramp_steer_eval_report_metrics.csv
-```
-
-## SteadyStateEval
-
-SteadyStateEval characterizes quasi-steady lateral response using the unified
-`VehicleSim` executable in closed-loop target lateral-acceleration mode.
-
-Current config highlights:
-
-| Key | Current role |
-| :-- | :-- |
-| `simulation.exec_name` | `BobLib.Experiments.Standards.VehicleSim` |
-| `simulation.build_dir` | `_3_StandardSim/BuildBobLib/VehicleSim` |
-| `simulation.init_parameters.useMode` | `3`, closed-loop target lateral acceleration |
-| `simulation.init_parameters.steadyStateSettleTimeout` | timeout after the target ramp reaches its final value |
-| `simulation.init_parameters.steadyStateAyTolerance` | settled lateral-acceleration tracking tolerance |
-| `simulation.init_parameters.steadyStateSpeedTolerance` | settled speed tracking tolerance |
-| `simulation.extra_args` | includes `-jacobian=internalNumerical` |
-| `sweep.testVels` | `12.5`, `15.0`, `17.5`, `20.0` m/s |
-| `sweep.targetAys` | available target grid up to `18.0` m/s^2 |
-| `sweep.maxAyByVelocity` | default per-velocity caps for feasible alpha runs |
-| `fit.ay_linear_max` | linear fit band upper bound |
-| `report.metric_target_velocity_mps` | velocity used for exported summary metrics |
-
-The default target list stays broad, but the default app and workflow configs
-cap generated steady-state cases by velocity:
-
-| Velocity | Default max target |
-| :-- | :-- |
-| `12.5` m/s | `16.0` m/s^2 |
-| `15.0` m/s | `10.0` m/s^2 |
-| `17.5` m/s | `6.0` m/s^2 |
-| `20.0` m/s | `4.0` m/s^2 |
-
-Remove or raise a cap when intentionally exploring higher lateral acceleration
-targets. The app exposes these caps and the closed-loop settle tolerances in
-the Steady State run config modal.
-
-The workflow extracts steering, acceleration, roll, sideslip, yaw velocity,
-wheel loads, handwheel torque, and controller/debug signals. It fits response
-curves against measured lateral acceleration and exports gradients, ranges,
-tracking errors, and velocity trends.
-
-Main outputs:
-
-```text
-_3_StandardSim/generated_results/steady_state_eval_report.pdf
-_3_StandardSim/generated_results/steady_state_eval_report_metrics.csv
-
-_3_StandardSim/results/steady_state_eval_report.pdf
-_3_StandardSim/results/steady_state_eval_report_metrics.csv
-```
-
-## TransientEval
-
-TransientEval characterizes steering response over time using step-steer and
-continuous sine cases.
-
-Current config highlights:
-
-| Key | Current role |
-| :-- | :-- |
-| `simulation.exec_name` | `BobLib.Experiments.Standards.VehicleSim` |
-| `simulation.extra_args` | includes `-jacobian=internalNumerical` |
-| `test.testVel` | `15.0` and `20.0` m/s velocity groups |
-| `test.run_step` | enables representative step-steer cases |
-| `test.run_continuous_sine` | enables sustained sine sweeps |
-| `test.steerStep_deg` | `5.0` degree step input |
-| `test.sweep_freq_hz` | `0.5`, `0.75`, `1.0` Hz |
-| `test.sweep_amp_deg` | `5.0` degree sine amplitude |
-| `test.n_cycles` | `4` cycles per sine run |
-
-BobLib's integrated vehicle model uses transient tire slip, with relaxation
-parameters supplied by each tire record. That matters most here because the
-workflow is explicitly measuring time-domain steering response.
-
-Main outputs:
-
-```text
-_3_StandardSim/generated_results/transient_eval_report.pdf
-_3_StandardSim/generated_results/transient_eval_report_metrics.csv
-
-_3_StandardSim/results/transient_eval_report.pdf
-_3_StandardSim/results/transient_eval_report_metrics.csv
-```
-
-Representative metrics include lateral acceleration rise time, yaw-rate rise
-time, overshoot, gain, phase, equivalent lag, and frequency-response trends.
-
-## FourPostEval
-
-FourPostEval evaluates suspension and chassis response through heave and roll
-sweeps using `BobLib.Experiments.Standards.FourPostSim`.
-
-Current config highlights:
-
-| Key | Current role |
-| :-- | :-- |
-| `simulation.exec_name` | `BobLib.Experiments.Standards.FourPostSim` |
-| `simulation.build_dir` | `_3_StandardSim/BuildBobLib/FourPostSim` |
-| `simulation.extra_args` | includes `-jacobian=internalNumerical` |
-| `procedure.heaveMagnitude` | `0.03` m |
-| `procedure.rollMagnitude` | `0.02181661564992912` rad |
-| `procedure.forceMagnitude` | `1000` N |
-| `report.metrics_csv_path` | `_3_StandardSim/results/four_post_eval_report_metrics.csv` |
-| `report.raw_time_series_appendix` | `false` by default for focused K&C reports |
-
-The workflow extracts front and rear K&C output records and computes summary
-metrics for camber, toe, caster, KPI, mechanical trail, mechanical scrub,
-motion ratio, anti/jacking behavior, roll stiffness, anti-roll-bar
-contribution, and lateral load transfer distribution.
-
-The Geometric Anti-Roll vs Roll report page plots the measured front and rear
-lateral jacking anti-roll curves across the roll sweep. Raw per-run signal data
-is still retained in Archive packages when the app saves a run.
-
-Main outputs:
-
-```text
-_3_StandardSim/generated_results/four_post_eval_report.pdf
-_3_StandardSim/generated_results/four_post_eval_report_metrics.csv
-
-_3_StandardSim/results/four_post_eval_report.pdf
-_3_StandardSim/results/four_post_eval_report_metrics.csv
-```
-
-FourPostEval metrics are useful to EnvelopeSim. If available, the envelope
-loader can use the latest four-post lateral-load-transfer metric; otherwise it
-falls back to static front mass fraction.
+BobLib adds mechanical joint constraints to the multibody equations. Maneuver
+uses RK45 for DynPy 3/6 DOF and Radau for 10/14 DOF. Saved sample spacing is
+separate from the integrator's adaptive steps.
 
 ## Reports
 
-Standard reports are built by `_0_Utils/reporting/report_engine.py`.
+The response report and saved signals expose steering, speed, acceleration,
+yaw response, and the body and wheel states present at the selected fidelity.
+A settled initial state may include nonzero suspension travel under load.
+Zero travel is a geometry reference, not necessarily static equilibrium.
 
-The report engine:
+A single sine case is not a full frequency sweep. The legacy BobLib transient
+suite runs step and sine cases across its configured speeds and frequencies.
+Its fitted gain and phase depend on amplitude and the selected analysis window.
 
-- reads the workflow config
-- creates a title page
-- dispatches to workflow-specific summary pages
-- renders plots from the `plots` config
-- writes a PDF with Matplotlib `PdfPages`
+## Example output
 
-Plot pages are handled by `_0_Utils/plotting/plot_engine.py`.
+[![Current 14 DOF ramp report showing steering, yaw rate, lateral acceleration, and speed](/images/examples/maneuver-14dof-report.png)](/examples/maneuver-14dof-report.pdf#page=3)
 
-## Debugging
+A saved October 2026 DynPy run at 15 m/s with a 2° roadwheel ramp.
+The image opens the complete report. The [homepage replay](/#animations)
+shows the same run in the current viewer.
 
-The fastest debugging loop for maneuver studies is:
+## Command-line studies
 
-```bash
-make standard-build
-make standard-eval-steady-state
-```
+| Command | Study |
+| --- | --- |
+| `make standard-eval-four-post` | BobLib four-post rig |
+| `make standard-eval-ramp-steer` | BobLib ramp cases |
+| `make standard-eval-steady-state` | BobLib settled cornering cases |
+| `make standard-eval-transient` | BobLib step and sine suite |
+| `make standard-eval-all` | All four BobLib studies |
+| `make reduced-eval REDUCED_DOF=6` | DynPy step response |
 
-For four-post work:
+The settled BobLib study advances through time until its monitored responses
+settle. It is different from an algebraic GGV solve.
 
-```bash
-make standard-build-four-post
-make standard-eval-four-post
-```
-
-If a run fails:
-
-- Confirm the build directory contains the executable and init XML.
-- Set `execution.cleanup: false` in the workflow config.
-- Rerun the workflow.
-- Inspect the retained run directory.
-- Check `overrides.txt`, `run.log`, and the generated result CSV.
+Source: [response workflows](https://github.com/BobDyn/BobSim/tree/main/simulations/response).

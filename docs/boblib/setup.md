@@ -1,12 +1,6 @@
 ---
 layout: doc
 title: BobDyn/BobLib Setup
-prev:
-  text: 'BobDyn/BobLib'
-  link: '/boblib/'
-next:
-  text: 'CLI Workflow'
-  link: '/boblib/cli-workflow'
 ---
 
 # BobDyn/BobLib Setup
@@ -15,7 +9,7 @@ This page lists what you need to work on BobLib directly: the source,
 OpenModelica, the Modelica libraries, and a Python environment. For a guided
 first run, see the [BobLib Startup guide](/startup-guide/boblib).
 
-## Get the source
+## Source checkout
 
 Clone BobLib directly for model development and debugging:
 
@@ -36,7 +30,7 @@ cd BobLib
 
 See [Package Map](/boblib/package-map) for the full layout.
 
-## Install OpenModelica
+## OpenModelica
 
 For CLI use, you need:
 
@@ -46,7 +40,7 @@ For CLI use, you need:
 - VehicleInterfaces `2.0.2`
 
 For OMEdit, install the full OpenModelica GUI stack, not only the compiler.
-BobLib CI uses the container `openmodelica/openmodelica:v1.26.3-ompython`.
+BobLib CI uses the container `openmodelica/openmodelica:v1.27.1-ompython`.
 
 Official OpenModelica links:
 
@@ -71,7 +65,7 @@ Check the compiler:
 omc --version
 ```
 
-## Set up Python
+## Python environment
 
 The test harness needs Python with `pytest` and `ruff`. The versions are pinned
 in `Tests/requirements-dev.txt`.
@@ -94,7 +88,7 @@ Check the install:
 python -c "import pytest; print('ok')"
 ```
 
-## Run a first check
+## First checks
 
 A small first check:
 
@@ -110,13 +104,13 @@ make ci PYTHON=.venv/bin/python
 
 See [Tests and Checks](/boblib/testing) for every target.
 
-## Use BobLib inside BobSim
+## BobSim integration
 
 BobSim includes BobLib as a Git submodule at:
 
 ```text
-_0_Utils/external/BobLib/
+engines/boblib/
 ```
 
-BobSim uses it as a static Modelica library. Vehicle data comes from
-checked-in Modelica records. There is no Python or YAML generation step.
+BobSim generates Modelica vehicle records from YAML through **Write to MBD**
+or `make sync-vehicle-write`. Its Python analyses read YAML directly.

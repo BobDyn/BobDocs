@@ -14,19 +14,23 @@ behind the repos they describe. Before editing a page that names a path, a
 | Claim about | Check |
 | --- | --- |
 | A `make` target, or what a command does | BobSim's `makefile` and `make help` — authoritative over any doc |
-| App paths, saved files, UI labels | `_5_App/storage.py`, `_5_App/registry.py`, `_5_App/static/index.html` |
-| Study settings, solver options, sweeps | `_3_StandardSim/*/[name]_config.yml` |
-| Modelica library versions | `_3_StandardSim/build_vehicle_sim.mos` and the `Dockerfile` |
+| App paths, saved files, UI labels | `app/storage.py`, `app/registry.py`, `app/static/index.html` |
+| Study settings, solver options, sweeps | `simulations/` and `optimization/` configs |
+| Modelica library versions | `simulations/response/mbd/build_vehicle_sim.mos` and the `Dockerfile` |
 | Repo conventions | BobSim's `AGENTS.md`, `docs/architecture.md` |
 
 If a doc and the code disagree, the code wins and the doc gets fixed.
+
+`docs/reference/versions.md` records reviewed revisions. Unreleased BobLib
+work belongs in `docs/boblib/unreleased.md`, clearly separated from published
+interfaces. Local source inspection is not evidence of passing simulation tests.
 
 ## Layout
 
 - `docs/**.md` — every page. Content is plain Markdown.
 - `docs/.vitepress/config.ts` — nav, sidebar, markdown and mermaid settings.
 - `docs/.vitepress/theme/components/` — Vue components usable inside Markdown:
-  `PdfEmbed`, `PIDPlot`, `BangBangPlot`, `ScrollIndicator`.
+  `PdfEmbed`, `PIDPlot`, `BangBangPlot`.
 - `docs/public/` — static assets, served from the root. An image at
   `docs/public/images/bobsim/x.png` is referenced as `/images/bobsim/x.png`.
 

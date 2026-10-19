@@ -1,12 +1,6 @@
 ---
 layout: doc
 title: CLI Workflow
-prev:
-  text: 'Setup'
-  link: '/boblib/setup'
-next:
-  text: 'OMEdit Workflow'
-  link: '/boblib/omedit-workflow'
 ---
 
 # CLI Workflow
@@ -14,7 +8,7 @@ next:
 Use `omc` to load, build, and simulate BobLib models without OMEdit. For the
 `make` check targets, see [Tests and Checks](/boblib/testing).
 
-## Load the package
+## Package loading
 
 From the BobLib repository root, start `omc` and run:
 
@@ -29,7 +23,7 @@ getErrorString();
 Both `loadFile(...)` calls should return `true`. `getErrorString()` should be
 empty or show only non-critical messages.
 
-## Build or simulate an entry point
+## Entry-point execution
 
 After you load the package, build the model without running it:
 
@@ -49,9 +43,9 @@ The same calls work for `BobLib.Experiments.Standards.FourPostSim`. See
 [Entry Points](/boblib/entry-points) for the other models.
 
 To change which vehicle architecture the entry points use, see
-[Static Vehicle Templates](/boblib/generation).
+[Records and templates](/boblib/generation).
 
-## Build in a scratch directory
+## Scratch builds
 
 A scratch directory keeps the generated C code, executables, XML, logs, and
 results out of the repository.
@@ -93,7 +87,7 @@ results out of the repository.
 For the four-post model, use a separate scratch directory and replace the model
 class with `BobLib.Experiments.Standards.FourPostSim`.
 
-## Build through BobSim
+## BobSim builds
 
 Inside BobSim, BobLib is a submodule. BobSim owns the workflow YAML, case
 generation, result extraction, plots, and reports. BobLib owns the physical

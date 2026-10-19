@@ -1,12 +1,6 @@
 ---
 layout: doc
 title: OMEdit Workflow
-prev:
-  text: 'CLI Workflow'
-  link: '/boblib/cli-workflow'
-next:
-  text: 'Package Map'
-  link: '/boblib/package-map'
 ---
 
 # OMEdit Workflow
@@ -19,7 +13,7 @@ experiments, and view animations.
 - A full OpenModelica installation that includes OMEdit. On Linux, `omc` alone
   is enough for CLI work but not for OMEdit.
 - Modelica Standard Library `4.1.0` and VehicleInterfaces `2.0.2`. See
-  [Setup](/boblib/setup#install-openmodelica).
+  [Setup](/boblib/setup#openmodelica).
 - The BobLib repository on a local path without unusual permissions.
 
 | Platform | Notes |
@@ -28,7 +22,7 @@ experiments, and view animations.
 | Windows | Use the standard OpenModelica installer. |
 | macOS | Native packages are limited. Use the official macOS notes, a Linux or Windows host, or a VM. |
 
-## Open BobLib
+## Package loading
 
 1. Start OMEdit with no BobLib package loaded.
 2. Open the File menu with `Alt+F`. Press `Down` until
@@ -48,7 +42,7 @@ experiments, and view animations.
 If OMEdit reports a missing `Modelica` or `VehicleInterfaces` package, install
 the missing library, restart OMEdit, and load `BobLib/package.mo` again.
 
-## Run a simulation
+## Simulation
 
 1. Set a scratch working directory in `Tools > Options > General`, for example
    `/tmp/BobLibOMEdit`.

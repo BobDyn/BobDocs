@@ -1,95 +1,54 @@
 ---
 layout: doc
-title: BobDyn/BobLib
-next:
-  text: 'Setup'
-  link: '/boblib/setup'
+title: BobLib
 ---
 
-# BobDyn/BobLib
+# BobLib
 
-BobLib is the Modelica vehicle model library for BobDyn. It holds the chassis,
-suspension, tire, aero, powertrain, and control physics, built inside the
+BobLib is the Modelica vehicle library. It contains suspension, tire, aero,
+powertrain, and control models connected through physical connectors and
 VehicleInterfaces contracts.
 
-| Use | When you want to |
-| :-- | :-- |
-| BobLib | Inspect, change, translate, simulate, or debug the Modelica models directly. Browse diagrams in OMEdit. Run regression tests. |
-| [BobSim](/bobsim/) | Run complete vehicle studies: case execution, signal extraction, metrics, plots, reports, envelope maps, and sensitivity studies. |
+| Task | Guide |
+| --- | --- |
+| Installation and first translation | [Setup](/boblib/setup) |
+| Diagrams and interactive simulation | [OMEdit workflow](/boblib/omedit-workflow) |
+| Scripted translation and simulation | [Command line](/boblib/cli-workflow) |
+| Vehicle composition | [Records and templates](/boblib/generation) |
+| Experiment inputs and outputs | [Entry points](/boblib/entry-points) |
+| Regression checks | [Tests and checks](/boblib/testing) |
+| Upcoming architecture | [Unreleased development preview](/boblib/unreleased) |
 
-::: info In-package documentation
-BobLib ships its own guide at `BobLib.UsersGuide`. BobLib's README treats it as
-the source of truth for the package version. If this site and the UsersGuide
-disagree, the UsersGuide wins.
-:::
+## Published library
 
-## Key facts
+These guides describe published `main` at `ea7dda2`, inspected on
+19 October 2026. The package declares version `0.2.0`, Modelica Standard
+Library `4.1.0`, and VehicleInterfaces `2.0.2`.
 
-| Item | Value |
-| :-- | :-- |
-| Package | `BobLib` (version `0.2.0` in `BobLib/package.mo`) |
-| Test package | `Tests/BobLibTest`, a sibling package of regression and component fixtures |
-| Dependencies | Modelica Standard Library `4.1.0`, VehicleInterfaces `2.0.2` |
-| Entry points | `Experiments.Standards.VehicleSim`, `FourPostSim`, and `VehicleFMI` |
-| Vehicle data | Checked-in Modelica records. There is no Python or YAML generation step. |
-| Shared signals | The VehicleInterfaces `controlBus`, plus a BobLib `AtmosphereBus` |
-| Animation | On by default (`headless = false`) |
+The standard entry points are `VehicleSim`, `FourPostSim`, and `VehicleFMI`
+under `BobLib.Experiments.Standards`. They extend checked-in architecture
+templates and use Modelica vehicle records. Animation is enabled by default
+with `headless = false`.
 
-## How the parts fit
+Standalone BobLib needs no YAML generation. [BobSim](/bobsim/) supplies a
+separate vehicle editor and generator that writes records for its pinned
+BobLib checkout. A standalone checkout and BobSim's submodule can be at
+different revisions.
 
-The standard entry points extend checked-in templates under
-`BobLib.Experiments.Standards.Templates`. To change a vehicle, you edit records
-and templates, translate the entry points, run the checks, and then simulate
-directly or through BobSim.
-
-<div class="workflow-diagram">
+## Model structure
 
 ```mermaid
-flowchart TB
-    vi["VehicleInterfaces<br/>shared contracts"]
-    domains["BobLib domains<br/>chassis, aero, powertrain, controls"]
-    records["Records<br/>vehicle data and schemas"]
-    experiments["Experiments.Standards<br/>VehicleSim / FourPostSim"]
-    checks["Translation, initialization,<br/>regression, smoke checks"]
-    sim["Direct omc/OMEdit<br/>or BobSim workflows"]
-
-    vi --> domains
-    records --> domains
-    domains --> experiments
-    experiments --> checks
-    checks --> sim
+flowchart LR
+    records["Vehicle records"] --> components["Subsystem models"]
+    interfaces["Physical connectors and buses"] --> components
+    components --> experiment["Vehicle, rig, or FMI experiment"]
+    experiment --> results["Signals and animation"]
 ```
 
-</div>
+[Package map](/boblib/package-map) describes the source tree.
+[Control bus](/boblib/control-bus) explains signal ownership.
+`BobLib.UsersGuide` contains the guide shipped with each package revision.
 
-<details class="diagram-text">
-<summary>Text version</summary>
-
-1. VehicleInterfaces (shared contracts) and Records (vehicle data and schemas) feed the BobLib domains: chassis, aero, powertrain, controls.
-2. The domains feed Experiments.Standards: VehicleSim and FourPostSim.
-3. The experiments go through translation, initialization, regression, and smoke checks.
-4. Checked models run through direct omc/OMEdit or BobSim workflows.
-
-</details>
-
-## Pages
-
-| Page | Use it for |
-| :-- | :-- |
-| [Setup](/boblib/setup) | Clone path, OpenModelica, libraries, Python environment |
-| [CLI Workflow](/boblib/cli-workflow) | Load, build, and simulate with `omc` |
-| [OMEdit Workflow](/boblib/omedit-workflow) | Open BobLib in OMEdit, browse diagrams, run a simulation |
-| [Package Map](/boblib/package-map) | Repository layout and Modelica packages |
-| [Control Bus](/boblib/control-bus) | Bus wiring, signal ownership, and what stays on explicit connectors |
-| [Static Templates](/boblib/generation) | Records, redeclares, and architecture templates |
-| [Entry Points](/boblib/entry-points) | `VehicleSim`, `FourPostSim`, `VehicleFMI`, maneuver modes, outputs |
-| [Tests and Checks](/boblib/testing) | `make` targets, test files, baselines |
-| [Development](/boblib/development) | Architecture rules and checks before you commit |
-| [Troubleshooting](/boblib/troubleshooting) | OpenModelica, OMEdit, dependency, and check failures |
-
-## Maturity
-
-BobLib's README describes it as active engineering infrastructure, not a
-finished general-purpose vehicle library. Validate model outputs against
-measured data before you trust them. Release confidence comes from the BobLib
-check suite plus BobSim's workflow-level checks.
+The [development preview](/boblib/unreleased) is a separate, unreleased API.
+Passing regression checks establishes consistency with the test cases. It does
+not establish agreement with a particular real vehicle.

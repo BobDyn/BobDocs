@@ -1,19 +1,15 @@
 ---
 layout: doc
 title: Entry Points
-prev:
-  text: 'Static Templates'
-  link: '/boblib/generation'
-next:
-  text: 'Tests and Checks'
-  link: '/boblib/testing'
 ---
 
 # Entry Points
 
 The standard entry points are the Modelica models in
 `BobLib.Experiments.Standards`. BobSim workflows and direct OpenModelica runs
-both start from them.
+both start from them. This page describes published main. The
+[development preview](/boblib/unreleased) covers the new base classes and
+separate driver models.
 
 | Model | Use it for | BobSim studies |
 | :-- | :-- | :-- |
@@ -25,7 +21,7 @@ both start from them.
 
 `VehicleSim` is the main maneuver simulation. It follows the VehicleInterfaces
 demo-style assembly and inserts BobLib physics through subsystem redeclares.
-See [Static Vehicle Templates](/boblib/generation) for the template stack.
+See [Records and templates](/boblib/generation) for the template stack.
 
 The vehicle-level assembly contains:
 
@@ -107,6 +103,12 @@ With the default, OMEdit shows MultiBody animation geometry. Set
 sweeps. It extends a four-post architecture template. Its outputs are two
 `FourPostEvalRecord` instances, `frKnC` and `rrKnC`, which hold K&C-style
 response data for the front and rear axles.
+
+The rig rotates about global x and translates along the rotated local z axis.
+Contact-patch global heights are constrained while the remaining contact
+translations and rotations are free. Steering enters as handwheel angle
+through the rack-and-pinion C-factor. It is not prescribed wheel travel or
+direct rack displacement.
 
 ## `VehicleFMI`
 

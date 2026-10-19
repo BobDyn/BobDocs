@@ -1,64 +1,33 @@
 # BobDocs
 
-BobDocs is the VitePress documentation site for BobDyn, the open-source vehicle simulation framework.
+Documentation for [BobSim](https://github.com/BobDyn/BobSim) and
+[BobLib](https://github.com/BobDyn/BobLib), published at [bobdyn.com](https://bobdyn.com).
 
-The site focuses on the currently public pages:
-
-- startup and usage guides
-- BobLib overview
-- BobSim overview
-- reference material for metrics and control theory
-
-The old `docs/documentation/` tree has been removed. The public docs now live directly under the top-level pages in `docs/`.
-
-## Project Layout
-
-- `docs/index.md` - home page
-- `docs/startup-guide/index.md` - setup and first-run workflow
-- `docs/use-guide/index.md` - day-to-day BobSim usage
-- `docs/boblib/index.md` - BobLib overview
-- `docs/bobsim/index.md` - BobSim overview
-- `docs/reference/vehicle-dynamics.md` - vehicle dynamics reference
-- `docs/reference/metrics.md` - vehicle performance metrics
-- `docs/reference/fsae-bridge.md` - FSAE bridge reference
-- `docs/reference/field-notes.md` - field notes
-- `docs/.vitepress/config.ts` - site navigation, sidebar, and markdown configuration
-
-## Tech Stack
-
-- VitePress
-- Vue 3
-- Mermaid diagrams
-- MathJax math rendering
-- PDF.js embeds for documentation previews
-
-## Development
+## Local preview
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Other useful commands:
+## Content
+
+- `docs/startup-guide/`: installation and first runs
+- `docs/bobsim/`: vehicle setup, models, analyses, and results
+- `docs/boblib/`: Modelica interfaces, experiments, and checks
+- `docs/reference/`: engineering reference and source-version scope
+- `docs/.vitepress/config.ts`: navigation and site configuration
+
+Claims about software behavior need verification against the corresponding
+repository. Unreleased BobLib changes have a separate preview page.
+
+## Checks
 
 ```bash
 npm run build
-npm run preview
+npx markdownlint-cli "docs/**/*.md"
+npm run lint:ts
 ```
 
-## Working With Content
-
-Most content is written in Markdown. The main entry points for editing are:
-
-- `docs/index.md` for the homepage
-- `docs/startup-guide/index.md` for setup instructions
-- `docs/use-guide/index.md` for workflow guidance
-- `docs/boblib/index.md` and `docs/bobsim/index.md` for the project overviews
-
-If you need to change navigation or site-wide markdown behavior, edit `docs/.vitepress/config.ts`.
-
-## Notes
-
-- The site is centered on BobLib and BobSim rather than the old generated documentation tree.
-- Public links should point at the top-level BobLib, BobSim, and Reference pages.
-- The docs build is expected to stay clean under `npm run build`.
+The build checks internal page links and sidebar coverage. CI also checks
+external links. See [Contributing](docs/contributing.md) for the editing workflow.

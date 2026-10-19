@@ -1,257 +1,140 @@
 ---
 layout: home
-
+title: BobDyn
 hero:
   name: BobDyn
-  text: A high-fidelity, open-source vehicle simulation framework
+  text: Vehicle models and analysis
+  tagline: Documentation for BobSim and BobLib.
   image:
     src: /bobdyn.png
     alt: BobDyn
   actions:
     - theme: brand
-      text: Startup Guide
+      text: Getting started
       link: /startup-guide/
     - theme: alt
-      text: Use Guide
-      link: /use-guide/
-    - theme: alt
-      text: VDyn Overview
-      link: /reference/vehicle-dynamics
-    - theme: alt
-      text: FSAE Bridge
-      link: /reference/fsae-bridge
-
+      text: Simulation workspace
+      link: /bobsim/app
 features:
-  - icon:
-      src: /icons/boblib.svg
-      alt: BobDyn/BobLib
-      width: "26"
-      height: "26"
-      wrap: true
-    title: BobDyn/BobLib
-    details: A Modelica library that models the vehicle as an acausal multibody system with explicit geometry, constraints, tires, suspension, and powertrain interfaces.
-
-  - icon:
-      src: /icons/bobsim.svg
-      alt: BobDyn/BobSim
-      width: "26"
-      height: "26"
-      wrap: true
-    title: BobDyn/BobSim
-    details: A local browser app and Python workflow runner. It sets up vehicles, runs studies on BobDyn/BobLib models, and turns the results into metrics, plots, and reports.
-
-  - icon:
-      src: /icons/bobdyn.svg
-      alt: BobDyn
-      width: "26"
-      height: "26"
-      wrap: true
-    title: BobDyn
-    details: The parent framework. It joins the physical model and the analysis workflow so that every report traces back to plain-text model and config files.
+  - title: BobSim
+    details: Vehicle setup, suspension kinematics, response studies, envelopes, lap simulation, and results.
+    link: /bobsim/
+    linkText: BobSim documentation
+  - title: BobLib
+    details: Modelica vehicle physics, subsystem interfaces, experiment models, and validation checks.
+    link: /boblib/
+    linkText: BobLib documentation
+  - title: Engineering reference
+    details: Coordinate conventions, tire behavior, vehicle dynamics, and metric interpretation.
+    link: /reference/vehicle-dynamics
+    linkText: Engineering reference
 ---
 
-## Vehicle Model Structure
+## Vehicle setup and analysis
 
-BobDyn models the vehicle as a hierarchy of physical systems. The structure is
-explicit, so you can trace geometry, loads, constraints, and response signals
-from full-vehicle behavior down to subsystem assumptions.
-
-Start with [BobDyn/BobSim](/bobsim/) to set up a vehicle, run studies, and get
-metrics, plots, and reports. Go to [BobDyn/BobLib](/boblib/) to inspect,
-change, or debug the vehicle models directly.
-
-<div class="model-structure-diagram">
-
-```mermaid
-%%{init: {"flowchart": {"rankSpacing": 72, "nodeSpacing": 48}}}%%
-flowchart TB
-    vehicle["`**Vehicle Model**`"]
-    base["`**Unactuated Vehicle**<br/>mass, inertia, reference frames`"]
-    aero["`**Aerodynamic Loads**`"]
-    powertrain["`**Powertrain Interface**`"]
-    chassis["`**Chassis Assembly**`"]
-    body["`**Driver & Frame**<br/>sprung mass, compliance`"]
-    suspension["`**Suspension System**`"]
-    front["`**Front Axle**`"]
-    rear["`**Rear Axle**`"]
-    axle["`**Axle Structure**<br/>mounts, hardpoints, wheel centers`"]
-    steering["`**Steering System**`"]
-    tire["`**Wheel & Tire Model**<br/>mass, inertia, compliance`"]
-    contact["`**Contact & Wheel Dynamics**`"]
-    forces["`**Tire Force & Slip Behavior**`"]
-    linkages["`**Linkages & Shocks**<br/>rods, bellcranks, springs, dampers, masses`"]
-    antiroll["`**Stabars**`"]
-
-    vehicle --> base
-    base --> chassis
-    base --> aero
-    vehicle --> powertrain
-    chassis --> body
-    chassis --> suspension
-    suspension --> front
-    suspension --> rear
-    front --> axle
-    rear --> axle
-    axle --> steering
-    axle --> tire
-    tire --> contact
-    tire --> forces
-    front --> linkages
-    rear --> linkages
-    front --> antiroll
-    rear --> antiroll
-```
-
-</div>
-
-<details class="diagram-text">
-<summary>Text version</summary>
-
-- Vehicle Model
-  - Unactuated Vehicle: mass, inertia, reference frames
-    - Chassis Assembly
-      - Driver & Frame: sprung mass, compliance
-      - Suspension System
-        - Front Axle and Rear Axle
-          - Axle Structure: mounts, hardpoints, wheel centers
-            - Steering System
-            - Wheel & Tire Model: mass, inertia, compliance
-              - Contact & Wheel Dynamics
-              - Tire Force & Slip Behavior
-          - Linkages & Shocks: rods, bellcranks, springs, dampers, masses
-          - Stabars
-    - Aerodynamic Loads
-  - Powertrain Interface
-
-</details>
-
----
-
-## How BobDyn Works
-
-The driver feels a vehicle's response, not its equations. So BobDyn describes
-vehicles with response metrics, keeps the model inspectable, and makes every
-study traceable from configuration to report.
-
-BobDyn/BobLib provides the physical vehicle model in Modelica. BobDyn/BobSim
-runs repeatable studies on that model and turns the results into plots,
-metrics, and reports. You can inspect, compare, and reuse those results across
-design iterations.
-
-Every part of the pipeline is plain text under version control:
-
-| Part | Where it lives |
-| :-- | :-- |
-| Physical models | Modelica. Geometry, constraints, and force generation are written from first principles. |
-| Configuration | Vehicle records, test setups, and simulation parameters in YAML and Modelica `.mo` files |
-| Execution | Python workflows for simulation, extraction, analysis, and reporting. You can extend, change, or replace them. |
-| Results | Outputs link back to the model structure, configuration, and equations that produced them. |
-
----
-
-## What You Can Do With BobDyn
-
-|Capability|Description|
-|:--|:--|
-|**Standard tests**|Run repeatable studies such as steady-state cornering, transient steering response, and kinematics/compliance workflows.|
-|**Automated reporting**|Turn simulation output into metrics, plots, CSV files, and engineering reports with no manual post-processing.|
-|**Model correlation**|Use full-system simulation results as reference data for reduced-order models, design tools, and simplifying assumptions.|
-|**Design exploration**|Sweep parameters, compare configurations, and see how physical changes affect vehicle-level behavior.|
-
----
-
-## Sample Outputs
-
-The two animations show input samples: a closed-loop PI control input and an
-open-loop prescribed-frequency input.
+<figure class="app-figure">
+  <a href="/images/bobsim/geometry-current.png" target="_blank" rel="noreferrer">
+    <img src="/images/bobsim/geometry-current.png" alt="BobSim geometry editor with hardpoint coordinates on the left and front and rear suspension geometry on the right" width="1440" height="960" loading="lazy" />
+  </a>
+  <figcaption>Geometry editing in BobSim. Hardpoints, axle selection, and the 3D view share one workspace. <a href="/bobsim/configuration">Vehicle setup →</a></figcaption>
+</figure>
 
 <div class="sample-output-grid">
   <article class="sample-output-card">
-    <p class="sample-output-label">Closed-Loop PI Input Sample</p>
-    <video autoplay loop muted playsinline width="100%">
-      <source src="/steady_state_eval.mp4" type="video/mp4">
-    </video>
-    <p>
-      A proof-of-concept closed-loop PI radius-control input. It is not
-      presented as a tuned controller.
-    </p>
-    <div class="sample-output-links">
-      <a href="/steady_state_eval.mp4" target="_blank" rel="noreferrer">Open sample</a>
-    </div>
+    <p class="sample-output-label">Tire behavior</p>
+    <a href="/images/bobsim/tires-current.png" target="_blank" rel="noreferrer"><img src="/images/bobsim/tires-current.png" alt="Front tire definition and its pure and combined-slip friction ellipse in BobSim" width="1440" height="960" loading="lazy" /></a>
+    <p>Front and rear tire definitions with force and moment plots. <a href="/bobsim/configuration#tires-and-suspension">Tires and suspension →</a></p>
   </article>
   <article class="sample-output-card">
-    <p class="sample-output-label">Open-Loop Frequency Input Sample</p>
-    <video autoplay loop muted playsinline width="100%">
-      <source src="/transient_eval.mp4" type="video/mp4">
-    </video>
-    <p>
-      An open-loop prescribed steering-frequency input showing the vehicle
-      response under a commanded steering sweep.
-    </p>
-    <div class="sample-output-links">
-      <a href="/transient_eval.mp4" target="_blank" rel="noreferrer">Open sample</a>
-    </div>
+    <p class="sample-output-label">Simulation workspace</p>
+    <a href="/images/bobsim/workspace-current.png" target="_blank" rel="noreferrer"><img src="/images/bobsim/workspace-current.png" alt="BobSim simulation tree and overview showing analysis groups and the GGV plus racing-line dependency for QSS lap" width="1440" height="960" loading="lazy" /></a>
+    <p>Analyses belong to the vehicle. Results belong to each analysis. <a href="/bobsim/app">Simulation workspace →</a></p>
   </article>
 </div>
 
-The PDF reports come from BobDyn/BobSim StandardSim workflows. They are
-separate studies, not the input samples above. Open a PDF link for a wider
-view.
+App captures from the October 2026 source workspace. Images open at full size.
+
+## Animations
+
+New MBD runs show the front suspension alongside synchronized steering and
+lateral-acceleration signals. Both use a 15 m/s target speed and 30° handwheel
+amplitude, producing about 7.3° mean roadwheel steer. Motion is shown at its
+simulated magnitude.
+
+<div class="sample-output-grid animation-grid">
+  <article class="sample-output-card">
+    <p class="sample-output-label">MBD · Ramp steering</p>
+    <video controls loop muted playsinline preload="none" poster="/images/examples/mbd-ramp.png" aria-label="New MBD front-suspension ramp-steering animation">
+      <source src="/examples/mbd-ramp.mp4" type="video/mp4" />
+      <a href="/examples/mbd-ramp.mp4">Ramp-steering animation</a>
+    </video>
+    <p>A 30° handwheel ramp from 1–5 s, held through 8 s. Front and perspective views show the same captured suspension geometry.</p>
+    <div class="sample-output-links"><a href="/examples/mbd-ramp.mp4" target="_blank" rel="noreferrer">Full-size animation</a></div>
+  </article>
+  <article class="sample-output-card">
+    <p class="sample-output-label">MBD · Sinusoidal steering</p>
+    <video controls loop muted playsinline preload="none" poster="/images/examples/mbd-sine.png" aria-label="New MBD front-suspension sinusoidal-steering animation">
+      <source src="/examples/mbd-sine.mp4" type="video/mp4" />
+      <a href="/examples/mbd-sine.mp4">Sinusoidal-steering animation</a>
+    </video>
+    <p>A ±30° handwheel sine at 0.5 Hz, starting at 1 s. Four cycles show steering reversal and suspension response.</p>
+    <div class="sample-output-links"><a href="/examples/mbd-sine.mp4" target="_blank" rel="noreferrer">Full-size animation</a></div>
+  </article>
+</div>
+
+<figure class="app-figure">
+  <a href="/images/bobsim/replay-14dof.png" target="_blank" rel="noreferrer"><img src="/images/bobsim/replay-14dof.png" alt="Current BobSim replay with the 14 DOF vehicle, playback controls, and per-corner tire-force utilization displays" width="1440" height="960" loading="lazy" /></a>
+  <figcaption>The current app replay, shown with a 14 DOF run, with playback controls and approximate peak-grip ellipses. <a href="/bobsim/visualization">Animation and signal exploration →</a></figcaption>
+</figure>
+
+## Reports
+
+BobSim generates PDF reports for MBD response studies, DynPy maneuvers, and
+lap simulations. Each preview opens the full report. The MBD examples are
+existing May–June 2026 reports. The DynPy examples are October 2026 saved runs.
 
 <div class="sample-output-grid">
   <article class="sample-output-card">
-    <p class="sample-output-label">SteadyStateEval Report</p>
-    <p>
-      Ramp-steer velocity-isoline workflow with controller behavior, response
-      traces, fitted handling metrics, and CSV-ready summary values.
-    </p>
-    <div class="sample-output-links">
-      <a href="/steady_state_eval_report_1b607470.pdf" target="_blank" rel="noreferrer">Open PDF report</a>
-    </div>
-    <PdfEmbed src="/steady_state_eval_report_1b607470.pdf" max-height="34rem" />
+    <p class="sample-output-label">MBD · Ramp-steer characterization</p>
+    <a href="/steady_state_eval_report_1b607470.pdf#page=7" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/steady_state_eval_report_1b607470.png" alt="MBD report with curvature, roll, and sideslip against lateral acceleration at four speeds" loading="lazy" /></a>
+    <p>Velocity isolines, steering effort, and fitted handling metrics from the SteadyStateEval ramp-response study.</p>
+    <div class="sample-output-links"><a href="/steady_state_eval_report_1b607470.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
   </article>
   <article class="sample-output-card">
-    <p class="sample-output-label">TransientEval Report</p>
-    <p>
-      Step-steer and sine-response workflow with gain, phase, lag, rise-time,
-      and overshoot metrics from the same Modelica vehicle model.
-    </p>
-    <div class="sample-output-links">
-      <a href="/transient_eval_report_05d3fdda.pdf" target="_blank" rel="noreferrer">Open PDF report</a>
-    </div>
-    <PdfEmbed src="/transient_eval_report_05d3fdda.pdf" max-height="34rem" />
+    <p class="sample-output-label">MBD · Transient response</p>
+    <a href="/transient_eval_report_05d3fdda.pdf#page=8" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/transient_eval_report_05d3fdda.png" alt="MBD transient report with lateral acceleration and yaw frequency-response gains" loading="lazy" /></a>
+    <p>Step and sine responses, rise time, overshoot, gain, phase, and delay.</p>
+    <div class="sample-output-links"><a href="/transient_eval_report_05d3fdda.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
+  </article>
+  <article class="sample-output-card">
+    <p class="sample-output-label">14 DOF · Ramp steering response</p>
+    <a href="/examples/maneuver-14dof-report.pdf#page=3" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/maneuver-14dof-report.png" alt="Current 14 DOF report with steering input, yaw rate, lateral acceleration, and controlled speed" loading="lazy" /></a>
+    <p>Steering response, tire forces, camber, and wheel travel from a 14 DOF ramp maneuver.</p>
+    <div class="sample-output-links"><a href="/examples/maneuver-14dof-report.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
+  </article>
+  <article class="sample-output-card">
+    <p class="sample-output-label">6 DOF GGV · QSS lap</p>
+    <a href="/examples/qss-6dof-report.pdf#page=4" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/qss-6dof-report.png" alt="QSS lap report with speed, longitudinal and lateral acceleration, and curvature along the Michigan track" loading="lazy" /></a>
+    <p>A linked GGV and racing line supply the lap's acceleration limits and path.</p>
+    <div class="sample-output-links"><a href="/examples/qss-6dof-report.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
   </article>
 </div>
 
-## Quick Start
+## Analysis paths
 
-Run BobSim from a source checkout in Docker. You need Git, Make, and Docker.
-The BobSim image contains OpenModelica and Python.
+| Question | Documentation |
+| --- | --- |
+| How is a vehicle defined? | [Vehicle setup](/bobsim/configuration) |
+| Which model represents the required dynamics? | [Models and fidelity](/bobsim/models) |
+| How does the suspension move? | [Four post](/bobsim/standard-sim#four-post) |
+| How does the vehicle respond to steering? | [Vehicle response](/bobsim/standard-sim) |
+| What acceleration can it sustain? | [GGV and yaw moment diagrams](/bobsim/envelope) |
+| What limits its lap performance? | [Tracks](/bobsim/tracks) and [lap simulation](/bobsim/laptime) |
+| How are the Modelica components connected? | [BobLib package map](/boblib/package-map) |
 
-```bash
-git clone --recurse-submodules https://github.com/BobDyn/BobSim.git
-cd BobSim
-make init
-make docker-build
-make app
-```
+## Documentation scope
 
-Then open `http://127.0.0.1:8765` and follow:
-
-```text
-Setup -> Save Vehicle -> Write to MBD -> Simulation -> Archive
-```
-
-![BobSim app showing the guided Setup view with vehicle architecture controls and preview](/images/bobsim/app-setup-architecture.png)
-
-To run all four standard studies without the app, run
-`make standard-eval-all`. It builds the Modelica executables when they are
-missing, then runs RampSteerEval, SteadyStateEval, TransientEval, and
-FourPostEval. The PDF reports and metrics CSVs go to
-`_3_StandardSim/generated_results/`.
-
-The [BobSim Startup](/startup-guide/bobsim) tutorial covers each step. To use
-the released desktop app from the
-[GitHub Release](https://github.com/BobDyn/BobSim/releases/latest) instead, see
-[Run BobSim Without Docker](/startup-guide/bobsim-without-docker). The desktop
-app needs a local OpenModelica to simulate.
+The BobSim guides describe current main, including changes newer than the
+v2026.10.13 desktop release. BobLib guides describe published main. Its local
+architecture changes have a separate [unreleased preview](/boblib/unreleased).
+[Source versions](/reference/versions) records the revisions used for this review.

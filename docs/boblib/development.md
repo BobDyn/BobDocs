@@ -1,12 +1,6 @@
 ---
 layout: doc
 title: Development
-prev:
-  text: 'Tests and Checks'
-  link: '/boblib/testing'
-next:
-  text: 'Troubleshooting'
-  link: '/boblib/troubleshooting'
 ---
 
 # Development
@@ -34,7 +28,7 @@ BobLib builds its physics inside the VehicleInterfaces contracts. BobLib's
   subsystem packages. Complete vehicle records live under `Records.VehicleDefn`.
 - Test models live in `Tests/BobLibTest`, not in the production package.
 
-## Before you commit
+## Change verification
 
 For vehicle architecture or template changes, confirm that:
 
