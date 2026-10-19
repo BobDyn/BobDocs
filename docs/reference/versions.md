@@ -32,7 +32,13 @@ refresh. The [BobLib test guide](/boblib/testing) and BobSim's repository
 ## Visual examples
 
 The homepage uses captures from the October 2026 BobSim source workspace.
-Replay presentations use these existing saved runs:
+The homepage animations retain the original MBD radius-control and sinusoidal
+steering demonstrations. The MBD report examples were generated on June 6,
+2026 (ramp characterization) and May 27, 2026 (transient response). These are
+separate studies from the animation examples, not newly regenerated results.
+Both report workflows remain in BobSim's `simulations/response/mbd` package.
+
+The model-fidelity page and DynPy reports use these existing saved runs:
 
 | Example | Saved run | Input |
 | --- | --- | --- |

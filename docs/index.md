@@ -56,44 +56,58 @@ App captures from the October 2026 source workspace. Images open at full size.
 
 ## Animations
 
-Saved October 2026 runs shown with BobSim's renderer and synchronized response plots.
-The two models retain different dynamic states and have different visual
-representations. These are separate maneuvers, not a controlled comparison.
+The original MBD examples show suspension motion alongside synchronized signals.
+These saved demonstrations use separate inputs from the report studies below.
 
 <div class="sample-output-grid animation-grid">
   <article class="sample-output-card">
-    <p class="sample-output-label">14 DOF · Ramp steer</p>
-    <video controls loop muted playsinline preload="none" poster="/images/examples/composed-14dof.png" aria-label="Current BobSim 14 DOF ramp-steer replay">
-      <source src="/examples/composed-14dof.mp4" type="video/mp4" />
-      <a href="/examples/composed-14dof.mp4">14 DOF replay video</a>
+    <p class="sample-output-label">MBD · Closed-loop radius control</p>
+    <video controls loop muted playsinline preload="none" poster="/images/examples/steady_state_eval.png" aria-label="MBD suspension animation with closed-loop radius control">
+      <source src="/steady_state_eval.mp4" type="video/mp4" />
+      <a href="/steady_state_eval.mp4">Radius-control animation</a>
     </video>
-    <p>Body motion, wheel rotation, and unsprung motion. A 2° roadwheel ramp at a 15 m/s target speed.</p>
+    <p>PI radius-control demonstration with suspension motion and response traces.</p>
+    <div class="sample-output-links"><a href="/steady_state_eval.mp4" target="_blank" rel="noreferrer">Full-size animation</a></div>
   </article>
   <article class="sample-output-card">
-    <p class="sample-output-label">3 DOF · Sine steer</p>
-    <video controls loop muted playsinline preload="none" poster="/images/examples/composed-3dof.png" aria-label="Current BobSim 3 DOF sine-steer replay">
-      <source src="/examples/composed-3dof.mp4" type="video/mp4" />
-      <a href="/examples/composed-3dof.mp4">3 DOF replay video</a>
+    <p class="sample-output-label">MBD · Sinusoidal steering</p>
+    <video controls loop muted playsinline preload="none" poster="/images/examples/transient_eval.png" aria-label="MBD suspension animation with sinusoidal steering">
+      <source src="/transient_eval.mp4" type="video/mp4" />
+      <a href="/transient_eval.mp4">Sinusoidal-steering animation</a>
     </video>
-    <p>Planar body motion with four tire contacts. A 2° roadwheel sine input at 0.5 Hz and a 15 m/s target speed.</p>
+    <p>Prescribed steering input with suspension motion and lateral acceleration.</p>
+    <div class="sample-output-links"><a href="/transient_eval.mp4" target="_blank" rel="noreferrer">Full-size animation</a></div>
   </article>
 </div>
 
 <figure class="app-figure">
   <a href="/images/bobsim/replay-14dof.png" target="_blank" rel="noreferrer"><img src="/images/bobsim/replay-14dof.png" alt="Current BobSim replay with the 14 DOF vehicle, playback controls, and per-corner tire-force utilization displays" width="1440" height="960" loading="lazy" /></a>
-  <figcaption>The same 14 DOF run inside the app, with playback controls and approximate peak-grip ellipses. <a href="/bobsim/visualization">Animation and signal exploration →</a></figcaption>
+  <figcaption>The current app replay, shown with a 14 DOF run, with playback controls and approximate peak-grip ellipses. <a href="/bobsim/visualization">Animation and signal exploration →</a></figcaption>
 </figure>
 
 ## Reports
 
-Reports from saved October 2026 runs. Each preview opens the complete PDF,
-including model fidelity, operating conditions, and solver status.
+BobSim generates PDF reports for MBD response studies, DynPy maneuvers, and
+lap simulations. Each preview opens the full report. The MBD examples are
+existing May–June 2026 reports. The DynPy examples are October 2026 saved runs.
 
 <div class="sample-output-grid">
   <article class="sample-output-card">
+    <p class="sample-output-label">MBD · Ramp-steer characterization</p>
+    <a href="/steady_state_eval_report_1b607470.pdf#page=7" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/steady_state_eval_report_1b607470.png" alt="MBD report with curvature, roll, and sideslip against lateral acceleration at four speeds" loading="lazy" /></a>
+    <p>Velocity isolines, steering effort, and fitted handling metrics from the SteadyStateEval ramp-response study.</p>
+    <div class="sample-output-links"><a href="/steady_state_eval_report_1b607470.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
+  </article>
+  <article class="sample-output-card">
+    <p class="sample-output-label">MBD · Transient response</p>
+    <a href="/transient_eval_report_05d3fdda.pdf#page=8" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/transient_eval_report_05d3fdda.png" alt="MBD transient report with lateral acceleration and yaw frequency-response gains" loading="lazy" /></a>
+    <p>Step and sine responses, rise time, overshoot, gain, phase, and delay.</p>
+    <div class="sample-output-links"><a href="/transient_eval_report_05d3fdda.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
+  </article>
+  <article class="sample-output-card">
     <p class="sample-output-label">14 DOF · Ramp steering response</p>
     <a href="/examples/maneuver-14dof-report.pdf#page=3" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/maneuver-14dof-report.png" alt="Current 14 DOF report with steering input, yaw rate, lateral acceleration, and controlled speed" loading="lazy" /></a>
-    <p>The run shown in the replay above, including steering response, tire forces, camber, and wheel travel.</p>
+    <p>Steering response, tire forces, camber, and wheel travel from a 14 DOF ramp maneuver.</p>
     <div class="sample-output-links"><a href="/examples/maneuver-14dof-report.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
   </article>
   <article class="sample-output-card">
