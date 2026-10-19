@@ -28,3 +28,17 @@ Documentation review is not simulation validation. The unreleased BobLib
 snapshot was inspected but not translated or regression-tested for this site
 refresh. The [BobLib test guide](/boblib/testing) and BobSim's repository
 `CONTRIBUTING.md` define the corresponding checks.
+
+## Visual examples
+
+The homepage uses captures from the October 2026 BobSim source workspace.
+Replay videos were exported from these existing saved runs:
+
+| Example | Saved run | Input |
+| --- | --- | --- |
+| 14 DOF replay and report | `20261019-134809-maneuver-review` | 15 m/s target, 2° roadwheel ramp, 8 s duration |
+| 3 DOF replay | `20261016-150101-maneuver-review` | 15 m/s target, 2° roadwheel sine at 0.5 Hz, 5 s duration |
+| QSS report | `20261019-143250-qss-lap-review` | Michigan track, linked 6 DOF GGV and racing line |
+
+These are examples of the current outputs, not newly rerun validation cases.
+The replay captures use the viewer's real-time video-export fallback.

@@ -17,6 +17,16 @@ of values in the saved state vector.
 | DynPy 14 DOF | 10 DOF plus four unsprung vertical motions | Python |
 | BobLib MBD | Body and linkage coordinates subject to mechanical joint constraints | OpenModelica compiled executable |
 
+## Visual representations
+
+| 3 DOF | 14 DOF |
+| --- | --- |
+| [![Planar vehicle representation in the current replay](/images/examples/replay-3dof.png)](/examples/replay-3dof.mp4) | [![Body and suspension representation in the current replay](/images/examples/replay-14dof.png)](/examples/replay-14dof.mp4) |
+| Planar body motion with four tire contacts | Body attitude, wheel rotation, and unsprung motion |
+
+Images open the replay exports. The examples use different steering inputs.
+They illustrate representation, not a fidelity comparison under matched conditions.
+
 ## Common inputs
 
 DynPy uses four tire contacts even at 3 DOF. It is not a bicycle model. KinPy

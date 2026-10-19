@@ -56,45 +56,51 @@ App captures from the October 2026 source workspace. Images open at full size.
 
 ## Animations
 
-Archived Modelica demonstrations. These clips are separate from the report
-runs below and do not show the current app's replay controls.
+Exports from BobSim's current replay viewer, using saved October 2026 runs.
+The two models retain different dynamic states and have different visual
+representations. These are separate maneuvers, not a controlled comparison.
 
 <div class="sample-output-grid">
   <article class="sample-output-card">
-    <p class="sample-output-label">Closed-loop steering</p>
-    <video controls loop muted playsinline preload="none" poster="/images/examples/steady_state_eval.png" aria-label="Archived closed-loop steering animation">
-      <source src="/steady_state_eval.mp4" type="video/mp4" />
-      <a href="/steady_state_eval.mp4">Animation video</a>
+    <p class="sample-output-label">14 DOF · Ramp steer</p>
+    <video controls loop muted playsinline preload="none" poster="/images/examples/replay-14dof.png" aria-label="Current BobSim 14 DOF ramp-steer replay">
+      <source src="/examples/replay-14dof.mp4" type="video/mp4" />
+      <a href="/examples/replay-14dof.mp4">14 DOF replay video</a>
     </video>
-    <p>A vehicle response with a closed-loop steering input.</p>
+    <p>Body motion, wheel rotation, and unsprung motion. A 2° roadwheel ramp at a 15 m/s target speed.</p>
   </article>
   <article class="sample-output-card">
-    <p class="sample-output-label">Sinusoidal steering</p>
-    <video controls loop muted playsinline preload="none" poster="/images/examples/transient_eval.png" aria-label="Archived sinusoidal steering animation">
-      <source src="/transient_eval.mp4" type="video/mp4" />
-      <a href="/transient_eval.mp4">Animation video</a>
+    <p class="sample-output-label">3 DOF · Sine steer</p>
+    <video controls loop muted playsinline preload="none" poster="/images/examples/replay-3dof.png" aria-label="Current BobSim 3 DOF sine-steer replay">
+      <source src="/examples/replay-3dof.mp4" type="video/mp4" />
+      <a href="/examples/replay-3dof.mp4">3 DOF replay video</a>
     </video>
-    <p>A vehicle response to a prescribed periodic steering input.</p>
+    <p>Planar body motion with four tire contacts. A 2° roadwheel sine input at 0.5 Hz and a 15 m/s target speed.</p>
   </article>
 </div>
 
+<figure class="app-figure">
+  <a href="/images/bobsim/replay-14dof.png" target="_blank" rel="noreferrer"><img src="/images/bobsim/replay-14dof.png" alt="Current BobSim replay with the 14 DOF vehicle, playback controls, and per-corner tire-force utilization displays" width="1440" height="960" loading="lazy" /></a>
+  <figcaption>The same 14 DOF run inside the app, with playback controls and approximate peak-grip ellipses. <a href="/bobsim/visualization">Animation and signal exploration →</a></figcaption>
+</figure>
+
 ## Reports
 
-Archived examples of the plots and metrics produced by the MBD workflows.
-Each preview opens its full PDF. The report records its own settings and date.
+Reports from saved October 2026 runs. Each preview opens the complete PDF,
+including model fidelity, operating conditions, and solver status.
 
 <div class="sample-output-grid">
   <article class="sample-output-card">
-    <p class="sample-output-label">Ramp-steer characterization</p>
-    <a href="/steady_state_eval_report_1b607470.pdf#page=6" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/ramp-report.png" alt="Report plots of roadwheel and handwheel angle against measured lateral acceleration at four speeds" loading="lazy" /></a>
-    <p>Steering, body response, and handling gradients. June 2026.</p>
-    <div class="sample-output-links"><a href="/steady_state_eval_report_1b607470.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
+    <p class="sample-output-label">14 DOF · Ramp steering response</p>
+    <a href="/examples/maneuver-14dof-report.pdf#page=3" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/maneuver-14dof-report.png" alt="Current 14 DOF report with steering input, yaw rate, lateral acceleration, and controlled speed" loading="lazy" /></a>
+    <p>The run shown in the replay above, including steering response, tire forces, camber, and wheel travel.</p>
+    <div class="sample-output-links"><a href="/examples/maneuver-14dof-report.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
   </article>
   <article class="sample-output-card">
-    <p class="sample-output-label">Transient response</p>
-    <a href="/transient_eval_report_05d3fdda.pdf#page=6" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/transient-report.png" alt="Report plots of step steering input, lateral acceleration, and yaw velocity over time" loading="lazy" /></a>
-    <p>Step response, sine response, gain, and phase. May 2026.</p>
-    <div class="sample-output-links"><a href="/transient_eval_report_05d3fdda.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
+    <p class="sample-output-label">6 DOF GGV · QSS lap</p>
+    <a href="/examples/qss-6dof-report.pdf#page=4" target="_blank" rel="noreferrer"><img class="report-preview" src="/images/examples/qss-6dof-report.png" alt="QSS lap report with speed, longitudinal and lateral acceleration, and curvature along the Michigan track" loading="lazy" /></a>
+    <p>A linked GGV and racing line supply the lap's acceleration limits and path.</p>
+    <div class="sample-output-links"><a href="/examples/qss-6dof-report.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a></div>
   </article>
 </div>
 

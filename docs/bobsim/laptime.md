@@ -83,6 +83,13 @@ report. Transient signals can drive the vehicle replay. Signal Explorer plots
 time histories or parametric relationships, with an optional third signal
 shown by color.
 
+## Example report
+
+[![QSS speed and acceleration along the Michigan circuit](/images/examples/qss-6dof-report.png)](/examples/qss-6dof-report.pdf#page=4)
+
+October 2026 run using a linked 6 DOF GGV and racing line. The image opens the
+report, including convergence and envelope-coverage checks.
+
 ## Command line
 
 ```bash

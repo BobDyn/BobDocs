@@ -11,6 +11,11 @@ source selection.
 
 ## Animation
 
+[![BobSim 14 DOF replay with vehicle geometry and per-corner grip displays](/images/bobsim/replay-14dof.png)](/images/bobsim/replay-14dof.png)
+
+The current viewer displaying a saved October 2026 run.
+[Playable exports](/#animations) show both 3 DOF and 14 DOF representations.
+
 Supported transient results use the vehicle view with the states retained by
 the model. A 3 DOF vehicle has planar body motion and four tire contacts.
 Body heave, roll, pitch, wheel rotation dynamics, and unsprung vertical motion

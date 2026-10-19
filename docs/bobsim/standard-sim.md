@@ -77,10 +77,11 @@ Its fitted gain and phase depend on amplitude and the selected analysis window.
 
 ## Example output
 
-[![Archived step-response report showing steering input, lateral acceleration, and yaw velocity](/images/examples/transient-report.png)](/transient_eval_report_05d3fdda.pdf#page=6)
+[![Current 14 DOF ramp report showing steering, yaw rate, lateral acceleration, and speed](/images/examples/maneuver-14dof-report.png)](/examples/maneuver-14dof-report.pdf#page=3)
 
-Step-response page from the May 2026 MBD report. The image opens the full PDF.
-This archived run illustrates report output, not a validation of current defaults.
+A saved October 2026 DynPy run at 15 m/s with a 2° roadwheel ramp.
+The image opens the complete report. The [homepage replay](/#animations)
+shows the same run in the current viewer.
 
 ## Command-line studies
 
