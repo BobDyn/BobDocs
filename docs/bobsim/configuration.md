@@ -38,6 +38,11 @@ are different inputs.
 
 ## Geometry editing
 
+<figure class="app-figure">
+  <a href="/images/bobsim/geometry-current.png" target="_blank" rel="noreferrer"><img src="/images/bobsim/geometry-current.png" alt="Hardpoint coordinates beside the suspension geometry in the BobSim editor" width="1440" height="960" loading="lazy" /></a>
+  <figcaption>Geometry editor, October 2026 source workspace. Image opens at full size.</figcaption>
+</figure>
+
 A selected point can move along its highlighted axis. **Tab** cycles axes
 while a point is selected. Empty-space clicks, **Esc**, or the close control
 clear the selection. **Ctrl/Cmd + Z** undoes edits and **Ctrl/Cmd + Shift + Z**
@@ -52,6 +57,11 @@ Pickup order affects the displayed outline and should match the intended
 physical arrangement.
 
 ## Tires and suspension
+
+<figure class="app-figure">
+  <a href="/images/bobsim/tires-current.png" target="_blank" rel="noreferrer"><img src="/images/bobsim/tires-current.png" alt="Front tire inputs beside the combined-slip friction ellipse" width="1440" height="960" loading="lazy" /></a>
+  <figcaption>Tire setup, October 2026 source workspace. Image opens at full size.</figcaption>
+</figure>
 
 Front and rear tires can use different MF5.2 data. Tire views select the axle,
 pure or combined slip, and force or moment channel. The model includes

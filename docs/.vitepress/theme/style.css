@@ -288,3 +288,29 @@ h4:hover .header-anchor {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+/* App captures and report previews share the existing media cards. */
+.app-figure {
+    margin: 1.5rem 0;
+}
+.app-figure img,
+.sample-output-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+.app-figure img {
+    border: 1px solid var(--vp-c-divider);
+}
+.app-figure figcaption {
+    margin-top: 0.75rem;
+    color: var(--vp-c-text-2);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+.sample-output-card .report-preview {
+    max-height: 440px;
+    object-fit: contain;
+    background: #fff;
+}

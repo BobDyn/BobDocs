@@ -11,6 +11,11 @@ track geometry, and lap performance.
 
 ## Tree structure
 
+<figure class="app-figure">
+  <a href="/images/bobsim/workspace-current.png" target="_blank" rel="noreferrer"><img src="/images/bobsim/workspace-current.png" alt="Simulation categories and task overview in the BobSim workspace" width="1440" height="960" loading="lazy" /></a>
+  <figcaption>The initial Simulation view, before analyses are added. October 2026 source workspace. Image opens at full size.</figcaption>
+</figure>
+
 ```text
 Vehicle
 ├── Kinematics

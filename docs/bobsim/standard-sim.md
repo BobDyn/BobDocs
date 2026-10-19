@@ -75,6 +75,13 @@ A single sine case is not a full frequency sweep. The legacy BobLib transient
 suite runs step and sine cases across its configured speeds and frequencies.
 Its fitted gain and phase depend on amplitude and the selected analysis window.
 
+## Example output
+
+[![Archived step-response report showing steering input, lateral acceleration, and yaw velocity](/images/examples/transient-report.png)](/transient_eval_report_05d3fdda.pdf#page=6)
+
+Step-response page from the May 2026 MBD report. The image opens the full PDF.
+This archived run illustrates report output, not a validation of current defaults.
+
 ## Command-line studies
 
 | Command | Study |
