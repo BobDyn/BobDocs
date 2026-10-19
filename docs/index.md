@@ -56,24 +56,24 @@ App captures from the October 2026 source workspace. Images open at full size.
 
 ## Animations
 
-Exports from BobSim's current replay viewer, using saved October 2026 runs.
+Saved October 2026 runs shown with BobSim's renderer and synchronized response plots.
 The two models retain different dynamic states and have different visual
 representations. These are separate maneuvers, not a controlled comparison.
 
-<div class="sample-output-grid">
+<div class="sample-output-grid animation-grid">
   <article class="sample-output-card">
     <p class="sample-output-label">14 DOF · Ramp steer</p>
-    <video controls loop muted playsinline preload="none" poster="/images/examples/replay-14dof.png" aria-label="Current BobSim 14 DOF ramp-steer replay">
-      <source src="/examples/replay-14dof.mp4" type="video/mp4" />
-      <a href="/examples/replay-14dof.mp4">14 DOF replay video</a>
+    <video controls loop muted playsinline preload="none" poster="/images/examples/composed-14dof.png" aria-label="Current BobSim 14 DOF ramp-steer replay">
+      <source src="/examples/composed-14dof.mp4" type="video/mp4" />
+      <a href="/examples/composed-14dof.mp4">14 DOF replay video</a>
     </video>
     <p>Body motion, wheel rotation, and unsprung motion. A 2° roadwheel ramp at a 15 m/s target speed.</p>
   </article>
   <article class="sample-output-card">
     <p class="sample-output-label">3 DOF · Sine steer</p>
-    <video controls loop muted playsinline preload="none" poster="/images/examples/replay-3dof.png" aria-label="Current BobSim 3 DOF sine-steer replay">
-      <source src="/examples/replay-3dof.mp4" type="video/mp4" />
-      <a href="/examples/replay-3dof.mp4">3 DOF replay video</a>
+    <video controls loop muted playsinline preload="none" poster="/images/examples/composed-3dof.png" aria-label="Current BobSim 3 DOF sine-steer replay">
+      <source src="/examples/composed-3dof.mp4" type="video/mp4" />
+      <a href="/examples/composed-3dof.mp4">3 DOF replay video</a>
     </video>
     <p>Planar body motion with four tire contacts. A 2° roadwheel sine input at 0.5 Hz and a 15 m/s target speed.</p>
   </article>

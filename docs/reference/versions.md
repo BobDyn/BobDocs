@@ -32,7 +32,7 @@ refresh. The [BobLib test guide](/boblib/testing) and BobSim's repository
 ## Visual examples
 
 The homepage uses captures from the October 2026 BobSim source workspace.
-Replay videos were exported from these existing saved runs:
+Replay presentations use these existing saved runs:
 
 | Example | Saved run | Input |
 | --- | --- | --- |
@@ -41,4 +41,7 @@ Replay videos were exported from these existing saved runs:
 | QSS report | `20261019-143250-qss-lap-review` | Michigan track, linked 6 DOF GGV and racing line |
 
 These are examples of the current outputs, not newly rerun validation cases.
-The replay captures use the viewer's real-time video-export fallback.
+The presentations reuse the app renderer with fixed vehicle-relative cameras,
+no floor grid, and higher-contrast linkage colors. Steering and lateral
+acceleration plots use the same saved signals and time cursor. Playback is
+recorded in real time at the original maneuver duration.
