@@ -32,11 +32,36 @@ refresh. The [BobLib test guide](/boblib/testing) and BobSim's repository
 ## Visual examples
 
 The homepage uses captures from the October 2026 BobSim source workspace.
-The homepage animations retain the original MBD radius-control and sinusoidal
-steering demonstrations. The MBD report examples were generated on June 6,
-2026 (ramp characterization) and May 27, 2026 (transient response). These are
-separate studies from the animation examples, not newly regenerated results.
-Both report workflows remain in BobSim's `simulations/response/mbd` package.
+The homepage animations were simulated on 19 October 2026 with BobSim
+`22c5056` and its pinned BobLib `1bd6d78`, using the checked-in
+`EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord`. OpenModelica 1.27.1 compiled
+and ran the full MBD vehicle. The figures show its captured front suspension
+from two vehicle-relative camera angles, with unscaled motion and synchronized
+handwheel and lateral-acceleration signals. The presentation reuses the original
+PyVista renderer from BobSim `943d989`, with its translucent tires and linkage
+colors. Only the rendering style is historical. Geometry and signals come from
+the new runs.
+
+| Setting | Ramp | Sine |
+| --- | --- | --- |
+| Target speed | 15 m/s | 15 m/s |
+| Handwheel amplitude | 30° | ±30° |
+| Start time | 1 s | 1 s |
+| Input | 4 s ramp, then hold | 0.5 Hz |
+| End time | 8 s | 9 s |
+| Peak mean roadwheel angle | 7.31° | 7.31° |
+| Peak lateral acceleration magnitude | 18.91 m/s² | 17.93 m/s² |
+| Minimum corner normal load | 141.25 N | 140.46 N |
+
+Both runs completed with finite signals and all four tires loaded. The ramp
+uses the step maneuver's finite-rise input with its early-settling stop disabled
+(`der_yawVelTol = 0`) so the hold remains visible. This is an illustrative
+simulation check, not a vehicle validation or a regenerated regression baseline.
+
+The detailed MBD report examples were generated on June 6, 2026 (ramp
+characterization) and May 27, 2026 (transient response). They are separate
+studies from these animations. Both report workflows remain in BobSim's
+`simulations/response/mbd` package.
 
 The model-fidelity page and DynPy reports use these existing saved runs:
 

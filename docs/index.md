@@ -56,27 +56,29 @@ App captures from the October 2026 source workspace. Images open at full size.
 
 ## Animations
 
-The original MBD examples show suspension motion alongside synchronized signals.
-These saved demonstrations use separate inputs from the report studies below.
+New MBD runs show the front suspension alongside synchronized steering and
+lateral-acceleration signals. Both use a 15 m/s target speed and 30° handwheel
+amplitude, producing about 7.3° mean roadwheel steer. Motion is shown at its
+simulated magnitude.
 
 <div class="sample-output-grid animation-grid">
   <article class="sample-output-card">
-    <p class="sample-output-label">MBD · Closed-loop radius control</p>
-    <video controls loop muted playsinline preload="none" poster="/images/examples/steady_state_eval.png" aria-label="MBD suspension animation with closed-loop radius control">
-      <source src="/steady_state_eval.mp4" type="video/mp4" />
-      <a href="/steady_state_eval.mp4">Radius-control animation</a>
+    <p class="sample-output-label">MBD · Ramp steering</p>
+    <video controls loop muted playsinline preload="none" poster="/images/examples/mbd-ramp.png" aria-label="New MBD front-suspension ramp-steering animation">
+      <source src="/examples/mbd-ramp.mp4" type="video/mp4" />
+      <a href="/examples/mbd-ramp.mp4">Ramp-steering animation</a>
     </video>
-    <p>PI radius-control demonstration with suspension motion and response traces.</p>
-    <div class="sample-output-links"><a href="/steady_state_eval.mp4" target="_blank" rel="noreferrer">Full-size animation</a></div>
+    <p>A 30° handwheel ramp from 1–5 s, held through 8 s. Front and perspective views show the same captured suspension geometry.</p>
+    <div class="sample-output-links"><a href="/examples/mbd-ramp.mp4" target="_blank" rel="noreferrer">Full-size animation</a></div>
   </article>
   <article class="sample-output-card">
     <p class="sample-output-label">MBD · Sinusoidal steering</p>
-    <video controls loop muted playsinline preload="none" poster="/images/examples/transient_eval.png" aria-label="MBD suspension animation with sinusoidal steering">
-      <source src="/transient_eval.mp4" type="video/mp4" />
-      <a href="/transient_eval.mp4">Sinusoidal-steering animation</a>
+    <video controls loop muted playsinline preload="none" poster="/images/examples/mbd-sine.png" aria-label="New MBD front-suspension sinusoidal-steering animation">
+      <source src="/examples/mbd-sine.mp4" type="video/mp4" />
+      <a href="/examples/mbd-sine.mp4">Sinusoidal-steering animation</a>
     </video>
-    <p>Prescribed steering input with suspension motion and lateral acceleration.</p>
-    <div class="sample-output-links"><a href="/transient_eval.mp4" target="_blank" rel="noreferrer">Full-size animation</a></div>
+    <p>A ±30° handwheel sine at 0.5 Hz, starting at 1 s. Four cycles show steering reversal and suspension response.</p>
+    <div class="sample-output-links"><a href="/examples/mbd-sine.mp4" target="_blank" rel="noreferrer">Full-size animation</a></div>
   </article>
 </div>
 
