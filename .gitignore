@@ -31,3 +31,4 @@ docs/.vitepress/dist
 
 .claude/*
 !.claude/skills/
+!.claude/settings.json
